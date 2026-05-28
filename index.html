@@ -2879,19 +2879,18 @@
                 letterRendering: true,
                 backgroundColor: '#ffffff',
                 logging: false,
-                width: w,
-                height: h,
                 windowWidth: 800,
-                scrollX: 0,
-                scrollY: 0,
-                x: 0,
-                y: 0,
-                onclone: (clonedDoc, clonedEl) => {
-                  // Make cloned element visible in its private document
-                  if (clonedEl) {
-                    clonedEl.style.position = 'static';
-                    clonedEl.style.left = 'auto';
-                    clonedEl.style.top = 'auto';
+                onclone: (clonedDoc) => {
+                  // CRITICAL: cloned wrapper still has position:absolute; left:-99999px
+                  // → html2canvas captures empty area. Reset position in clone.
+                  const cloned = clonedDoc.querySelector('.tib-pdf-root');
+                  if (cloned) {
+                    cloned.style.position = 'static';
+                    cloned.style.left = '0';
+                    cloned.style.top = '0';
+                    console.log('[TIB PDF] onclone: wrapper reset to static');
+                  } else {
+                    console.warn('[TIB PDF] onclone: .tib-pdf-root not found in clone');
                   }
                 }
               },
