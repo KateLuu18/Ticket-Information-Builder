@@ -2824,7 +2824,9 @@
           const htmlContent = _buildExportHTML(entries);
           if (!htmlContent) return reject(new Error('Empty content'));
           const wrapper = document.createElement('div');
-          wrapper.style.cssText = 'position:fixed;top:-9999px;left:0;width:800px;background:#fff;';
+          // CRITICAL: render IN viewport (left:0/top:0) but invisible via opacity+z-index
+          // off-screen (top:-9999px) can be skipped by browser paint optimizer → blank canvas
+          wrapper.style.cssText = 'position:fixed;left:0;top:0;width:800px;background:#fff;z-index:-99999;opacity:0;pointer-events:none;';
           wrapper.innerHTML = htmlContent.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<\/?head[^>]*>|<\/?body[^>]*>|<meta[^>]*>|<title[^>]*>[^<]*<\/title>|<style[\s\S]*?<\/style>/gi, '');
           const styleMatch = htmlContent.match(/<style>([\s\S]*?)<\/style>/);
           if (styleMatch) {
@@ -2835,19 +2837,32 @@
           wrapper.querySelectorAll('.no-print').forEach(el => el.remove());
           document.body.appendChild(wrapper);
 
-          html2pdf().set({
-            margin: [8, 8, 8, 8],
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['css', 'legacy'], before: '.service-block' }
-          }).from(wrapper).outputPdf('blob').then(blob => {
-            document.body.removeChild(wrapper);
-            resolve(blob);
-          }).catch(err => {
-            try { document.body.removeChild(wrapper); } catch(e){}
-            reject(err);
-          });
+          // Wait 1 frame for layout/fonts to settle before html2canvas snapshot
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            html2pdf().set({
+              margin: [8, 8, 8, 8],
+              image: { type: 'jpeg', quality: 0.95 },
+              html2canvas: {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                width: 800,
+                windowWidth: 800,
+                scrollX: 0,
+                scrollY: 0,
+                logging: false,
+                backgroundColor: '#ffffff'
+              },
+              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+              pagebreak: { mode: ['css', 'legacy'], before: '.service-block' }
+            }).from(wrapper).outputPdf('blob').then(blob => {
+              try { document.body.removeChild(wrapper); } catch(e){}
+              resolve(blob);
+            }).catch(err => {
+              try { document.body.removeChild(wrapper); } catch(e){}
+              reject(err);
+            });
+          }));
         } catch (err) { reject(err); }
       });
     }
