@@ -1200,8 +1200,8 @@
       if (!entries || !entries.length) return '';
 
       const now = new Date();
-      const dateStr = now.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
-      const timeStr = now.toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit' });
+      const dateStr = now.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', timeZone: 'Asia/Ho_Chi_Minh' });
+      const timeStr = now.toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' });
 
       // Helper: render badge html for PDF
       function badge(text, color) {
@@ -2789,9 +2789,15 @@
       return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase().slice(0, maxLen || 60);
     }
     function _timestamp() {
-      const pad = n => String(n).padStart(2, '0');
-      const d = new Date();
-      return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes());
+      // Force Asia/Ho_Chi_Minh timezone regardless of browser locale
+      const fmt = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', hour12: false
+      }).formatToParts(new Date());
+      const p = {};
+      fmt.forEach(x => { if (x.type !== 'literal') p[x.type] = x.value; });
+      return p.year + p.month + p.day + '-' + p.hour + p.minute;
     }
     function _triggerDownload(blob, filename) {
       const url = URL.createObjectURL(blob);
@@ -2926,7 +2932,7 @@
         const readme = '═══════════════════════════════════════════════\n'
           + 'Nexus Ticket Information Builder — File Bundle\n'
           + '═══════════════════════════════════════════════\n\n'
-          + 'Tạo lúc: ' + new Date().toLocaleString('vi-VN') + '\n'
+          + 'Tạo lúc: ' + new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }) + '\n'
           + 'Số service: ' + entries.length + '\n\n'
           + 'NỘI DUNG GÓI:\n'
           + '─────────────\n'
