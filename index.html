@@ -7,7 +7,6 @@
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <!-- Google Fonts Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
@@ -170,10 +169,14 @@
 
 #fta-modal .fta-subs { display: none; flex-direction: column; gap: 7px; }
 #fta-modal .fta-subs.visible { display: flex; }
-#fta-modal .fta-sub { width: 100%; padding: 11px 14px; text-align: left; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; color: #334155; transition: all 0.15s; }
+#fta-modal .fta-sub { width: 100%; padding: 11px 14px; text-align: left; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; color: #334155; transition: all 0.15s; display: flex; align-items: flex-start; gap: 11px; }
 #fta-modal .fta-sub:hover { border-color: #ADE3FF; background: #f5f9ff; }
 #fta-modal .fta-sub.active { border-color: #155DFC; background: #eef4ff; color: #155DFC; }
 #fta-modal .fta-sub .s-note { display: block; font-size: 11.5px; font-weight: 500; color: #94a3b8; margin-top: 3px; }
+#fta-modal .fta-sub-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: #EFF6FF; border: 0.5px solid #BFDBFE; color: #155DFC; flex-shrink: 0; }
+#fta-modal .fta-sub.active .fta-sub-icon { background: #DBEAFE; border-color: #93C5FD; }
+#fta-modal .fta-sub-text { flex: 1; min-width: 0; }
+#fta-modal .fta-sub-title { display: block; }
 
 #fta-modal .fta-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid #f1f5f9; }
 #fta-modal .fta-btn-back { padding: 8px 16px; background: #fff; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; }
@@ -241,7 +244,7 @@
           </button>
           <div id="svc-dropdown" class="absolute top-full right-0 mt-2 w-96 bg-white border border-slate-200 rounded-2xl shadow-xl z-[200] hidden">
             <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-              <span class="font-bold text-sm text-slate-800">Services trong session</span>
+              <span class="font-bold text-sm text-slate-800">Services in session</span>
               <button onclick="closeServiceDropdown()" class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition text-xs">✕</button>
             </div>
             <div id="svc-dropdown-list" class="max-h-72 overflow-y-auto custom-scrollbar p-2"></div>
@@ -249,9 +252,36 @@
           </div>
         </div>
 
-        <button onclick="toggleLanguage()" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg transition">
-          <span class="text-sm">🌐</span> <span id="lang-indicator">VI</span>
-        </button>
+        <div class="relative">
+          <button class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg transition" onclick="toggleTemplateMenu(event)" title="Apply an example field template">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            <span>Examples</span>
+          </button>
+          <div id="template-menu" class="hidden absolute right-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1.5">
+            <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Form examples</div>
+            <button class="w-full flex items-start gap-3 px-3 py-2.5 hover:bg-slate-50 text-left transition" onclick="applyFieldTemplate('test_all_types_1')">
+              <div class="w-8 h-8 rounded-lg bg-blue-50 text-nexus flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v6.5L3.7 18.5A2 2 0 005.4 21h13.2a2 2 0 001.7-2.5L15 9.5V3M9 3h6M9 14h6"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-xs font-bold text-slate-800">All field types</div>
+                <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">12 fields · Label, Text, Number, Email, Boolean, Date, DateRange, Select, Radio, Checkbox, Upload, Textarea</div>
+              </div>
+            </button>
+            <button class="w-full flex items-start gap-3 px-3 py-2.5 hover:bg-slate-50 text-left transition" onclick="applyFieldTemplate('test_all_types_2')">
+              <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-xs font-bold text-slate-800">Conditional fields demo</div>
+                <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">8 fields · Conditional visibility, real-life Passport support form</div>
+              </div>
+            </button>
+            <div class="border-t border-slate-100 mt-1 pt-2 pb-1 px-3">
+              <div class="text-[10px] text-slate-400 italic leading-relaxed">Applying an example only replaces fields. Catalog/Category/Service and description stay the same.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -261,13 +291,13 @@
     <div class="flex items-center mb-0 px-8 pt-5 pb-0 border-b border-slate-100">
       <div class="relative flex items-center gap-3 cursor-pointer py-3 pr-2" onclick="goStep(1)" id="step-1-wrap">
         <div class="w-9 h-9 rounded-full bg-nexus text-white flex items-center justify-center text-sm font-extrabold flex-shrink-0 shadow-sm transition-all" id="step-1-badge">1</div>
-        <span class="text-base font-bold whitespace-nowrap text-nexus transition-all" id="step-1-text">Chọn dịch vụ</span>
+        <span class="text-base font-bold whitespace-nowrap text-nexus transition-all" id="step-1-text">Choose service</span>
         <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-transparent transition-all" id="step-1-underline"></div>
       </div>
       <div class="mx-5 h-px bg-slate-300 flex-shrink-0" style="width:48px"></div>
       <div class="relative flex items-center gap-3 cursor-pointer py-3 pl-0" onclick="goStep(2)" id="step-2-wrap">
         <div class="w-9 h-9 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center text-sm font-extrabold flex-shrink-0 transition-all" id="step-2-badge">2</div>
-        <span class="text-base font-bold whitespace-nowrap text-slate-400 transition-all" id="step-2-text">Thiết kế form</span>
+        <span class="text-base font-bold whitespace-nowrap text-slate-400 transition-all" id="step-2-text">Design form</span>
         <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-transparent transition-all" id="step-2-underline"></div>
       </div>
       <div class="flex-1 ml-6"></div>
@@ -332,7 +362,7 @@
         <div class="w-full border-t border-slate-100 mt-3 pt-3">
           <div class="flex items-center justify-between mb-2">
             <label class="font-bold text-sm text-slate-700 flex items-center gap-1">
-              <span data-lang-key="desc_label">Mô tả dịch vụ</span> <span class="text-red-500 font-bold">*</span>
+              <span data-lang-key="desc_label">Service description</span> <span class="text-red-500 font-bold">*</span>
             </label>
             <div class="text-xs font-semibold text-slate-400" id="wcount">0 / 100 words</div>
           </div>
@@ -342,7 +372,7 @@
 
       <div style="display:flex;align-items:center;justify-content:flex-end;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
         <button class="flex items-center gap-2 bg-slate-100 text-slate-400 font-bold px-5 py-3 rounded-xl transition" id="next-btn" onclick="goStep(2)" disabled>
-          <span data-lang-key="next_step">Tiếp theo</span>
+          <span data-lang-key="next_step">Next</span>
           <svg id="next-arrow" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
         </button>
       </div>
@@ -373,89 +403,42 @@
           <div style="background:#fff;overflow:hidden;display:flex;flex-direction:column;flex:1;">
             <div class="px-8 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-slate-800" data-lang-key="fields_title">Danh sách Câu hỏi</span>
+                <span class="font-bold text-slate-800">Fields</span>
                 <span class="bg-nexus/10 text-nexus text-xs px-2.5 py-0.5 rounded-full font-bold" id="field-count">0</span>
               </div>
-              
-              <div class="flex items-center gap-2">
-                <div class="relative">
-                  <button class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition" onclick="toggleTemplateMenu(event)" title="Áp dụng tập field mẫu để test rendering">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                    Template mẫu
-                  </button>
-                  <div id="template-menu" class="hidden absolute right-0 mt-1.5 w-80 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1.5">
-                    <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">Template mẫu — testing tools</div>
-                    <button class="w-full flex items-start gap-3 px-3 py-2.5 hover:bg-slate-50 text-left transition" onclick="applyFieldTemplate('test_all_types_1')">
-                      <div class="w-8 h-8 rounded-lg bg-blue-50 text-nexus flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3v6.5L3.7 18.5A2 2 0 005.4 21h13.2a2 2 0 001.7-2.5L15 9.5V3M9 3h6M9 14h6"/></svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="text-xs font-bold text-slate-800">Test — All field types</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">12 fields · Label, Text, Number, Email, Boolean, Date, DateRange, Select, Radio, Checkbox, Upload, Textarea</div>
-                      </div>
-                    </button>
-                    <button class="w-full flex items-start gap-3 px-3 py-2.5 hover:bg-slate-50 text-left transition" onclick="applyFieldTemplate('test_all_types_2')">
-                      <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="text-xs font-bold text-slate-800">Test — Branching + Conditional</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">9 fields · Branch nested fields, Conditional visibility, GAM Input</div>
-                      </div>
-                    </button>
-                    <div class="border-t border-slate-100 mt-1 pt-2 pb-1 px-3">
-                      <div class="text-[10px] text-slate-400 italic leading-relaxed">Áp dụng template chỉ thay thế fields. Catalog/Category/Service và Mô tả dịch vụ vẫn giữ nguyên.</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="advisor-btn-wrap">
-                  <button class="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-nexus text-nexus hover:bg-nexus-light transition" onclick="openAdvisor()" title="Không biết chọn type gì? Để tool gợi ý cho bạn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                    Gợi ý type
-                  </button>
-                  <span class="advisor-pulse-dot" id="advisor-pulse" aria-hidden="true">
-                    <span class="advisor-pulse-ring"></span>
-                    <span class="advisor-pulse-core"></span>
-                  </span>
-                </div>
-                <button class="bg-nexus hover:bg-nexus-hover text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1" onclick="openTypePicker()">
-                  <span>+</span> <span data-lang-key="add_field">Thêm Field</span>
+              <!-- Plain "+ New field" — opens Type Picker which has Advisor banner inside -->
+              <div class="relative inline-flex items-center advisor-btn-wrap">
+                <button onclick="openTypePicker()" class="bg-nexus hover:bg-nexus-hover text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition flex items-center gap-1" title="Add a new field — pick a type, or get a suggestion from the Advisor inside">
+                  <span>+</span> <span>New field</span>
                 </button>
+                <span class="advisor-pulse-dot" id="advisor-pulse" aria-hidden="true">
+                  <span class="advisor-pulse-ring"></span>
+                  <span class="advisor-pulse-core"></span>
+                </span>
               </div>
             </div>
 
             <div class="px-8 py-5">
-              <!-- Empty state: 3 CTA cards -->
-              <div id="empty-placeholder" class="py-6">
-                <div class="text-center mb-5">
-                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-100 mb-3">
-                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" d="M8 8h8M8 12h8M8 16h5"/></svg>
-                  </div>
-                  <div class="font-bold text-sm text-slate-700">Chưa có field nào</div>
-                  <div class="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">Thêm field để thiết kế ticket form, hoặc chọn điểm bắt đầu bên dưới.</div>
+              <!-- Empty state V2: Hero + 2 CTAs + helper -->
+              <div id="empty-placeholder" class="py-8 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-3" style="background:linear-gradient(135deg,#DBEAFE 0%,#EFF6FF 100%)">
+                  <svg class="w-8 h-8 text-nexus" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 8h8M8 12h8M8 16h5"/></svg>
                 </div>
-                <div class="grid grid-cols-3 gap-3">
-                  <button onclick="openTypePicker()" class="flex flex-col items-center gap-2 border border-slate-200 hover:border-nexus hover:bg-nexus/5 rounded-xl p-4 text-center transition group">
-                    <div class="w-9 h-9 rounded-lg bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition">
-                      <svg class="w-5 h-5 text-nexus" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                    </div>
-                    <div class="font-bold text-xs text-slate-700">Thêm field</div>
-                    <div class="text-[10px] text-slate-400 leading-relaxed">Chọn type và cấu hình từ đầu</div>
+                <div class="font-bold text-base text-slate-800">No fields yet</div>
+                <div class="text-xs text-slate-500 mt-1 mb-5 max-w-sm mx-auto leading-relaxed">Add your first field to describe what the form should collect from the Requester. <span class="italic text-slate-400">Thêm field đầu tiên để mô tả thông tin form cần thu thập từ Requester.</span></div>
+                <div class="flex items-center justify-center gap-2 mb-4">
+                  <button onclick="openTypePicker()" class="bg-nexus hover:bg-nexus-hover text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    Add first field
                   </button>
-                  <button onclick="openAdvisor()" class="flex flex-col items-center gap-2 border border-slate-200 hover:border-violet-400 hover:bg-violet-50/50 rounded-xl p-4 text-center transition group">
-                    <div class="w-9 h-9 rounded-lg bg-violet-50 group-hover:bg-violet-100 flex items-center justify-center transition">
-                      <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                    </div>
-                    <div class="font-bold text-xs text-slate-700">Gợi ý type</div>
-                    <div class="text-[10px] text-slate-400 leading-relaxed">Advisor hướng dẫn chọn field</div>
+                  <button onclick="toggleTemplateMenu(event)" class="bg-white hover:bg-slate-50 text-nexus text-xs font-bold px-4 py-2.5 rounded-lg border border-nexus-border transition flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    Try an example
                   </button>
-                  <button onclick="toggleTemplateMenu(event)" class="flex flex-col items-center gap-2 border border-slate-200 hover:border-orange-400 hover:bg-orange-50/50 rounded-xl p-4 text-center transition group">
-                    <div class="w-9 h-9 rounded-lg bg-orange-50 group-hover:bg-orange-100 flex items-center justify-center transition">
-                      <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </div>
-                    <div class="font-bold text-xs text-slate-700">Template mẫu</div>
-                    <div class="text-[10px] text-slate-400 leading-relaxed">Dùng form test để xem preview</div>
-                  </button>
+                </div>
+                <div class="text-[11px] text-slate-400 inline-flex items-center gap-1.5 justify-center">
+                  <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                  Not sure where to start? <span class="italic text-slate-300 ml-1">Không biết bắt đầu từ đâu?</span> <button onclick="openAdvisor()" class="text-nexus hover:underline font-bold ml-0.5">Let me suggest →</button>
                 </div>
               </div>
               
@@ -485,21 +468,21 @@
         <div class="flex items-center gap-2">
           <button class="flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold px-5 py-3 rounded-xl transition" onclick="goBackFromStep2()">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5 5-5M18 12H6"/></svg>
-            <span data-lang-key="back">Quay lại</span>
+            <span data-lang-key="back">Back</span>
           </button>
-          <button class="flex items-center gap-2 bg-white hover:bg-red-50 border border-slate-300 hover:border-red-200 text-slate-500 hover:text-red-500 font-bold px-4 py-3 rounded-xl transition" onclick="clearCurrentFields()" title="Xóa tất cả fields trong template hiện tại">
+          <button class="flex items-center gap-2 bg-white hover:bg-red-50 border border-slate-300 hover:border-red-200 text-slate-500 hover:text-red-500 font-bold px-4 py-3 rounded-xl transition" onclick="clearCurrentFields()" title="Clear all fields in this template">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            <span>Làm mới</span>
+            <span>Reset</span>
           </button>
         </div>
         <div class="flex items-center gap-3">
-          <button class="flex items-center gap-2 bg-white hover:bg-nexus-light border border-nexus text-nexus font-bold px-5 py-3 rounded-xl transition" onclick="saveAndAddAnother()" title="Lưu template hiện tại và tạo thêm service mới">
+          <button class="flex items-center gap-2 bg-white hover:bg-nexus-light border border-nexus text-nexus font-bold px-5 py-3 rounded-xl transition" onclick="saveAndAddAnother()" title="Save current template and create another service">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            <span>Lưu & thêm service</span>
+            <span>Save &amp; add service</span>
           </button>
-          <button class="flex items-center gap-2 bg-nexus hover:bg-nexus-hover text-white font-bold px-6 py-3 rounded-xl shadow-premium transition" onclick="saveAndExportCurrent()" title="Lưu và xuất JSON + HTML cho service này">
+          <button class="flex items-center gap-2 bg-nexus hover:bg-nexus-hover text-white font-bold px-6 py-3 rounded-xl shadow-premium transition" onclick="saveAndExportCurrent()" title="Save and export JSON + HTML bundle">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            <span>Lưu & xuất</span>
+            <span>Save &amp; export</span>
           </button>
         </div>
       </div>
@@ -515,31 +498,39 @@
     <div class="fta-header">
       <div class="fta-header-text">
         <h3>Field Type Advisor</h3>
-        <p>Trả lời từng bước — nhận gợi ý field type phù hợp nhất</p>
+        <p>Answer 2-3 quick questions — we'll suggest the best field type for you</p>
       </div>
       <button class="fta-close" onclick="FieldTypeAdvisor.close(null)">✕</button>
+    </div>
+
+    <!-- Escape toolbar: Browse types instead -->
+    <div id="fta-toolbar" style="display:flex;align-items:center;justify-content:flex-end;padding:8px 18px;border-bottom:0.5px solid #f1f5f9;background:#fafbfc;">
+      <button onclick="FTA.exitToTypePicker()" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#155DFC;cursor:pointer;padding:5px 10px;border-radius:6px;border:0.5px solid #BFDBFE;background:#fff;transition:all 0.15s" onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='#fff'" title="Skip the wizard and pick a type yourself">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>
+        Browse types instead
+      </button>
     </div>
 
     <div class="fta-progress">
       <div class="fta-prog-steps">
         <div class="fta-prog-step">
           <div class="fta-dot active" id="fta-pd1">1</div>
-          <span class="fta-plabel active" id="fta-pl1">Loại dữ liệu</span>
+          <span class="fta-plabel active" id="fta-pl1">Input kind</span>
         </div>
         <div class="fta-pline" id="fta-pline1"></div>
         <div class="fta-prog-step">
           <div class="fta-dot" id="fta-pd2">2</div>
-          <span class="fta-plabel" id="fta-pl2">Chi tiết</span>
+          <span class="fta-plabel" id="fta-pl2">Detail</span>
         </div>
         <div class="fta-pline" id="fta-pline2"></div>
         <div class="fta-prog-step">
           <div class="fta-dot" id="fta-pd3">3</div>
-          <span class="fta-plabel" id="fta-pl3">Điều kiện</span>
+          <span class="fta-plabel" id="fta-pl3">Visibility</span>
         </div>
         <div class="fta-pline" id="fta-pline3"></div>
         <div class="fta-prog-step" style="flex:0">
           <div class="fta-dot" id="fta-pd4">✓</div>
-          <span class="fta-plabel" id="fta-pl4">Kết quả</span>
+          <span class="fta-plabel" id="fta-pl4">Result</span>
         </div>
       </div>
     </div>
@@ -547,116 +538,127 @@
     <div class="fta-body">
 
       <div class="fta-step visible" id="fta-step1">
-        <div class="fta-step-title"><span>Bước 1 / 3</span> — Người dùng sẽ làm gì với field này?</div>
+        <div class="fta-step-title"><span>Step 1 / 3</span> — What kind of input do you need? <span style="font-style:italic;color:#94a3b8;font-weight:500;font-size:12px">Bạn cần loại input nào?</span></div>
         <div class="fta-grid">
           <button class="fta-choice" onclick="FTA.sel1('list',this)">
             <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg></div>
             <div class="c-text">
-              <div class="c-title">Chọn từ danh sách</div>
-              <div class="c-sub">Service Owner tự cấu hình các tùy chọn có sẵn cho người dùng chọn.</div>
+              <div class="c-title">Pick from a list</div>
+              <div class="c-sub"><i>User chọn từ list cấu hình sẵn — status, category, platform...</i></div>
             </div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('input',this)">
             <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
             <div class="c-text">
-              <div class="c-title">Tự nhập nội dung</div>
-              <div class="c-sub">Nhập trực tiếp các định dạng văn bản, số, email hoặc boolean.</div>
+              <div class="c-title">Type text or numbers</div>
+              <div class="c-sub"><i>User tự nhập — tên, email, ID, mô tả...</i></div>
             </div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('date',this)">
             <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
             <div class="c-text">
-              <div class="c-title">Ngày / Thời gian</div>
-              <div class="c-sub">Lựa chọn mốc thời gian cụ thể hoặc một khoảng thời gian mong muốn.</div>
+              <div class="c-title">Date or time range</div>
+              <div class="c-sub"><i>1 ngày cụ thể, hoặc khoảng từ → đến.</i></div>
             </div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('file',this)">
             <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div>
             <div class="c-text">
-              <div class="c-title">Đính kèm file</div>
-              <div class="c-sub">Hỗ trợ người dùng tải các tập tin đính kèm trực tiếp lên hệ thống.</div>
+              <div class="c-title">Attach files</div>
+              <div class="c-sub"><i>User upload screenshot, document, report...</i></div>
             </div>
           </button>
           <button class="fta-choice fullwidth" onclick="FTA.sel1('display',this)">
-            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
             <div class="c-text">
-              <div class="c-title">Hiển thị thông tin</div>
-              <div class="c-sub">Hiển thị thông báo, cảnh báo hoặc liên kết hữu ích (không thu thập dữ liệu).</div>
+              <div class="c-title">Display info only</div>
+              <div class="c-sub"><i>Hiện note, warning, link — không thu thập data.</i></div>
             </div>
           </button>
         </div>
         <div class="fta-nav">
           <div></div>
-          <button class="fta-btn-next" id="fta-next1" disabled onclick="FTA.goStep(2)">Tiếp theo →</button>
+          <button class="fta-btn-next" id="fta-next1" disabled onclick="FTA.goStep(2)">Next →</button>
         </div>
       </div>
 
       <div class="fta-step" id="fta-step2">
-        <div class="fta-step-title"><span>Bước 2 / 3</span> — Chi tiết hơn về loại dữ liệu này?</div>
+        <div class="fta-step-title"><span>Step 2 / 3</span> — Tell me more about the data <span style="font-style:italic;color:#94a3b8;font-weight:500;font-size:12px">Mô tả chi tiết hơn về dữ liệu</span></div>
 
         <div id="fta-sub-list" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('list-segmented',this)">Dưới 5 lựa chọn — hiện thẳng ra ngoài (vd: iOS / Android / PC)<span class="s-note">Người dùng thấy tất cả option ngay, không cần bấm mở</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-dropdown',this)">5 đến 30 lựa chọn — thu gọn vào dropdown (vd: Hạng mục lỗi)<span class="s-note">Giúp form không bị dài, tránh lỗi gõ tay</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-checkbox',this)">Cho phép chọn nhiều mục cùng lúc (Multi-select)<span class="s-note">Giá trị lưu dạng mảng Array</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-checklist',this)">Danh sách đầu việc cần tích hoàn thành (Todo-style)<span class="s-note">Dùng cho checklist vận hành nội bộ</span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-segmented',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="6" height="12" rx="1"/><rect x="11" y="6" width="4" height="12" rx="1"/><rect x="17" y="6" width="4" height="12" rx="1"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Under 5 options — shown inline (e.g. iOS / Android / PC)</span><span class="s-note"><i>Dưới 5 lựa chọn — hiện thẳng ra ngoài, không cần bấm dropdown</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-dropdown',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="4" rx="1"/><polyline points="7 14 12 19 17 14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">5 to 30 options — collapsed in a dropdown</span><span class="s-note"><i>5-30 lựa chọn — thu gọn vào dropdown, giúp form không bị dài</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-checkbox',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Multiple values at once (multi-select)</span><span class="s-note"><i>Cho user chọn nhiều giá trị cùng lúc — lưu dạng mảng (array)</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-checklist',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Todo-style checklist — items to tick off</span><span class="s-note"><i>Danh sách đầu việc cần tích hoàn thành — dùng cho checklist vận hành</i></span></span></button>
         </div>
         <div id="fta-sub-input" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('text-short',this)">Chuỗi ngắn — dưới 100 ký tự (vd: Họ tên, Tên game, Mã yêu cầu)<span class="s-note">⚠️ Dùng khi giá trị có thể chứa cả chữ lẫn số (vd: TXN-001, ABC123)</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('text-long',this)">Mô tả dài / Giải trình chi tiết (nhiều dòng)<span class="s-note">Không giới hạn ký tự, phù hợp mô tả lỗi hoặc yêu cầu phức tạp</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('text-email',this)">Địa chỉ email<span class="s-note">Tự động kiểm tra định dạng có @ và tên miền hợp lệ</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('num-calc',this)">Số lượng thuần túy (vd: Số key, Số ngày phép)<span class="s-note">⚠️ Chỉ dùng khi giá trị là số thuần — không chứa bất kỳ ký tự chữ nào</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('num-bool',this)">Xác nhận Có / Không (vd: Đồng ý điều khoản, Đã kiểm tra)<span class="s-note">Người dùng chỉ tích hoặc bỏ tích — không nhập gì thêm</span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-short',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="6" y="17" font-size="14" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">T</text><line x1="12" y1="18" x2="20" y2="18"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Short text — under 100 chars (name, code, ID)</span><span class="s-note"><i>Chuỗi ngắn có cả chữ + số (vd: TXN-001, ABC123)</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-long',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Long description (multi-line)</span><span class="s-note"><i>Mô tả dài nhiều dòng — không giới hạn ký tự, phù hợp mô tả lỗi</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-email',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Email address</span><span class="s-note"><i>Tự động kiểm tra định dạng có @ và domain hợp lệ</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('num-calc',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="6" y="17" font-size="13" font-weight="bold" stroke="none" fill="currentColor" font-family="sans-serif">#</text></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Pure number (e.g. count, days, port)</span><span class="s-note"><i>Chỉ dùng khi giá trị là SỐ THUẦN — không chứa chữ nào</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('num-bool',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Yes / No confirmation</span><span class="s-note"><i>User chỉ tick/bỏ tick — đồng ý điều khoản, đã kiểm tra...</i></span></span></button>
         </div>
         <div id="fta-sub-date" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('spec-date',this)">Một ngày cụ thể (vd: Ngày phát sinh lỗi, Ngày release)<span class="s-note">Lưu dạng ISO YYYY-MM-DD</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('spec-daterange',this)">Khoảng thời gian — từ ngày đến ngày (vd: Thời gian bảo trì)<span class="s-note">Lưu dạng mảng [start, end]</span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-date',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A single date (e.g. incident date, release date)</span><span class="s-note"><i>Một ngày cụ thể — lưu dạng ISO YYYY-MM-DD</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-daterange',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A date range — from → to (e.g. maintenance window)</span><span class="s-note"><i>Khoảng thời gian từ → đến — lưu dạng [start, end]</i></span></span></button>
         </div>
         <div id="fta-sub-file" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('spec-file',this)">Người dùng upload file lên ticket (vd: Ảnh sự cố, Báo cáo Excel)<span class="s-note">Cấu hình được định dạng cho phép: image/*, .xlsx, .pdf…</span></button>
-          <div class="fta-info fta-info-blue">💡 Cần vừa đính kèm link tải template vừa cho user upload? Chọn <strong>Hiển thị thông tin</strong> ở Bước 1.</div>
+          <button class="fta-sub" onclick="FTA.sel2('spec-file',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">User uploads files (e.g. screenshots, Excel reports)</span><span class="s-note"><i>User tải file lên ticket — config được format: image/*, .xlsx, .pdf...</i></span></span></button>
+          <div class="fta-info fta-info-blue">💡 Need to share a template link AND let users upload? Pick <strong>Display info only</strong> in Step 1. <span style="font-style:italic;color:#94a3b8">Cần vừa share link template vừa cho user upload? Chọn "Display info only" ở Step 1.</span></div>
         </div>
         <div id="fta-sub-display" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('label-text',this)">Thông báo / Cảnh báo / Hướng dẫn (chỉ hiển thị, không collect data)<span class="s-note">Hỗ trợ Rich Text — có thể in đậm, in nghiêng, chèn link</span></button>
-          <button class="fta-sub" onclick="FTA.sel2('label-link',this)">Thông báo kèm link tải file template + cho user upload lại<span class="s-note">Dùng 2 fields liên tiếp: label (thông báo + link) → attachment (upload)</span></button>
+          <button class="fta-sub" onclick="FTA.sel2('label-text',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="5" y="17" font-size="14" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">H</text></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice / warning / guide (display only)</span><span class="s-note"><i>Hỗ trợ Rich Text — bold, italic, link nhúng</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('label-link',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="3" y="13" font-size="9" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">H</text><path d="M14 13l-3 3a2.5 2.5 0 1 1-3.5-3.5l3-3"/><path d="M10 13l3-3a2.5 2.5 0 1 1 3.5 3.5l-3 3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice + template link + upload combo</span><span class="s-note"><i>Tạo 2 fields liên tiếp: label (link) → attachment (upload)</i></span></span></button>
         </div>
 
         <div class="fta-nav">
-          <button class="fta-btn-back" onclick="FTA.goStep(1)">← Quay lại</button>
-          <button class="fta-btn-next" id="fta-next2" disabled onclick="FTA.goStep(3)">Tiếp theo →</button>
+          <button class="fta-btn-back" onclick="FTA.goStep(1)">← Back</button>
+          <button class="fta-btn-next" id="fta-next2" disabled onclick="FTA.goStep(3)">Next →</button>
         </div>
       </div>
 
       <div class="fta-step" id="fta-step3">
-        <div class="fta-step-title"><span>Bước 3 / 3</span> — Field này có câu hỏi theo điều kiện không?</div>
+        <div class="fta-step-title"><span>Step 3 / 3</span> — Should this field always show? <span style="font-style:italic;color:#94a3b8;font-weight:500;font-size:12px">Field này có luôn hiển thị không?</span></div>
         <div style="display:flex;flex-direction:column;gap:7px">
-          <button class="fta-sub" id="fta-cond-no" onclick="FTA.selCond('no',this)">Không cần — field luôn hiển thị với tất cả người dùng<span class="s-note">Field độc lập, không phụ thuộc vào lựa chọn nào khác</span></button>
-          <button class="fta-sub" id="fta-cond-yes" onclick="FTA.selCond('yes',this)">Có — chọn option nào thì hiện câu hỏi tương ứng option đó<span class="s-note">Ví dụ: chọn "iOS" → hiện thêm "App Store ID"; chọn "Android" → hiện "Play Store ID"</span></button>
+          <button class="fta-sub" id="fta-cond-no" onclick="FTA.selCond('no',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Always visible — to every user</span><span class="s-note"><i>Field độc lập, không phụ thuộc vào lựa chọn nào khác</i></span></span></button>
+          <button class="fta-sub" id="fta-cond-yes" onclick="FTA.selCond('yes',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><path d="M9 6h6"/><path d="M15 6l-3 -3"/><path d="M15 6l-3 3"/><circle cx="18" cy="18" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Conditional — show based on another answer</span><span class="s-note"><i>VD: chọn "iOS" → hiện thêm "App Store ID"; chọn "Android" → hiện "Play Store ID"</i></span></span></button>
         </div>
         <div class="fta-nav">
-          <button class="fta-btn-back" onclick="FTA.goStep(2)">← Quay lại</button>
-          <button class="fta-btn-next" id="fta-next3" disabled onclick="FTA.showResult()">Xem kết quả →</button>
+          <button class="fta-btn-back" onclick="FTA.goStep(2)">← Back</button>
+          <button class="fta-btn-next" id="fta-next3" disabled onclick="FTA.showResult()">See result →</button>
         </div>
       </div>
 
       <div class="fta-result" id="fta-result">
-        <div class="fta-result-header">
-          <span class="r-badge">🎯 Gợi ý field type</span>
-          <div class="r-name" id="fta-r-name"></div>
+        <div class="fta-result-header" style="display:flex;align-items:center;gap:12px;padding:14px 16px;">
+          <div id="fta-r-icon" style="width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05)"></div>
+          <div style="flex:1;min-width:0">
+            <span class="r-badge">🎯 Recommended for you</span>
+            <div class="r-name" id="fta-r-name"></div>
+          </div>
         </div>
         <div class="fta-result-body">
           <div class="fta-result-desc" id="fta-r-desc"></div>
           <div class="fta-result-cfg" id="fta-r-cfg"></div>
           <div class="fta-result-callout" id="fta-r-callout"></div>
           <div class="fta-result-sim">
-            <span class="sim-lbl">💻 Mô phỏng giao diện</span>
+            <span class="sim-lbl">💻 Live preview</span>
             <div id="fta-r-sim"></div>
+          </div>
+          <!-- Close alternatives with "why not" -->
+          <div id="fta-r-alts" style="display:none;margin-top:4px;padding-top:14px;border-top:0.5px solid #e2e8f0">
+            <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>
+              Close alternatives — and why we didn't pick them
+            </div>
+            <div id="fta-r-alts-list" style="display:flex;flex-direction:column;gap:6px"></div>
           </div>
         </div>
         <div class="fta-pills" id="fta-pills"></div>
         <div class="fta-actions">
-          <button class="fta-btn-apply" id="fta-btn-apply" onclick="FTA.apply()">✓ Áp dụng type này</button>
-          <button class="fta-btn-skip" onclick="FieldTypeAdvisor.close(null)">Bỏ qua</button>
-          <button class="fta-btn-restart" onclick="FTA.reset()">↺</button>
+          <button class="fta-btn-apply" id="fta-btn-apply" onclick="FTA.apply()">✓ Apply this type</button>
+          <button class="fta-btn-skip" onclick="FieldTypeAdvisor.close(null)">Skip</button>
+          <button class="fta-btn-restart" onclick="FTA.reset()" title="Start over">↺</button>
         </div>
       </div>
 
@@ -671,17 +673,30 @@
       <div class="p-5 border-b border-slate-100 shrink-0">
         <div class="flex items-center justify-between">
           <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-            <span class="text-nexus">✨</span> <span data-lang-key="add_field_step1">Chọn loại câu hỏi muốn tạo</span>
+            <span class="text-nexus">✨</span> <span data-lang-key="add_field_step1">Step 1 — Choose a field type</span>
           </h3>
           <button class="text-slate-400 hover:text-slate-600 font-bold" onclick="closeTypePicker()">✕</button>
         </div>
-        <p class="text-xs text-slate-500 mt-1" data-lang-key="add_field_step1_sub">Chọn kiểu dữ liệu phù hợp để form có độ bảo vệ dữ liệu tốt nhất.</p>
+        <p class="text-xs text-slate-500 mt-1" data-lang-key="add_field_step1_sub">Pick the kind of data your user will enter. <span class="italic text-slate-400">Chọn loại dữ liệu user sẽ nhập — bạn có thể chỉnh label, options, validation ở bước sau.</span></p>
         <div class="relative mt-4">
-          <input class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold rounded-lg py-2.5 pl-9 pr-4 text-slate-800 focus:outline-none focus:border-nexus transition" id="type-search" type="text" placeholder="Tìm kiếm nhanh loại field..." oninput="filterTypeSearch(this.value)" autocomplete="off">
+          <input class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold rounded-lg py-2.5 pl-9 pr-4 text-slate-800 focus:outline-none focus:border-nexus transition" id="type-search" type="text" placeholder="Search e.g. date, country, file..." oninput="filterTypeSearch(this.value)" autocomplete="off">
           <span class="absolute left-3 top-3 text-slate-400 text-sm">🔍</span>
         </div>
       </div>
-      <div class="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-6" id="type-modal-body"></div>
+      <div class="flex-1 overflow-y-auto custom-scrollbar" id="type-modal-body-wrap">
+        <!-- Advisor banner pinned top (inside scroll so it scrolls with content) -->
+        <button id="tp-advisor-banner" onclick="closeTypePicker();openAdvisor()" class="w-full text-left m-5 mb-0 mr-10 px-3.5 py-3 flex items-center gap-3 transition" style="width:calc(100% - 40px);background:linear-gradient(135deg,#FEF3C7 0%,#FFFBEB 100%);border:0.5px solid #FCD34D;border-radius:12px;cursor:pointer;box-shadow:0 1px 3px rgba(245,158,11,0.1);" onmouseover="this.style.boxShadow='0 4px 12px rgba(245,158,11,0.2)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(245,158,11,0.1)'">
+          <div style="width:34px;height:34px;border-radius:9px;background:white;display:flex;align-items:center;justify-content:center;color:#f59e0b;flex-shrink:0;box-shadow:0 1px 3px rgba(245,158,11,0.15);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#78350F">Not sure which type to pick?</div>
+            <div style="font-size:11px;color:#B45309;margin-top:1px;font-style:italic">Không chắc chọn loại nào? Trả lời 2 câu hỏi → tool gợi ý cho bạn</div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" style="flex-shrink:0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <div class="p-5 space-y-6" id="type-modal-body"></div>
+      </div>
     </div>
   </div>
 
@@ -706,7 +721,7 @@
       <div class="flex-1 overflow-y-auto px-6 py-2 custom-scrollbar bg-white" id="ew-body"></div>
 
       <div class="p-4 border-t border-slate-100 bg-slate-50 shrink-0 flex items-center justify-between">
-        <button class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-xl transition" onclick="cancelEdit()" data-lang-key="cancel">Hủy</button>
+        <button class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-xl transition" onclick="cancelEdit()" data-lang-key="cancel">Cancel</button>
         <div class="flex items-center gap-2">
           <button class="bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-xl transition" id="ew-back" onclick="ewBack()" style="display:none">← Back</button>
           <button class="bg-nexus hover:bg-nexus-hover text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5" id="ew-next" onclick="ewNext()">Next →</button>
@@ -720,33 +735,33 @@
   <div id="mini-type-popup" class="fixed bg-white border border-slate-200 rounded-xl shadow-lg p-2.5 w-64 max-h-80 overflow-y-auto custom-scrollbar z-[220] transition" style="display:none"></div>
 
   <script>
-    // System Translation Matrix (VI/EN)
+    // System Translation Matrix (VI/EN) — vi key labels now in English by default per UX request
     const TRANSLATIONS = {
       vi: {
         title: "Ticket Information Builder",
-        select_preset: "-- Mẫu Form nhanh --",
+        select_preset: "-- Quick Templates --",
         preset_bug: "Báo cáo lỗi game",
         preset_access: "Cấp quyền truy cập hệ thống",
         preset_patch: "Yêu cầu Up Patch game",
-        export_excel: "Xuất Excel",
-        export_excel_full: "Xác nhận & Xuất Excel",
-        step1_name: "Chọn dịch vụ",
-        step2_name: "Thiết kế form",
+        export_excel: "Export Excel",
+        export_excel_full: "Confirm & Export Excel",
+        step1_name: "Choose service",
+        step2_name: "Design form",
         tab_service: "Service",
         tab_internal: "Internal Service",
-        select_catalog_prompt: "Vui lòng chọn Catalog...",
-        select_category_prompt: "Vui lòng chọn Category...",
-        desc_label: "Mô tả dịch vụ",
-        next_step: "Tiếp theo",
-        fields_title: "Danh sách Câu hỏi",
-        add_field: "Thêm Câu hỏi",
-        add_first_field: "Bấm vào đây để thêm câu hỏi đầu tiên",
-        add_first_field_sub: "Nhiều loại input đa dạng phù hợp cho game vận hành",
+        select_catalog_prompt: "Please select Catalog...",
+        select_category_prompt: "Please select Category...",
+        desc_label: "Service description",
+        next_step: "Next",
+        fields_title: "Fields",
+        add_field: "New field",
+        add_first_field: "Click to add your first field",
+        add_first_field_sub: "Multiple input types for game operations",
         live_preview: "Live Preview (Interactive)",
-        back: "Quay lại",
-        add_field_step1: "Chọn loại câu hỏi muốn tạo",
-        add_field_step1_sub: "Chọn kiểu dữ liệu phù hợp để form có độ bảo vệ dữ liệu tốt nhất.",
-        cancel: "Hủy"
+        back: "Back",
+        add_field_step1: "Choose field type",
+        add_field_step1_sub: "Pick the type that best matches the data you want to collect.",
+        cancel: "Cancel"
       },
       en: {
         title: "Ticket Information Builder",
@@ -1561,11 +1576,30 @@
       if (menu) menu.classList.add('hidden');
     }
 
+    // ── Split button: "+ New field" ▾ dropdown ──
+    function toggleNewFieldMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('new-field-menu');
+      if (!menu) return;
+      const isOpen = !menu.classList.contains('hidden');
+      closeNewFieldMenu();
+      if (!isOpen) {
+        menu.classList.remove('hidden');
+        setTimeout(() => {
+          document.addEventListener('click', closeNewFieldMenu, { once: true });
+        }, 0);
+      }
+    }
+    function closeNewFieldMenu() {
+      const menu = document.getElementById('new-field-menu');
+      if (menu) menu.classList.add('hidden');
+    }
+
     function applyFieldTemplate(presetId) {
       if (!presetId) return;
       closeTemplateMenu();
       if (fields.length > 0) {
-        if (!confirm('Sẽ thay thế ' + fields.length + ' field hiện tại bằng template mẫu.\n\nCatalog/Category/Service và Mô tả dịch vụ sẽ được giữ nguyên.\n\nTiếp tục?')) {
+        if (!confirm('This will replace your current ' + fields.length + ' field(s) with the example.\n\nCatalog/Category/Service and Service description will stay the same.\n\nContinue?')) {
           return;
         }
       }
@@ -1605,8 +1639,8 @@
       renderFieldList();
       renderPreview();
       sv();
-      const templateName = presetId === 'test_all_types_1' ? 'All field types' : 'Branching + Conditional';
-      toast('✅ Đã áp dụng template "' + templateName + '" — ' + fields.length + ' field');
+      const templateName = presetId === 'test_all_types_1' ? 'All field types' : 'Conditional fields demo';
+      toast('✅ Applied example "' + templateName + '" — ' + fields.length + ' fields');
     }
 
     const TYPE_GROUPS = [
@@ -2620,18 +2654,18 @@
         // Card body clickable (unless already editing this service) — opens template for edit
         const bodyClick = isEditing ? '' : 'onclick="loadServiceFromDropdown(' + i + ')"';
         const cursor = isEditing ? 'cursor-default' : 'cursor-pointer';
-        return '<div class="flex items-center gap-2.5 p-2.5 rounded-xl border ' + (isEditing ? 'border-nexus bg-blue-50/40' : 'border-slate-100 hover:border-nexus/40 hover:bg-blue-50/30') + ' transition mb-1.5 group">'
-          + '<div class="flex-1 min-w-0 ' + cursor + '" ' + bodyClick + ' title="' + (isEditing ? 'B\u1ea1n \u0111ang ch\u1ec9nh s\u1eeda template n\u00e0y' : 'Click \u0111\u1ec3 m\u1edf template') + '">'
+        return '<div class="flex items-center gap-2 p-2.5 rounded-xl border ' + (isEditing ? 'border-nexus bg-blue-50/40' : 'border-slate-100 hover:border-nexus/40 hover:bg-blue-50/30') + ' transition mb-1.5 group">'
+          + '<div class="flex-1 min-w-0 ' + cursor + '" ' + bodyClick + ' title="' + (isEditing ? 'You are currently editing this template' : 'Click to open template') + '">'
           +   '<div class="text-[13px] font-bold text-slate-800 truncate ' + (!isEditing ? 'group-hover:text-nexus transition' : '') + '">' + H(entry.service) + '</div>'
           +   '<div class="text-[10px] text-slate-400 mt-0.5 truncate">' + H(breadcrumb) + ' \u00b7 ' + fCount + ' fields</div>'
           + '</div>'
           + (isEditing
             ? '<span class="text-[10px] font-bold text-nexus bg-nexus/10 border border-nexus/30 px-2 py-0.5 rounded-md flex-shrink-0">editing</span>'
             : '<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md flex-shrink-0">saved</span>')
-          + '<button onclick="openServiceCardMenu(' + i + ',event)" class="w-7 h-7 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition flex-shrink-0" title="Th\u00eam t\u00f9y ch\u1ecdn"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>'
+          + '<button onclick="openServiceCardMenu(' + i + ',event)" class="w-7 h-7 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 flex items-center justify-center transition flex-shrink-0" title="More options"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>'
           + '</div>';
       }).join('');
-      footer.innerHTML = '<button onclick="exportAllServices()" class="flex-1 flex items-center justify-center gap-2 bg-nexus hover:bg-nexus-hover text-white font-bold text-xs px-4 py-2.5 rounded-xl transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Xu\u1ea5t t\u1ea5t c\u1ea3 (' + sessionServices.length + ' services)</button>';
+      footer.innerHTML = '<button onclick="exportAllServices()" class="flex-1 flex items-center justify-center gap-2 bg-nexus hover:bg-nexus-hover text-white font-bold text-xs px-4 py-2.5 rounded-xl transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export all (' + sessionServices.length + ' services)</button>';
     }
 
     // ── Service card 3-dot menu ──
@@ -2657,19 +2691,19 @@
         return b;
       };
 
-      const exportIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
       const tplIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+      const dlIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>';
       const delIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
 
-      menu.appendChild(makeItem(exportIcon, 'Xuất file', 'text-nexus', () => exportSingle(idx)));
-      menu.appendChild(makeItem(tplIcon, 'Use as template…', 'text-indigo-700', () => useAsTemplate(idx)));
+      menu.appendChild(makeItem(tplIcon, 'Use as template\u2026', 'text-indigo-700', () => useAsTemplate(idx)));
+      menu.appendChild(makeItem(dlIcon, 'Download', 'text-nexus', () => exportSingle(idx)));
 
       // Divider
       const div = document.createElement('div');
       div.className = 'h-px bg-slate-100 my-1';
       menu.appendChild(div);
 
-      menu.appendChild(makeItem(delIcon, 'Xóa template', 'text-red-600', () => deleteServiceFromDropdown(idx)));
+      menu.appendChild(makeItem(delIcon, 'Delete', 'text-red-600', () => deleteServiceFromDropdown(idx)));
 
       document.body.appendChild(menu);
       setTimeout(() => document.addEventListener('click', closeServiceCardMenu), 10);
@@ -2825,113 +2859,37 @@
 
     // Build PDF as Blob. RELIABLE strategy: render wrapper VISIBLE briefly during capture,
     // hide behind a loading overlay so user doesn't see the content flash.
-    function _buildPDFBlob(entries) {
-      return new Promise((resolve, reject) => {
-        let wrapper = null, styleEl = null, overlay = null;
-        const cleanup = () => {
-          try { if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper); } catch(e){}
-          try { if (styleEl && styleEl.parentNode) styleEl.parentNode.removeChild(styleEl); } catch(e){}
-          try { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay); } catch(e){}
-        };
-        try {
-          const htmlContent = _buildExportHTML(entries);
-          if (!htmlContent) return reject(new Error('Empty content'));
-
-          // 1. Style → document head, scope to .tib-pdf-root
-          const styleMatch = htmlContent.match(/<style>([\s\S]*?)<\/style>/);
-          if (styleMatch) {
-            styleEl = document.createElement('style');
-            styleEl.setAttribute('data-tib-pdf', 'true');
-            const cssText = styleMatch[1].replace(/(^|\})\s*body\s*\{/g, '$1 .tib-pdf-root {');
-            styleEl.textContent = cssText;
-            document.head.appendChild(styleEl);
-          }
-
-          // 2. Loading overlay covers entire viewport so user doesn't see wrapper flash
-          overlay = document.createElement('div');
-          overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.85);z-index:99998;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-          overlay.innerHTML = '<div style="background:#fff;padding:24px 32px;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,0.3);text-align:center;font-family:Inter,sans-serif"><div style="width:40px;height:40px;border:3px solid #155DFC;border-top-color:transparent;border-radius:50%;margin:0 auto 12px;animation:spin 0.8s linear infinite"></div><div style="font-size:14px;font-weight:600;color:#0f172a">Đang tạo PDF...</div><div style="font-size:11px;color:#64748b;margin-top:4px">Vui lòng đợi vài giây</div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
-          document.body.appendChild(overlay);
-
-          // 3. Wrapper VISIBLE (below overlay so user can't see content flash) — z-index 1
-          wrapper = document.createElement('div');
-          wrapper.className = 'tib-pdf-root';
-          wrapper.style.cssText = 'position:fixed;left:0;top:0;width:800px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#111;padding:32px 40px;box-sizing:border-box;z-index:1;';
-          wrapper.innerHTML = htmlContent.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<\/?head[^>]*>|<\/?body[^>]*>|<meta[^>]*>|<title[^>]*>[^<]*<\/title>|<style[\s\S]*?<\/style>/gi, '');
-          wrapper.querySelectorAll('.no-print').forEach(el => el.remove());
-          document.body.appendChild(wrapper);
-
-          // 4. Force layout
-          const h = wrapper.offsetHeight;
-          const w = wrapper.offsetWidth;
-          console.log('[TIB PDF] Wrapper layout:', { w, h, htmlLen: wrapper.innerHTML.length });
-          if (h < 50 || w < 50) {
-            cleanup();
-            return reject(new Error('Wrapper layout empty (h=' + h + ', w=' + w + ')'));
-          }
-
-          // 5. Wait fonts + paint, then capture
-          const startCapture = () => {
-            console.log('[TIB PDF] Starting html2pdf capture...');
-            html2pdf().set({
-              margin: [8, 8, 8, 8],
-              image: { type: 'jpeg', quality: 0.95 },
-              html2canvas: {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                letterRendering: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                windowWidth: 800
-              },
-              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-              pagebreak: { mode: ['css', 'legacy'], before: '.service-block' }
-            }).from(wrapper).outputPdf('blob').then(blob => {
-              console.log('[TIB PDF] Blob created, size:', blob.size);
-              cleanup();
-              if (blob.size < 5000) {
-                return reject(new Error('PDF blob suspiciously small (' + blob.size + ' bytes)'));
-              }
-              resolve(blob);
-            }).catch(err => {
-              console.error('[TIB PDF] html2pdf error:', err);
-              cleanup();
-              reject(err);
-            });
-          };
-
-          const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-          fontsReady.then(() => {
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-              setTimeout(startCapture, 150);
-            }));
-          });
-        } catch (err) { cleanup(); reject(err); }
-      });
+    // Build design HTML as Blob (standalone, self-contained, printable)
+    // User opens .html → browser renders → Cmd+P to save as PDF if needed
+    function _buildDesignHTMLBlob(entries) {
+      const htmlContent = _buildExportHTML(entries);
+      return new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
     }
 
-    function _dlPDF(entries) {
-      const ts = _timestamp();
-      let filename;
-      if (entries.length === 1) {
-        filename = _slug(entries[0].service||'svc', 50) + '__DESIGN.pdf';
-      } else {
-        const cats = [...new Set(entries.map(e => e.catalog))];
-        const slug = cats.length === 1 ? _slug(cats[0], 30) : 'multi';
-        filename = 'nexus-tib-' + slug + '-' + entries.length + 'svc-' + ts + '__DESIGN.pdf';
+    // Open design HTML in new tab + auto-trigger browser print dialog
+    // User chooses "Save as PDF" in dialog → reliable, native quality
+    function _dlPrintHTML(entries) {
+      const html = _buildExportHTML(entries);
+      // Inject auto-print on load (give browser ~400ms to layout)
+      // NOTE: must escape closing script and body tags as &lt;\/...&gt; so the outer HTML parser doesn't close this block early
+      const printScript = '<scr' + 'ipt>window.addEventListener("load",function(){setTimeout(function(){window.print();},400);});<\/scr' + 'ipt>';
+      const enhanced = html.replace('<\/body>', printScript + '<\/body>');
+      const blob = new Blob([enhanced], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, '_blank');
+      if (!win) {
+        URL.revokeObjectURL(url);
+        toast('\u26a0\ufe0f Browser ch\u1eb7n popup \u2014 vui l\u00f2ng cho ph\u00e9p popup r\u1ed3i th\u1eed l\u1ea1i');
+        return;
       }
-      _buildPDFBlob(entries).then(blob => {
-        _triggerDownload(blob, filename);
-      }).catch(err => {
-        toast('\u274c L\u1ed7i t\u1ea1o PDF: ' + (err.message || err));
-      });
+      // Cleanup blob URL after 2 minutes (after print dialog presumed closed)
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
     }
 
-    // ── ZIP Bundle (cả 2 file) ──
+    // ── ZIP Bundle (HTML + JSON + README) ──
     function _dlZipBundle(entries) {
       if (typeof JSZip === 'undefined') {
-        toast('\u274c JSZip ch\u01b0a load — th\u1eed l\u1ea1i sau v\u00e0i gi\u00e2y');
+        toast('\u274c JSZip ch\u01b0a load \u2014 th\u1eed l\u1ea1i sau v\u00e0i gi\u00e2y');
         return;
       }
       const ts = _timestamp();
@@ -2945,54 +2903,64 @@
         zipName = _slug(entries[0].service||'service', 60) + '.zip';
       }
 
-      toast('\u23f3 \u0110ang \u0111\u00f3ng g\u00f3i ZIP...', 6000);
+      toast('\u23f3 \u0110ang \u0111\u00f3ng g\u00f3i ZIP...', 4000);
 
-      _buildPDFBlob(entries).then(pdfBlob => {
+      try {
         const zip = new JSZip();
         if (isMulti) {
-          // Multi-service: subfolder per service for JSON + 1 combined PDF
+          // Multi-service: subfolder per service for JSON + 1 combined HTML
           entries.forEach(entry => {
             const folder = _slug(entry.service||'service', 60);
             try {
-              const jsonBlob = _buildJSONBlob(entry);
-              zip.file(folder + '/import.json', jsonBlob);
+              zip.file(folder + '/import.json', _buildJSONBlob(entry));
             } catch (e) {}
           });
-          // Combined PDF at root (chứa all services trong 1 PDF)
-          zip.file('design-all-' + entries.length + 'svc.pdf', pdfBlob);
+          // Combined design HTML at root (chứa all services)
+          zip.file('design-all-' + entries.length + 'svc.html', _buildDesignHTMLBlob(entries));
         } else {
           // Single service: flat structure
           const entry = entries[0];
-          zip.file('design.pdf', pdfBlob);
+          zip.file('design.html', _buildDesignHTMLBlob([entry]));
           zip.file('import.json', _buildJSONBlob(entry));
         }
-        // README to explain pair
-        const readme = '═══════════════════════════════════════════════\n'
-          + 'Nexus Ticket Information Builder — File Bundle\n'
-          + '═══════════════════════════════════════════════\n\n'
+        // README explains pair + print instructions
+        const readme = '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n'
+          + 'Nexus Ticket Information Builder \u2014 Bundle\n'
+          + '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n'
           + 'Tạo lúc: ' + new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }) + '\n'
           + 'Số service: ' + entries.length + '\n\n'
-          + 'NỘI DUNG GÓI:\n'
-          + '─────────────\n'
-          + '📄 design.pdf      → Bạn / team đọc & verify thiết kế form\n'
+          + 'NỘI DUNG GÓI\n'
+          + '────────────\n'
+          + '🎨 design.html      → Mở bằng browser để XEM design form (như PDF)\n'
           + '⚙️  import.json     → Gửi PIC services để import vào Nexus admin\n\n'
-          + 'LƯU Ý:\n'
-          + '──────\n'
-          + '• 2 file là 1 cặp — cùng mô tả 1 service\n'
-          + '• PDF chỉ để xem, KHÔNG dùng để import\n'
-          + '• JSON dùng để import vào Nexus, không phải để đọc trực tiếp\n';
+          + 'CÁCH SỬ DỤNG\n'
+          + '────────────\n'
+          + '1. XEM DESIGN\n'
+          + '   Double-click file design.html → mở bằng browser bất kỳ\n'
+          + '   (Chrome, Safari, Firefox, Edge... đều OK)\n\n'
+          + '2. LƯU PDF (nếu cần)\n'
+          + '   Mở design.html → bấm Cmd+P (Mac) / Ctrl+P (Windows)\n'
+          + '   → chọn destination "Save as PDF" → Save\n\n'
+          + '3. IMPORT VÀO NEXUS\n'
+          + '   PIC services nhận import.json → upload vào Nexus admin\n\n'
+          + 'LƯU Ý\n'
+          + '─────\n'
+          + '• HTML đọc được trên MỌI máy có browser — không cần cài thêm gì\n'
+          + '• HTML self-contained — không phụ thuộc internet\n'
+          + '• JSON dùng để IMPORT, KHÔNG đọc trực tiếp\n'
+          + '• 2 file là 1 cặp — cùng mô tả 1 service\n';
         zip.file('README.txt', readme);
 
         zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
           .then(blob => {
             _triggerDownload(blob, zipName);
-            toast('\u2705 \u0110\u00e3 t\u1ea3i ' + zipName + ' \u2014 extract: design.pdf \u0111\u1ec3 xem, import.json g\u1eedi PIC', 5000);
+            toast('\u2705 \u0110\u00e3 t\u1ea3i ' + zipName + ' \u2014 \u0111\u1ecdc README.txt b\u00ean trong', 5000);
           }).catch(err => {
             toast('\u274c L\u1ed7i \u0111\u00f3ng g\u00f3i ZIP: ' + (err.message || err));
           });
-      }).catch(err => {
-        toast('\u274c L\u1ed7i t\u1ea1o PDF: ' + (err.message || err));
-      });
+      } catch (err) {
+        toast('\u274c L\u1ed7i: ' + (err.message || err));
+      }
     }
 
     function doExport(format) {
@@ -3003,12 +2971,12 @@
       const label = ctx.label || '';
       if (format === 'json') {
         _dlJSON(entries);
-        toast('\u2705 \u0110ang t\u1ea3i ' + entries.length + ' file JSON' + (label ? ' — ' + label : ''));
+        toast('\u2705 \u0110ang t\u1ea3i ' + entries.length + ' file JSON' + (label ? ' \u2014 ' + label : ''));
       } else if (format === 'html') {
-        _dlPDF(entries);
-        toast('\u2705 \u0110ang t\u1ea3i file PDF' + (label ? ' — ' + label : ''));
+        _dlPrintHTML(entries);
+        toast('\u2705 M\u1edf print dialog \u2014 ch\u1ecdn "Save as PDF" \u0111\u1ec3 l\u01b0u', 4000);
       } else {
-        // 'both' → ZIP bundle (PDF + JSON + README)
+        // 'both' → ZIP bundle (HTML + JSON + README)
         _dlZipBundle(entries);
       }
       _exportCtx = null;
@@ -3021,10 +2989,10 @@
       pop.id = '_export_pop';
       pop.style.cssText = 'position:fixed;z-index:400;width:280px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.12);';
       pop.innerHTML = '<div style="font-size:11px;font-weight:600;color:#94a3b8;padding:6px 10px 4px">Ch\u1ecdn \u0111\u1ecbnh d\u1ea1ng xu\u1ea5t</div>'
-        + _popItem('both', '#EFF6FF', '#155DFC', 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4', 'B\u1ed9 \u0111\u1ea7y \u0111\u1ee7 (ZIP)', 'PDF + JSON + README \u2014 1 file \u0111\u1ec3 g\u1eedi', true)
+        + _popItem('both', '#EFF6FF', '#155DFC', 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4', 'B\u1ed9 \u0111\u1ea7y \u0111\u1ee7 (ZIP)', 'JSON + design HTML + README', true)
         + '<div style="height:0.5px;background:#f1f5f9;margin:2px 10px"></div>'
         + _popItem('json', '#FFF7ED', '#BA7517', 'M17 8l4 4-4 4M7 8l-4 4 4 4M14 4l-4 16', 'Ch\u1ec9 JSON', 'G\u1eedi PIC services import Nexus', false)
-        + _popItem('html', '#E1F5EE', '#0F6E56', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'Ch\u1ec9 PDF', 'B\u1ea1n / team \u0111\u1ecdc & verify', false);
+        + _popItem('html', '#E1F5EE', '#0F6E56', 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z', 'In ra PDF', 'M\u1edf dialog Save as PDF c\u1ee7a browser', false);
       document.body.appendChild(pop);
       // Position above button
       const rect = btnEl.getBoundingClientRect();
@@ -3038,14 +3006,14 @@
       setTimeout(() => document.addEventListener('click', _popClickOutside), 10);
     }
     function _popItem(fmt, bg, color, iconPath, title, desc, recommended) {
-      return '<div onclick="doExport(\'' + fmt + '\')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;'
+      return '<div onclick="doExport(\'' + fmt + '\')" style="display:flex;align-items:center;gap:10px;padding:11px 10px;border-radius:10px;cursor:pointer;'
         + (recommended ? 'background:#F8FAFF;border:0.5px solid #BFDBFE;' : '')
         + '" onmouseover="if(!this.style.borderColor)this.style.background=\'#f8fafc\'" onmouseout="if(!this.style.borderColor)this.style.background=\'\'"">'
         + '<div style="width:32px;height:32px;border-radius:8px;background:' + bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
         + '<svg style="width:16px;height:16px" fill="none" stroke="' + color + '" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="' + iconPath + '"/></svg></div>'
-        + '<div><div style="font-size:13px;font-weight:600;color:#1e293b">' + title
+        + '<div style="font-size:13px;font-weight:600;color:#1e293b;flex:1">' + title
         + (recommended ? '<span style="font-size:9px;font-weight:600;background:#EFF6FF;color:#155DFC;padding:1px 6px;border-radius:4px;margin-left:6px">khuy\u00ean d\u00f9ng</span>' : '')
-        + '</div><div style="font-size:11px;color:#94a3b8;margin-top:1px">' + desc + '</div></div></div>';
+        + '</div></div>';
     }
     function closeExportPopover() {
       const el = document.getElementById('_export_pop');
@@ -3062,14 +3030,18 @@
     function exportSingle(idx) {
       if (idx < 0 || idx >= sessionServices.length) return;
       const entry = sessionServices[idx];
-      const btn = event && event.currentTarget ? event.currentTarget : document.getElementById('session-counter');
-      showExportPopover(btn, [entry], entry.service);
+      // 1-click ZIP download — no popover
+      _exportCtx = { entries: [entry], label: entry.service };
+      _dlZipBundle([entry]);
+      _exportCtx = null;
     }
     function exportAllServices() {
       if (sel.n && fields.length) saveCurrentService();
       if (!sessionServices.length) { toast('\u26a0\ufe0f Ch\u01b0a c\u00f3 service n\u00e0o.'); return; }
-      const btn = event && event.currentTarget ? event.currentTarget : document.getElementById('session-counter');
-      showExportPopover(btn, [...sessionServices], sessionServices.length + ' services');
+      // 1-click ZIP download — no popover
+      _exportCtx = { entries: [...sessionServices], label: sessionServices.length + ' services' };
+      _dlZipBundle([...sessionServices]);
+      _exportCtx = null;
     }
     function saveAndExportCurrent() {
       if (!sel.n) { toast('\u26a0\ufe0f Ch\u01b0a ch\u1ecdn service!'); return; }
@@ -3081,8 +3053,9 @@
       saveCurrentService();
       const entry = sessionServices.find(s => s.catalog === sel.s && s.category === sel.g && s.service === sel.n);
       if (!entry) { toast('\u274c Kh\u00f4ng t\u00ecm th\u1ea5y service'); return; }
-      const btn = event && event.currentTarget ? event.currentTarget : document.querySelector('[onclick*="saveAndExportCurrent"]');
-      showExportPopover(btn, [entry], entry.service);
+      _exportCtx = { entries: [entry], label: entry.service };
+      _dlZipBundle([entry]);
+      _exportCtx = null;
     }
         function showCancelBanner() {} // no-op (UI banner not implemented)
     function hideCancelBanner() {} // no-op
@@ -3163,8 +3136,61 @@
         sim: '<div style="padding:8px 10px;background:#eef4ff;border-left:3px solid #155DFC;border-radius:4px;font-size:11px;color:#1e3a8a">📥 Tải template <a href="#" style="color:#155DFC;text-decoration:underline;font-weight:700">tại đây</a> rồi upload lại bên dưới.</div>' }
     };
 
-    const FTA_CAT_LABEL = { list: 'Chọn từ danh sách', input: 'Tự nhập', date: 'Ngày / Thời gian', file: 'File đính kèm', display: 'Hiển thị thông tin' };
+    const FTA_CAT_LABEL = { list: 'Pick from list', input: 'Type input', date: 'Date / Time', file: 'File attachment', display: 'Display info' };
     const FTA_SUB_ID = { list: 'fta-sub-list', input: 'fta-sub-input', date: 'fta-sub-date', file: 'fta-sub-file', display: 'fta-sub-display' };
+
+    // Close alternatives + reasoning why NOT picked — keyed by chosen detail
+    const FTA_ALTERNATIVES = {
+      'list-segmented':  [
+        { detail: 'list-dropdown',  whyNot: "Hides options behind a click — fine for many options, but you said under 5." },
+        { detail: 'list-checkbox',  whyNot: "Allows picking multiple — but you wanted just one value." }
+      ],
+      'list-dropdown':   [
+        { detail: 'list-segmented', whyNot: "Shows all options inline — wastes space when you have 5-30 options." },
+        { detail: 'list-checkbox',  whyNot: "Allows multi-select — but you wanted a single value." }
+      ],
+      'list-checkbox':   [
+        { detail: 'list-dropdown',  whyNot: "Single-select only — but you wanted multiple values at once." },
+        { detail: 'list-checklist', whyNot: "Designed for todo-tracking with state — not for arbitrary multi-select." }
+      ],
+      'list-checklist':  [
+        { detail: 'list-checkbox',  whyNot: "Lacks the 'done/pending' semantics of a true todo checklist." },
+        { detail: 'list-segmented', whyNot: "Single-select inline — not designed to track completion of many items." }
+      ],
+      'text-short':      [
+        { detail: 'text-long',      whyNot: "Multi-line — overkill for short values like names or codes." },
+        { detail: 'num-calc',       whyNot: "Numeric only — but your value can contain letters (e.g. TXN-001)." }
+      ],
+      'text-long':       [
+        { detail: 'text-short',     whyNot: "Single line — too cramped for long descriptions or step-by-step reports." }
+      ],
+      'text-email':      [
+        { detail: 'text-short',     whyNot: "No format validation — easier to get malformed addresses." }
+      ],
+      'num-calc':        [
+        { detail: 'text-short',     whyNot: "Accepts any character — loses numeric validation and math." },
+        { detail: 'num-bool',       whyNot: "Yes/No toggle only — can't capture a count or quantity." }
+      ],
+      'num-bool':        [
+        { detail: 'list-segmented', whyNot: "Shows full label per option — heavier UI for a simple yes/no." }
+      ],
+      'spec-date':       [
+        { detail: 'spec-daterange', whyNot: "Captures from→to — but you said you only need one date." }
+      ],
+      'spec-daterange':  [
+        { detail: 'spec-date',      whyNot: "Single date only — but you wanted a from→to range." }
+      ],
+      'spec-file':       [
+        { detail: 'label-link',     whyNot: "Just shows a link — doesn't let users upload anything back." }
+      ],
+      'label-text':      [
+        { detail: 'label-link',     whyNot: "Adds a separate upload field — overkill if you only need a notice." }
+      ],
+      'label-link':      [
+        { detail: 'label-text',     whyNot: "Display-only, no upload — but you needed users to attach files." },
+        { detail: 'spec-file',      whyNot: "Upload only, no instructions or template link." }
+      ]
+    };
 
     const FTA = {
       step: 1,
@@ -3178,18 +3204,24 @@
         document.querySelectorAll('#fta-step1 .fta-choice').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('fta-next1').disabled = false;
+        // Auto-advance after 250ms
+        setTimeout(() => { if (FTA.cat === cat && FTA.step === 1) FTA.goStep(2); }, 250);
       },
       sel2(detail, btn) {
         FTA.detail = detail;
         document.querySelectorAll('#fta-modal .fta-sub').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('fta-next2').disabled = false;
+        // Auto-advance after 250ms
+        setTimeout(() => { if (FTA.detail === detail && FTA.step === 2) FTA.goStep(3); }, 250);
       },
       selCond(cond, btn) {
         FTA.cond = cond;
         document.querySelectorAll('#fta-step3 .fta-sub').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('fta-next3').disabled = false;
+        // Auto-advance to result after 250ms
+        setTimeout(() => { if (FTA.cond === cond && FTA.step === 3) FTA.showResult(); }, 250);
       },
       goStep(n) {
         FTA.step = n;
@@ -3224,6 +3256,9 @@
           if (subId) document.getElementById(subId).classList.add('visible');
           document.getElementById('fta-next2').disabled = !FTA.detail;
         }
+        // Show "Browse types instead" toolbar in steps 1-3, hide in result
+        const toolbar = document.getElementById('fta-toolbar');
+        if (toolbar) toolbar.style.display = n <= 3 ? 'flex' : 'none';
       },
       showResult() {
         if (!FTA.cond) return;
@@ -3233,19 +3268,67 @@
         document.getElementById('fta-result').classList.add('visible');
 
         const r = FTA_RESULT_MAP[FTA.detail] || FTA_RESULT_MAP['text-short'];
+
+        // Icon — reuse getTypeIconSVG with light-blue box (consistent with Type Picker)
+        const iconEl = document.getElementById('fta-r-icon');
+        if (iconEl) {
+          try {
+            const c = (typeof getTypeColor === 'function') ? getTypeColor(r.type) : { bg: '#EFF6FF', border: '#BFDBFE', text: '#155DFC' };
+            const svg = (typeof getTypeIconSVG === 'function') ? getTypeIconSVG(r.type) : '';
+            iconEl.style.background = c.bg;
+            iconEl.style.border = '0.5px solid ' + c.border;
+            iconEl.style.color = c.text;
+            iconEl.innerHTML = svg;
+          } catch (e) { iconEl.innerHTML = ''; }
+        }
+
         document.getElementById('fta-r-name').textContent = r.name;
         document.getElementById('fta-r-desc').innerHTML = r.desc;
         document.getElementById('fta-r-cfg').innerHTML = r.cfg;
         document.getElementById('fta-r-callout').innerHTML = r.callout;
         document.getElementById('fta-r-sim').innerHTML = r.sim;
 
-        const condLabel = FTA.cond === 'yes' ? 'Có điều kiện' : 'Luôn hiển thị';
+        // Alternatives with "why not"
+        const altsEl = document.getElementById('fta-r-alts');
+        const altsListEl = document.getElementById('fta-r-alts-list');
+        const alts = FTA_ALTERNATIVES[FTA.detail] || [];
+        if (alts.length && altsEl && altsListEl) {
+          altsListEl.innerHTML = alts.map(a => {
+            const ar = FTA_RESULT_MAP[a.detail];
+            if (!ar) return '';
+            const c = (typeof getTypeColor === 'function') ? getTypeColor(ar.type) : { bg: '#EFF6FF', border: '#BFDBFE', text: '#155DFC' };
+            const svg = (typeof getTypeIconSVG === 'function') ? getTypeIconSVG(ar.type) : '';
+            return ''
+              + '<button onclick="FTA.switchTo(\'' + a.detail + '\')" style="text-align:left;background:#fff;border:0.5px solid #e2e8f0;border-radius:9px;padding:10px 12px;cursor:pointer;display:flex;align-items:flex-start;gap:10px;transition:all 0.15s;width:100%" onmouseover="this.style.borderColor=\'#BFDBFE\';this.style.background=\'#FAFBFC\'" onmouseout="this.style.borderColor=\'#e2e8f0\';this.style.background=\'#fff\'">'
+              +   '<div style="width:28px;height:28px;border-radius:7px;background:' + c.bg + ';border:0.5px solid ' + c.border + ';color:' + c.text + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' + svg + '</div>'
+              +   '<div style="flex:1;min-width:0">'
+              +     '<div style="font-size:12px;font-weight:700;color:#1e293b">' + ar.name + '</div>'
+              +     '<div style="font-size:10px;color:#B45309;margin-top:3px;line-height:1.5;display:flex;align-items:flex-start;gap:4px">'
+              +       '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;color:#f59e0b"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+              +       '<span><b style="color:#92400E">Why not:</b> ' + a.whyNot + '</span>'
+              +     '</div>'
+              +     '<div style="font-size:10px;color:#155DFC;font-weight:600;margin-top:4px">Use this instead →</div>'
+              +   '</div>'
+              + '</button>';
+          }).filter(Boolean).join('');
+          altsEl.style.display = 'block';
+        } else if (altsEl) {
+          altsEl.style.display = 'none';
+        }
+
+        const condLabel = FTA.cond === 'yes' ? 'Conditional' : 'Always visible';
         document.getElementById('fta-pills').innerHTML =
           '<span class="fta-pill">' + (FTA_CAT_LABEL[FTA.cat] || FTA.cat) + '</span>' +
           '<span class="fta-pill-arrow">›</span>' +
           '<span class="fta-pill">' + r.name + '</span>' +
           '<span class="fta-pill-arrow">›</span>' +
           '<span class="fta-pill">' + condLabel + '</span>';
+      },
+      // Switch recommended result to a different detail (from alternatives click)
+      switchTo(newDetail) {
+        if (!FTA_RESULT_MAP[newDetail]) return;
+        FTA.detail = newDetail;
+        FTA.showResult();
       },
       apply() {
         if (!FTA.detail) return;
@@ -3257,7 +3340,7 @@
         EW_tabIdx = 0;
         if (FTA.cond === 'yes') EW.visRule = { source: '', op: 'equals', values: '' };
         if (FTA.detail === 'label-link') {
-          EW.content = '📥 Tải file template <a href="https://drive.google.com/..." target="_blank">tại đây</a>, điền đầy đủ rồi upload lại bằng field bên dưới.';
+          EW.content = '📥 Download the template file <a href="https://drive.google.com/..." target="_blank">here</a>, fill it in, then upload it back using the field below.';
         }
         FieldTypeAdvisor.close();
         openEditorWizard();
@@ -3268,6 +3351,11 @@
         ['fta-next1', 'fta-next2', 'fta-next3'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = true; });
         FTA._renderProgress();
         FTA._showStep(1);
+      },
+      // Escape hatch: close Advisor, open Type Picker
+      exitToTypePicker() {
+        FieldTypeAdvisor.close();
+        openTypePicker();
       }
     };
 
