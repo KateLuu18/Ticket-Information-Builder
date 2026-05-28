@@ -149,69 +149,94 @@
 #fta-modal .fta-pline { flex: 1; height: 2px; background: #e2e8f0; margin: 0 5px; transition: all 0.2s; }
 #fta-modal .fta-pline.done { background: #155DFC; }
 
-#fta-modal .fta-body { padding: 20px 22px; }
+#fta-modal .fta-body { padding: 16px 22px; }
 #fta-modal .fta-step { display: none; }
 #fta-modal .fta-step.visible { display: block; }
-#fta-modal .fta-step-title { font-size: 12px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid #eef4ff; }
-#fta-modal .fta-step-title span { color: #155DFC; }
+#fta-modal .fta-step-title { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 8px; line-height: 1.4; }
+#fta-modal .fta-step-title span { display: inline-block; font-size: 10px; font-weight: 600; color: #155DFC; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 8px; padding: 2px 7px; background: #EFF6FF; border-radius: 4px; vertical-align: 2px; }
 
-#fta-modal .fta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-#fta-modal .fta-choice { padding: 16px 18px; text-align: left; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.15s; width: 100%; display: flex; align-items: flex-start; gap: 14px; }
-#fta-modal .fta-choice:hover { border-color: #cbd5e1; background: #fafbfc; }
-#fta-modal .fta-choice.active { border-color: #155DFC; background: #eef4ff; box-shadow: 0 0 0 3px rgba(21,93,252,0.08); }
-#fta-modal .fta-choice .c-icon { width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #475569; flex-shrink: 0; transition: all 0.15s; }
-#fta-modal .fta-choice.active .c-icon { background: #dbeafe; border-color: #93c5fd; color: #155DFC; }
+/* Step 1 — Categories: 2-zone card (white + slate footer) */
+#fta-modal .fta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#fta-modal .fta-choice { padding: 0; text-align: left; background: #fff; border: 0.5px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.15s; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
+#fta-modal .fta-choice:hover { border-color: #BFDBFE; background: #fafbfc; }
+#fta-modal .fta-choice.active { border-color: #155DFC; background: #F8FAFF; box-shadow: 0 0 0 2px rgba(21,93,252,0.08); }
+#fta-modal .fta-choice .c-en-zone { padding: 12px 14px; display: flex; align-items: flex-start; gap: 11px; flex: 1; }
+#fta-modal .fta-choice .c-icon { width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; border: 0.5px solid #BFDBFE; display: flex; align-items: center; justify-content: center; color: #155DFC; flex-shrink: 0; transition: all 0.15s; }
+#fta-modal .fta-choice.active .c-icon { background: #DBEAFE; border-color: #93C5FD; }
 #fta-modal .fta-choice .c-text { flex: 1; min-width: 0; }
-#fta-modal .fta-choice .c-title { font-weight: 800; font-size: 14px; color: #1e293b; margin-bottom: 4px; letter-spacing: -0.01em; line-height: 1.3; }
+#fta-modal .fta-choice .c-title { font-weight: 600; font-size: 13px; color: #1e293b; line-height: 1.35; }
 #fta-modal .fta-choice.active .c-title { color: #155DFC; }
-#fta-modal .fta-choice .c-sub { font-size: 12.5px; color: #64748b; line-height: 1.5; padding-left: 0; }
+#fta-modal .fta-choice .c-sub { display: block; padding: 8px 14px; background: #F8FAFC; font-size: 11px; font-style: italic; color: #64748b; line-height: 1.5; border-top: 0.5px solid #f1f5f9; }
+#fta-modal .fta-choice.active .c-sub { background: #EFF6FF; border-top-color: #DBEAFE; color: #475569; }
+#fta-modal .fta-choice .c-sub i { font-style: italic; }
 #fta-modal .fta-choice.fullwidth { grid-column: 1 / span 2; }
 
-#fta-modal .fta-subs { display: none; flex-direction: column; gap: 7px; }
+/* Step 2/3 — Sub buttons: 2-zone card */
+#fta-modal .fta-subs { display: none; flex-direction: column; gap: 8px; }
 #fta-modal .fta-subs.visible { display: flex; }
-#fta-modal .fta-sub { width: 100%; padding: 11px 14px; text-align: left; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; color: #334155; transition: all 0.15s; display: flex; align-items: flex-start; gap: 11px; }
-#fta-modal .fta-sub:hover { border-color: #ADE3FF; background: #f5f9ff; }
-#fta-modal .fta-sub.active { border-color: #155DFC; background: #eef4ff; color: #155DFC; }
-#fta-modal .fta-sub .s-note { display: block; font-size: 11.5px; font-weight: 500; color: #94a3b8; margin-top: 3px; }
-#fta-modal .fta-sub-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: #EFF6FF; border: 0.5px solid #BFDBFE; color: #155DFC; flex-shrink: 0; }
+#fta-modal .fta-sub { width: 100%; padding: 0; text-align: left; background: #fff; border: 0.5px solid #e2e8f0; border-radius: 10px; cursor: pointer; color: #334155; transition: all 0.15s; overflow: hidden; display: flex; flex-direction: column; gap: 0; }
+#fta-modal .fta-sub:hover { border-color: #BFDBFE; background: #fafbfc; }
+#fta-modal .fta-sub.active { border-color: #155DFC; background: #F8FAFF; box-shadow: 0 0 0 2px rgba(21,93,252,0.08); }
+#fta-modal .fta-sub-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: #EFF6FF; border: 0.5px solid #BFDBFE; color: #155DFC; flex-shrink: 0; transition: all 0.15s; }
 #fta-modal .fta-sub.active .fta-sub-icon { background: #DBEAFE; border-color: #93C5FD; }
+#fta-modal .fta-sub-row { display: flex; align-items: flex-start; gap: 11px; padding: 12px 14px; }
 #fta-modal .fta-sub-text { flex: 1; min-width: 0; }
-#fta-modal .fta-sub-title { display: block; }
+#fta-modal .fta-sub-title { display: block; font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.4; }
+#fta-modal .fta-sub.active .fta-sub-title { color: #155DFC; }
+#fta-modal .fta-sub .s-note { display: block; padding: 8px 14px; background: #F8FAFC; font-size: 11px; font-style: italic; color: #64748b; line-height: 1.5; border-top: 0.5px solid #f1f5f9; margin: 0; font-weight: 400; }
+#fta-modal .fta-sub.active .s-note { background: #EFF6FF; border-top-color: #DBEAFE; color: #475569; }
+#fta-modal .fta-sub .s-note i { font-style: italic; }
 
-#fta-modal .fta-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid #f1f5f9; }
-#fta-modal .fta-btn-back { padding: 8px 16px; background: #fff; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; }
+#fta-modal .fta-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 12px; border-top: 0.5px solid #f1f5f9; }
+#fta-modal .fta-btn-back { padding: 8px 14px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 8px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer; }
 #fta-modal .fta-btn-back:hover { background: #f8fafc; }
 #fta-modal .fta-btn-back:disabled { opacity: 0.3; cursor: not-allowed; }
-#fta-modal .fta-btn-next { padding: 8px 18px; background: #155DFC; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; }
+#fta-modal .fta-btn-next { padding: 8px 16px; background: #155DFC; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; }
 #fta-modal .fta-btn-next:hover { background: #0f3bbf; }
 #fta-modal .fta-btn-next:disabled { background: #cbd5e1; cursor: not-allowed; }
 
+/* Result — Hero light blue gradient (not dark navy) */
 #fta-modal .fta-result { display: none; }
 #fta-modal .fta-result.visible { display: block; }
-#fta-modal .fta-result-header { background: #1e293b; border-radius: 8px 8px 0 0; padding: 14px 16px; }
-#fta-modal .fta-result-header .r-badge { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; }
-#fta-modal .fta-result-header .r-name { font-size: 15px; font-weight: 800; color: #f8fafc; }
-#fta-modal .fta-result-body { border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-#fta-modal .fta-result-desc { font-size: 13px; color: #475569; line-height: 1.6; }
-#fta-modal .fta-result-cfg { font-size: 12px; color: #334155; line-height: 1.7; padding: 10px 12px; background: #f8fafc; border-radius: 6px; }
-#fta-modal .fta-result-callout { font-size: 12px; line-height: 1.7; }
-#fta-modal .fta-result-sim { background: #1e293b; border-radius: 8px; padding: 14px; }
-#fta-modal .fta-result-sim .sim-lbl { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; }
+#fta-modal .fta-result-header { background: linear-gradient(135deg, #EFF6FF 0%, #F8FAFF 100%); border: 0.5px solid #DBEAFE; border-radius: 10px 10px 0 0; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+#fta-modal .fta-result-header .r-badge { font-size: 9px; font-weight: 600; color: #155DFC; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 3px; }
+#fta-modal .fta-result-header .r-name { font-size: 16px; font-weight: 600; color: #0F3BBF; line-height: 1.3; }
+#fta-modal #fta-r-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: white; border: 0.5px solid #BFDBFE; color: #155DFC; box-shadow: 0 1px 3px rgba(21,93,252,0.08); }
+#fta-modal .fta-result-body { border: 0.5px solid #DBEAFE; border-top: none; border-radius: 0 0 10px 10px; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; background: white; }
+#fta-modal .fta-result-desc { font-size: 12px; color: #475569; line-height: 1.6; }
+#fta-modal .fta-result-cfg { font-size: 11px; color: #334155; line-height: 1.6; padding: 9px 12px; background: #F8FAFC; border: 0.5px solid #e2e8f0; border-radius: 7px; }
+#fta-modal .fta-result-cfg b { color: #155DFC; font-weight: 600; }
+#fta-modal .fta-result-callout { font-size: 11px; color: #92400E; line-height: 1.6; padding: 9px 12px; background: #FFFBEB; border-left: 3px solid #f59e0b; border-radius: 0 6px 6px 0; }
 
-#fta-modal .fta-actions { display: flex; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #f1f5f9; }
-#fta-modal .fta-btn-apply { flex: 1; padding: 10px 18px; background: #155DFC; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; color: #fff; cursor: pointer; }
+/* Live preview — Mac window style + red pulse label */
+#fta-modal .fta-result-sim { background: white; border: 0.5px solid #e2e8f0; border-radius: 8px; padding: 0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+#fta-modal .fta-sim-bar { background: #F1F5F9; padding: 8px 12px; border-bottom: 0.5px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
+#fta-modal .fta-sim-dots { display: flex; gap: 5px; flex-shrink: 0; }
+#fta-modal .fta-sim-dot { width: 8px; height: 8px; border-radius: 50%; }
+#fta-modal .fta-sim-dot-r { background: #FF5F57; }
+#fta-modal .fta-sim-dot-y { background: #FEBC2E; }
+#fta-modal .fta-sim-dot-g { background: #28C840; }
+#fta-modal .fta-sim-label { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: #1e293b; text-transform: uppercase; letter-spacing: 0.06em; }
+#fta-modal .fta-sim-live-pulse { width: 6px; height: 6px; border-radius: 50%; background: #DC2626; box-shadow: 0 0 0 2px rgba(220,38,38,0.15); animation: fta-live-pulse 1.5s infinite; }
+@keyframes fta-live-pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
+#fta-modal .fta-sim-tagline { margin-left: auto; font-size: 9.5px; color: #94a3b8; font-style: italic; }
+#fta-modal .fta-result-sim .sim-lbl { display: none; }
+#fta-modal .fta-sim-body { padding: 14px 14px; background: white; }
+
+#fta-modal .fta-actions { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid #f1f5f9; }
+#fta-modal .fta-btn-apply { flex: 1; padding: 10px 16px; background: #155DFC; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; }
 #fta-modal .fta-btn-apply:hover { background: #0f3bbf; }
-#fta-modal .fta-btn-skip { padding: 10px 18px; background: #fff; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-weight: 700; color: #64748b; cursor: pointer; }
+#fta-modal .fta-btn-skip { padding: 10px 14px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; }
 #fta-modal .fta-btn-skip:hover { background: #f8fafc; }
-#fta-modal .fta-btn-restart { padding: 10px 14px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700; color: #94a3b8; cursor: pointer; }
+#fta-modal .fta-btn-restart { padding: 10px 12px; background: #fff; border: 0.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; color: #94a3b8; cursor: pointer; }
 #fta-modal .fta-btn-restart:hover { background: #f8fafc; color: #64748b; }
 
-#fta-modal .fta-pills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
-#fta-modal .fta-pill { background: #eef4ff; color: #155DFC; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
-#fta-modal .fta-pill-arrow { color: #94a3b8; font-size: 12px; }
+#fta-modal .fta-pills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 0.5px solid #f1f5f9; }
+#fta-modal .fta-pill { background: #F8FAFC; color: #475569; border: 0.5px solid #e2e8f0; border-radius: 5px; padding: 3px 8px; font-size: 10px; font-weight: 500; }
+#fta-modal .fta-pill-arrow { color: #cbd5e1; font-size: 10px; }
 
-#fta-modal .fta-info { padding:10px 12px; border-radius:8px; font-size:12px; line-height:1.6; margin-top:4px; }
-#fta-modal .fta-info-blue { background:#eef4ff; border:1px solid #93c5fd; color:#1e40af; }
+#fta-modal .fta-info { padding:10px 12px; border-radius:8px; font-size:11px; line-height:1.6; margin-top:6px; }
+#fta-modal .fta-info-blue { background:#EFF6FF; border:0.5px solid #BFDBFE; color:#1E40AF; }
   </style>
 </head>
 <body class="font-sans text-slate-900 min-h-screen flex flex-col antialiased">
@@ -538,42 +563,53 @@
     <div class="fta-body">
 
       <div class="fta-step visible" id="fta-step1">
-        <div class="fta-step-title"><span>Step 1 / 3</span> — What kind of input do you need? <span style="font-style:italic;color:#94a3b8;font-weight:500;font-size:12px">Bạn cần loại input nào?</span></div>
+        <div class="fta-step-title"><span>Step 1 / 3</span> What kind of input do you need?</div>
+        <div style="font-size:11px;color:#94a3b8;font-style:italic;margin:-8px 0 14px;padding-bottom:8px;border-bottom:0.5px solid #f1f5f9">Bạn cần loại input nào? Chọn loại dữ liệu user sẽ nhập.</div>
         <div class="fta-grid">
           <button class="fta-choice" onclick="FTA.sel1('list',this)">
-            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg></div>
-            <div class="c-text">
-              <div class="c-title">Pick from a list</div>
-              <div class="c-sub"><i>User chọn từ list cấu hình sẵn — status, category, platform...</i></div>
+            <div class="c-en-zone">
+              <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg></div>
+              <div class="c-text">
+                <div class="c-title">Pick from a list</div>
+              </div>
             </div>
+            <div class="c-sub"><i>User chọn từ list cấu hình sẵn — status, category, platform...</i></div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('input',this)">
-            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-            <div class="c-text">
-              <div class="c-title">Type text or numbers</div>
-              <div class="c-sub"><i>User tự nhập — tên, email, ID, mô tả...</i></div>
+            <div class="c-en-zone">
+              <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+              <div class="c-text">
+                <div class="c-title">Type text or numbers</div>
+              </div>
             </div>
+            <div class="c-sub"><i>User tự nhập — tên, email, ID, mô tả...</i></div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('date',this)">
-            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div class="c-text">
-              <div class="c-title">Date or time range</div>
-              <div class="c-sub"><i>1 ngày cụ thể, hoặc khoảng từ → đến.</i></div>
+            <div class="c-en-zone">
+              <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <div class="c-text">
+                <div class="c-title">Date or time range</div>
+              </div>
             </div>
+            <div class="c-sub"><i>1 ngày cụ thể, hoặc khoảng từ → đến.</i></div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('file',this)">
-            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div>
-            <div class="c-text">
-              <div class="c-title">Attach files</div>
-              <div class="c-sub"><i>User upload screenshot, document, report...</i></div>
+            <div class="c-en-zone">
+              <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div>
+              <div class="c-text">
+                <div class="c-title">Attach files</div>
+              </div>
             </div>
+            <div class="c-sub"><i>User upload screenshot, document, report...</i></div>
           </button>
           <button class="fta-choice fullwidth" onclick="FTA.sel1('display',this)">
-            <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-            <div class="c-text">
-              <div class="c-title">Display info only</div>
-              <div class="c-sub"><i>Hiện note, warning, link — không thu thập data.</i></div>
+            <div class="c-en-zone">
+              <div class="c-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+              <div class="c-text">
+                <div class="c-title">Display info only</div>
+              </div>
             </div>
+            <div class="c-sub"><i>Hiện note, warning, link — không thu thập data.</i></div>
           </button>
         </div>
         <div class="fta-nav">
@@ -583,32 +619,33 @@
       </div>
 
       <div class="fta-step" id="fta-step2">
-        <div class="fta-step-title"><span>Step 2 / 3</span> — Tell me more about the data <span style="font-style:italic;color:#94a3b8;font-weight:500;font-size:12px">Mô tả chi tiết hơn về dữ liệu</span></div>
+        <div class="fta-step-title"><span>Step 2 / 3</span> Tell me more about the data</div>
+        <div style="font-size:11px;color:#94a3b8;font-style:italic;margin:-8px 0 14px;padding-bottom:8px;border-bottom:0.5px solid #f1f5f9">Mô tả chi tiết hơn về dữ liệu</div>
 
         <div id="fta-sub-list" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('list-segmented',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="6" height="12" rx="1"/><rect x="11" y="6" width="4" height="12" rx="1"/><rect x="17" y="6" width="4" height="12" rx="1"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Under 5 options — shown inline (e.g. iOS / Android / PC)</span><span class="s-note"><i>Dưới 5 lựa chọn — hiện thẳng ra ngoài, không cần bấm dropdown</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-dropdown',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="4" rx="1"/><polyline points="7 14 12 19 17 14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">5 to 30 options — collapsed in a dropdown</span><span class="s-note"><i>5-30 lựa chọn — thu gọn vào dropdown, giúp form không bị dài</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-checkbox',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Multiple values at once (multi-select)</span><span class="s-note"><i>Cho user chọn nhiều giá trị cùng lúc — lưu dạng mảng (array)</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-checklist',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Todo-style checklist — items to tick off</span><span class="s-note"><i>Danh sách đầu việc cần tích hoàn thành — dùng cho checklist vận hành</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-segmented',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="6" height="12" rx="1"/><rect x="11" y="6" width="4" height="12" rx="1"/><rect x="17" y="6" width="4" height="12" rx="1"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Under 5 options — shown inline (e.g. iOS / Android / PC)</span></span></div><span class="s-note"><i>Dưới 5 lựa chọn — hiện thẳng ra ngoài, không cần bấm dropdown</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-dropdown',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="4" rx="1"/><polyline points="7 14 12 19 17 14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">5 to 30 options — collapsed in a dropdown</span></span></div><span class="s-note"><i>5-30 lựa chọn — thu gọn vào dropdown, giúp form không bị dài</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-checkbox',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Multiple values at once (multi-select)</span></span></div><span class="s-note"><i>Cho user chọn nhiều giá trị cùng lúc — lưu dạng mảng (array)</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-checklist',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Todo-style checklist — items to tick off</span></span></div><span class="s-note"><i>Danh sách đầu việc cần tích hoàn thành — dùng cho checklist vận hành</i></span></button>
         </div>
         <div id="fta-sub-input" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('text-short',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="6" y="17" font-size="14" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">T</text><line x1="12" y1="18" x2="20" y2="18"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Short text — under 100 chars (name, code, ID)</span><span class="s-note"><i>Chuỗi ngắn có cả chữ + số (vd: TXN-001, ABC123)</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('text-long',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Long description (multi-line)</span><span class="s-note"><i>Mô tả dài nhiều dòng — không giới hạn ký tự, phù hợp mô tả lỗi</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('text-email',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Email address</span><span class="s-note"><i>Tự động kiểm tra định dạng có @ và domain hợp lệ</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('num-calc',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="6" y="17" font-size="13" font-weight="bold" stroke="none" fill="currentColor" font-family="sans-serif">#</text></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Pure number (e.g. count, days, port)</span><span class="s-note"><i>Chỉ dùng khi giá trị là SỐ THUẦN — không chứa chữ nào</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('num-bool',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Yes / No confirmation</span><span class="s-note"><i>User chỉ tick/bỏ tick — đồng ý điều khoản, đã kiểm tra...</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-short',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="6" y="17" font-size="14" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">T</text><line x1="12" y1="18" x2="20" y2="18"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Short text — under 100 chars (name, code, ID)</span></span></div><span class="s-note"><i>Chuỗi ngắn có cả chữ + số (vd: TXN-001, ABC123)</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-long',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Long description (multi-line)</span></span></div><span class="s-note"><i>Mô tả dài nhiều dòng — không giới hạn ký tự, phù hợp mô tả lỗi</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-email',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Email address</span></span></div><span class="s-note"><i>Tự động kiểm tra định dạng có @ và domain hợp lệ</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('num-calc',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="6" y="17" font-size="13" font-weight="bold" stroke="none" fill="currentColor" font-family="sans-serif">#</text></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Pure number (e.g. count, days, port)</span></span></div><span class="s-note"><i>Chỉ dùng khi giá trị là SỐ THUẦN — không chứa chữ nào</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('num-bool',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Yes / No confirmation</span></span></div><span class="s-note"><i>User chỉ tick/bỏ tick — đồng ý điều khoản, đã kiểm tra...</i></span></button>
         </div>
         <div id="fta-sub-date" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('spec-date',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A single date (e.g. incident date, release date)</span><span class="s-note"><i>Một ngày cụ thể — lưu dạng ISO YYYY-MM-DD</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('spec-daterange',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A date range — from → to (e.g. maintenance window)</span><span class="s-note"><i>Khoảng thời gian từ → đến — lưu dạng [start, end]</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-date',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A single date (e.g. incident date, release date)</span></span></div><span class="s-note"><i>Một ngày cụ thể — lưu dạng ISO YYYY-MM-DD</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-daterange',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A date range — from → to (e.g. maintenance window)</span></span></div><span class="s-note"><i>Khoảng thời gian từ → đến — lưu dạng [start, end]</i></span></button>
         </div>
         <div id="fta-sub-file" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('spec-file',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">User uploads files (e.g. screenshots, Excel reports)</span><span class="s-note"><i>User tải file lên ticket — config được format: image/*, .xlsx, .pdf...</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-file',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">User uploads files (e.g. screenshots, Excel reports)</span></span></div><span class="s-note"><i>User tải file lên ticket — config được format: image/*, .xlsx, .pdf...</i></span></button>
           <div class="fta-info fta-info-blue">💡 Need to share a template link AND let users upload? Pick <strong>Display info only</strong> in Step 1. <span style="font-style:italic;color:#94a3b8">Cần vừa share link template vừa cho user upload? Chọn "Display info only" ở Step 1.</span></div>
         </div>
         <div id="fta-sub-display" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('label-text',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="5" y="17" font-size="14" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">H</text></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice / warning / guide (display only)</span><span class="s-note"><i>Hỗ trợ Rich Text — bold, italic, link nhúng</i></span></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('label-link',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="3" y="13" font-size="9" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">H</text><path d="M14 13l-3 3a2.5 2.5 0 1 1-3.5-3.5l3-3"/><path d="M10 13l3-3a2.5 2.5 0 1 1 3.5 3.5l-3 3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice + template link + upload combo</span><span class="s-note"><i>Tạo 2 fields liên tiếp: label (link) → attachment (upload)</i></span></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('label-text',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="5" y="17" font-size="14" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">H</text></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice / warning / guide (display only)</span></span></div><span class="s-note"><i>Hỗ trợ Rich Text — bold, italic, link nhúng</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('label-link',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><text x="3" y="13" font-size="9" font-weight="bold" stroke="none" fill="currentColor" font-family="serif">H</text><path d="M14 13l-3 3a2.5 2.5 0 1 1-3.5-3.5l3-3"/><path d="M10 13l3-3a2.5 2.5 0 1 1 3.5 3.5l-3 3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice + template link + upload combo</span></span></div><span class="s-note"><i>Tạo 2 fields liên tiếp: label (link) → attachment (upload)</i></span></button>
         </div>
 
         <div class="fta-nav">
@@ -618,10 +655,11 @@
       </div>
 
       <div class="fta-step" id="fta-step3">
-        <div class="fta-step-title"><span>Step 3 / 3</span> — Should this field always show? <span style="font-style:italic;color:#94a3b8;font-weight:500;font-size:12px">Field này có luôn hiển thị không?</span></div>
+        <div class="fta-step-title"><span>Step 3 / 3</span> Should this field always show?</div>
+        <div style="font-size:11px;color:#94a3b8;font-style:italic;margin:-8px 0 14px;padding-bottom:8px;border-bottom:0.5px solid #f1f5f9">Field này có luôn hiển thị không?</div>
         <div style="display:flex;flex-direction:column;gap:7px">
-          <button class="fta-sub" id="fta-cond-no" onclick="FTA.selCond('no',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Always visible — to every user</span><span class="s-note"><i>Field độc lập, không phụ thuộc vào lựa chọn nào khác</i></span></span></button>
-          <button class="fta-sub" id="fta-cond-yes" onclick="FTA.selCond('yes',this)"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><path d="M9 6h6"/><path d="M15 6l-3 -3"/><path d="M15 6l-3 3"/><circle cx="18" cy="18" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Conditional — show based on another answer</span><span class="s-note"><i>VD: chọn "iOS" → hiện thêm "App Store ID"; chọn "Android" → hiện "Play Store ID"</i></span></span></button>
+          <button class="fta-sub" id="fta-cond-no" onclick="FTA.selCond('no',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Always visible — to every user</span></span></div><span class="s-note"><i>Field độc lập, không phụ thuộc vào lựa chọn nào khác</i></span></button>
+          <button class="fta-sub" id="fta-cond-yes" onclick="FTA.selCond('yes',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><path d="M9 6h6"/><path d="M15 6l-3 -3"/><path d="M15 6l-3 3"/><circle cx="18" cy="18" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Conditional — show based on another answer</span></span></div><span class="s-note"><i>VD: chọn "iOS" → hiện thêm "App Store ID"; chọn "Android" → hiện "Play Store ID"</i></span></button>
         </div>
         <div class="fta-nav">
           <button class="fta-btn-back" onclick="FTA.goStep(2)">← Back</button>
@@ -630,24 +668,37 @@
       </div>
 
       <div class="fta-result" id="fta-result">
-        <div class="fta-result-header" style="display:flex;align-items:center;gap:12px;padding:14px 16px;">
-          <div id="fta-r-icon" style="width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05)"></div>
+        <div class="fta-result-header">
+          <div id="fta-r-icon"></div>
           <div style="flex:1;min-width:0">
             <span class="r-badge">🎯 Recommended for you</span>
             <div class="r-name" id="fta-r-name"></div>
+            <div class="r-name-sub" id="fta-r-name-sub" style="font-size:11px;color:#64748B;margin-top:2px;font-style:italic"></div>
           </div>
         </div>
         <div class="fta-result-body">
           <div class="fta-result-desc" id="fta-r-desc"></div>
           <div class="fta-result-cfg" id="fta-r-cfg"></div>
           <div class="fta-result-callout" id="fta-r-callout"></div>
+          <!-- Live preview Mac window -->
           <div class="fta-result-sim">
-            <span class="sim-lbl">💻 Live preview</span>
-            <div id="fta-r-sim"></div>
+            <div class="fta-sim-bar">
+              <div class="fta-sim-dots">
+                <span class="fta-sim-dot fta-sim-dot-r"></span>
+                <span class="fta-sim-dot fta-sim-dot-y"></span>
+                <span class="fta-sim-dot fta-sim-dot-g"></span>
+              </div>
+              <span class="fta-sim-label">
+                <span class="fta-sim-live-pulse"></span>
+                Live preview
+              </span>
+              <span class="fta-sim-tagline">Trông giống user sẽ thấy thực tế</span>
+            </div>
+            <div class="fta-sim-body" id="fta-r-sim"></div>
           </div>
           <!-- Close alternatives with "why not" -->
-          <div id="fta-r-alts" style="display:none;margin-top:4px;padding-top:14px;border-top:0.5px solid #e2e8f0">
-            <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+          <div id="fta-r-alts" style="display:none;margin-top:4px;padding-top:14px;border-top:0.5px solid #f1f5f9">
+            <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 01-9 9"/></svg>
               Close alternatives — and why we didn't pick them
             </div>
