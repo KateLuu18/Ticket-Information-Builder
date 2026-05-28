@@ -2823,11 +2823,10 @@
       });
     }
 
-    // Build PDF as Blob (Promise). Uses bulletproof rendering strategy:
-    // - Wrapper visible at top:9999px (in-flow, paints normally, off-viewport)
-    // - Style at document head (not buried in wrapper)
-    // - Force layout via offsetHeight before capture
-    // - Multi-RAF + timeout wait for fonts/paint
+    // Build PDF as Blob (Promise). Robust strategy:
+    // - Wrapper positioned FAR LEFT (off-screen but fully rendered, no opacity tricks)
+    // - Style injected to <head> with .tib-pdf-root scope
+    // - Force layout, await fonts, multi-RAF before capture
     function _buildPDFBlob(entries) {
       return new Promise((resolve, reject) => {
         let wrapper = null, styleEl = null;
@@ -2839,35 +2838,37 @@
           const htmlContent = _buildExportHTML(entries);
           if (!htmlContent) return reject(new Error('Empty content'));
 
-          // 1. Extract <style> block — inject into document HEAD (not wrapper) for reliable cascade
+          // 1. Extract <style> block — inject to document HEAD, scope to .tib-pdf-root
           const styleMatch = htmlContent.match(/<style>([\s\S]*?)<\/style>/);
           if (styleMatch) {
             styleEl = document.createElement('style');
             styleEl.setAttribute('data-tib-pdf', 'true');
-            // Scope all body styles to .tib-pdf-root to not pollute main page
             const cssText = styleMatch[1].replace(/(^|\})\s*body\s*\{/g, '$1 .tib-pdf-root {');
             styleEl.textContent = cssText;
             document.head.appendChild(styleEl);
           }
 
-          // 2. Build content wrapper — render in-flow but pushed off-viewport (positive top)
+          // 2. Build wrapper — FAR LEFT off-screen (NOT opacity:0, NOT visibility:hidden)
+          // html2canvas RESPECTS opacity:0 → capture blank. Must use position trick only.
           wrapper = document.createElement('div');
           wrapper.className = 'tib-pdf-root';
-          wrapper.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#ffffff;z-index:-99999;opacity:0;pointer-events:none;font-family:-apple-system,Segoe UI,sans-serif;color:#111;padding:32px 40px;box-sizing:border-box;';
+          wrapper.style.cssText = 'position:absolute;left:-99999px;top:0;width:800px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#111;padding:32px 40px;box-sizing:border-box;';
           wrapper.innerHTML = htmlContent.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<\/?head[^>]*>|<\/?body[^>]*>|<meta[^>]*>|<title[^>]*>[^<]*<\/title>|<style[\s\S]*?<\/style>/gi, '');
           wrapper.querySelectorAll('.no-print').forEach(el => el.remove());
           document.body.appendChild(wrapper);
 
-          // 3. Force browser to compute layout
+          // 3. Force layout
           const h = wrapper.offsetHeight;
           const w = wrapper.offsetWidth;
+          console.log('[TIB PDF] Wrapper layout:', { w, h, htmlLen: wrapper.innerHTML.length });
           if (h < 50 || w < 50) {
             cleanup();
             return reject(new Error('Wrapper layout empty (h=' + h + ', w=' + w + ')'));
           }
 
-          // 4. Wait for fonts ready + 2 frames + timeout for safe paint
+          // 4. Wait fonts + paint, then capture
           const startCapture = () => {
+            console.log('[TIB PDF] Starting html2pdf capture...');
             html2pdf().set({
               margin: [8, 8, 8, 8],
               image: { type: 'jpeg', quality: 0.95 },
@@ -2884,14 +2885,27 @@
                 scrollX: 0,
                 scrollY: 0,
                 x: 0,
-                y: 0
+                y: 0,
+                onclone: (clonedDoc, clonedEl) => {
+                  // Make cloned element visible in its private document
+                  if (clonedEl) {
+                    clonedEl.style.position = 'static';
+                    clonedEl.style.left = 'auto';
+                    clonedEl.style.top = 'auto';
+                  }
+                }
               },
               jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
               pagebreak: { mode: ['css', 'legacy'], before: '.service-block' }
             }).from(wrapper).outputPdf('blob').then(blob => {
+              console.log('[TIB PDF] Blob created, size:', blob.size);
               cleanup();
+              if (blob.size < 1000) {
+                return reject(new Error('PDF blob suspiciously small (' + blob.size + ' bytes) — likely blank'));
+              }
               resolve(blob);
             }).catch(err => {
+              console.error('[TIB PDF] html2pdf error:', err);
               cleanup();
               reject(err);
             });
@@ -2900,7 +2914,7 @@
           const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
           fontsReady.then(() => {
             requestAnimationFrame(() => requestAnimationFrame(() => {
-              setTimeout(startCapture, 100);
+              setTimeout(startCapture, 150);
             }));
           });
         } catch (err) { cleanup(); reject(err); }
