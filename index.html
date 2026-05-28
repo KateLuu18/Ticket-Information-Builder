@@ -2823,22 +2823,21 @@
       });
     }
 
-    // Build PDF as Blob (Promise). Robust strategy:
-    // - Wrapper positioned FAR LEFT (off-screen but fully rendered, no opacity tricks)
-    // - Style injected to <head> with .tib-pdf-root scope
-    // - Force layout, await fonts, multi-RAF before capture
+    // Build PDF as Blob. RELIABLE strategy: render wrapper VISIBLE briefly during capture,
+    // hide behind a loading overlay so user doesn't see the content flash.
     function _buildPDFBlob(entries) {
       return new Promise((resolve, reject) => {
-        let wrapper = null, styleEl = null;
+        let wrapper = null, styleEl = null, overlay = null;
         const cleanup = () => {
           try { if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper); } catch(e){}
           try { if (styleEl && styleEl.parentNode) styleEl.parentNode.removeChild(styleEl); } catch(e){}
+          try { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay); } catch(e){}
         };
         try {
           const htmlContent = _buildExportHTML(entries);
           if (!htmlContent) return reject(new Error('Empty content'));
 
-          // 1. Extract <style> block — inject to document HEAD, scope to .tib-pdf-root
+          // 1. Style → document head, scope to .tib-pdf-root
           const styleMatch = htmlContent.match(/<style>([\s\S]*?)<\/style>/);
           if (styleMatch) {
             styleEl = document.createElement('style');
@@ -2848,16 +2847,21 @@
             document.head.appendChild(styleEl);
           }
 
-          // 2. Build wrapper — FAR LEFT off-screen (NOT opacity:0, NOT visibility:hidden)
-          // html2canvas RESPECTS opacity:0 → capture blank. Must use position trick only.
+          // 2. Loading overlay covers entire viewport so user doesn't see wrapper flash
+          overlay = document.createElement('div');
+          overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.85);z-index:99998;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+          overlay.innerHTML = '<div style="background:#fff;padding:24px 32px;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,0.3);text-align:center;font-family:Inter,sans-serif"><div style="width:40px;height:40px;border:3px solid #155DFC;border-top-color:transparent;border-radius:50%;margin:0 auto 12px;animation:spin 0.8s linear infinite"></div><div style="font-size:14px;font-weight:600;color:#0f172a">Đang tạo PDF...</div><div style="font-size:11px;color:#64748b;margin-top:4px">Vui lòng đợi vài giây</div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
+          document.body.appendChild(overlay);
+
+          // 3. Wrapper VISIBLE (below overlay so user can't see content flash) — z-index 1
           wrapper = document.createElement('div');
           wrapper.className = 'tib-pdf-root';
-          wrapper.style.cssText = 'position:absolute;left:-99999px;top:0;width:800px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#111;padding:32px 40px;box-sizing:border-box;';
+          wrapper.style.cssText = 'position:fixed;left:0;top:0;width:800px;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#111;padding:32px 40px;box-sizing:border-box;z-index:1;';
           wrapper.innerHTML = htmlContent.replace(/<!DOCTYPE[^>]*>|<\/?html[^>]*>|<\/?head[^>]*>|<\/?body[^>]*>|<meta[^>]*>|<title[^>]*>[^<]*<\/title>|<style[\s\S]*?<\/style>/gi, '');
           wrapper.querySelectorAll('.no-print').forEach(el => el.remove());
           document.body.appendChild(wrapper);
 
-          // 3. Force layout
+          // 4. Force layout
           const h = wrapper.offsetHeight;
           const w = wrapper.offsetWidth;
           console.log('[TIB PDF] Wrapper layout:', { w, h, htmlLen: wrapper.innerHTML.length });
@@ -2866,7 +2870,7 @@
             return reject(new Error('Wrapper layout empty (h=' + h + ', w=' + w + ')'));
           }
 
-          // 4. Wait fonts + paint, then capture
+          // 5. Wait fonts + paint, then capture
           const startCapture = () => {
             console.log('[TIB PDF] Starting html2pdf capture...');
             html2pdf().set({
@@ -2879,28 +2883,15 @@
                 letterRendering: true,
                 backgroundColor: '#ffffff',
                 logging: false,
-                windowWidth: 800,
-                onclone: (clonedDoc) => {
-                  // CRITICAL: cloned wrapper still has position:absolute; left:-99999px
-                  // → html2canvas captures empty area. Reset position in clone.
-                  const cloned = clonedDoc.querySelector('.tib-pdf-root');
-                  if (cloned) {
-                    cloned.style.position = 'static';
-                    cloned.style.left = '0';
-                    cloned.style.top = '0';
-                    console.log('[TIB PDF] onclone: wrapper reset to static');
-                  } else {
-                    console.warn('[TIB PDF] onclone: .tib-pdf-root not found in clone');
-                  }
-                }
+                windowWidth: 800
               },
               jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
               pagebreak: { mode: ['css', 'legacy'], before: '.service-block' }
             }).from(wrapper).outputPdf('blob').then(blob => {
               console.log('[TIB PDF] Blob created, size:', blob.size);
               cleanup();
-              if (blob.size < 1000) {
-                return reject(new Error('PDF blob suspiciously small (' + blob.size + ' bytes) — likely blank'));
+              if (blob.size < 5000) {
+                return reject(new Error('PDF blob suspiciously small (' + blob.size + ' bytes)'));
               }
               resolve(blob);
             }).catch(err => {
