@@ -278,6 +278,14 @@
         </div>
 
         <div class="relative">
+          <button id="btn-review-json" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-lg transition" onclick="openReviewJSONPicker()" title="Verify any exported JSON file">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v3M11 14v0.01"/></svg>
+            <span>Review JSON</span>
+          </button>
+          <span class="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none tracking-wider shadow-sm pointer-events-none">TRY</span>
+        </div>
+
+        <div class="relative">
           <button class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg transition" onclick="toggleTemplateMenu(event)" title="Apply an example field template">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
             <span>Examples</span>
@@ -716,6 +724,141 @@
     </div>
   </div>
 </div>
+
+  <!-- ── Review JSON: File picker modal ── -->
+  <input type="file" id="rj-file-input" accept=".json,application/json" style="display:none" onchange="onReviewJSONFileSelected(event)">
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-[200] opacity-0 pointer-events-none transition-all duration-200" id="rj-picker-modal" onclick="if(event.target===this)closeReviewJSONPicker()">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md flex flex-col overflow-hidden transform scale-95 transition-all duration-200" id="rj-picker-inner">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg width="16" height="16" fill="none" stroke="#155DFC" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v3M11 14v0.01"/></svg>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-slate-800 leading-tight">Review JSON</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Verify any exported JSON file</div>
+          </div>
+        </div>
+        <button onclick="closeReviewJSONPicker()" class="text-slate-300 hover:text-slate-500 p-1" aria-label="Close">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="px-5 py-5">
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-5 text-[11.5px] text-slate-600 leading-relaxed">
+          <div class="font-semibold text-slate-800 mb-0.5">What this does</div>
+          Select a JSON file you exported from this tool to preview its fields. You can optionally reload it as a new template to edit. <span class="italic text-slate-400">Chọn file JSON đã export để xem lại fields. Có thể reload làm template để edit tiếp.</span>
+        </div>
+
+        <div class="text-center">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 inline-flex items-center justify-center mb-3">
+            <svg width="24" height="24" fill="none" stroke="#155DFC" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="10" y1="13" x2="14" y2="13"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
+          </div>
+          <div class="text-[13px] font-semibold text-slate-800 mb-3.5">Select a JSON file from your computer</div>
+          <button onclick="document.getElementById('rj-file-input').click()" class="h-[34px] px-5 bg-nexus hover:bg-blue-700 text-white text-[12.5px] font-semibold rounded-lg inline-flex items-center gap-1.5 transition">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            Choose file
+          </button>
+        </div>
+
+        <div class="text-[10px] text-slate-400 text-center mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-center gap-1.5">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          JSON files only · Max 1MB
+        </div>
+      </div>
+
+      <div class="px-5 py-2.5 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <button onclick="closeReviewJSONPicker()" class="h-[30px] px-3.5 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11.5px] font-semibold rounded-md transition">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Review JSON: Verify modal ── -->
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-[201] opacity-0 pointer-events-none transition-all duration-200" id="rj-verify-modal" onclick="if(event.target===this)closeReviewJSONVerify()">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden transform scale-95 transition-all duration-200" id="rj-verify-inner">
+      <div class="px-5 py-3.5 border-b border-emerald-200" style="background:#ECFDF5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="inline-flex items-center gap-1 bg-emerald-700 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wider leading-tight">
+                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                REVIEW MODE
+              </span>
+              <div id="rj-v-filename" class="text-xs font-semibold text-emerald-900 truncate font-mono">file.json</div>
+            </div>
+            <div class="text-[11px] text-emerald-700">Read-only · Nothing changes until you reload as template</div>
+          </div>
+          <button onclick="closeReviewJSONVerify()" class="text-emerald-700 hover:text-emerald-900 p-1 shrink-0" aria-label="Close">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar px-5 py-4">
+        <!-- Service breadcrumb card -->
+        <div class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 mb-3.5">
+          <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-400 mb-1">Service</div>
+          <div id="rj-v-service" class="text-[12.5px] text-slate-800 font-medium leading-snug">—</div>
+          <div id="rj-v-description-wrap" class="hidden mt-2 pt-2 border-t border-slate-200">
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-400 mb-1">Description</div>
+            <div id="rj-v-description" class="text-[11.5px] text-slate-600 leading-relaxed italic"></div>
+          </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-cols-4 gap-2 mb-3.5">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-fields" class="text-[20px] font-bold text-slate-800 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Fields</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-required" class="text-[20px] font-bold text-red-700 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Required</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-conditional" class="text-[20px] font-bold text-amber-700 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Conditional</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-types" class="text-[20px] font-bold text-slate-800 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Variants</div>
+          </div>
+        </div>
+
+        <!-- Fields breakdown with view toggle -->
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-400">Fields breakdown</div>
+          <div class="inline-flex bg-slate-100 rounded-md p-0.5" role="tablist">
+            <button id="rj-v-tab-list" onclick="setReviewJSONView('list')" class="h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-700 bg-white shadow-sm transition" role="tab">
+              <span class="inline-flex items-center gap-1">
+                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+                List
+              </span>
+            </button>
+            <button id="rj-v-tab-preview" onclick="setReviewJSONView('preview')" class="h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-500 hover:text-slate-700 transition" role="tab">
+              <span class="inline-flex items-center gap-1">
+                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+                Form preview
+              </span>
+            </button>
+          </div>
+        </div>
+        <div id="rj-v-fields-list" class="border border-slate-200 rounded-lg overflow-hidden"></div>
+        <div id="rj-v-fields-preview" class="hidden border border-slate-200 rounded-lg bg-slate-50/50 p-4"></div>
+      </div>
+
+      <div class="px-5 py-2.5 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+        <button onclick="reloadImportedAsTemplate()" class="h-[30px] text-slate-500 hover:text-slate-700 text-[11.5px] font-medium inline-flex items-center gap-1.5 transition" title="Replace current session with this template">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          <span class="underline underline-offset-2">Reload as template</span>
+        </button>
+        <button onclick="closeReviewJSONVerify()" class="h-[32px] px-4 bg-nexus hover:bg-blue-700 text-white text-[12px] font-semibold rounded-md inline-flex items-center gap-1.5 transition">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Looks good — close
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 font-medium text-xs flex items-center gap-2 transform translate-y-2 opacity-0 pointer-events-none transition-all duration-300 z-50"></div>
 
@@ -1306,7 +1449,7 @@
           if (f.type !== 'label') badges += badge(tInfo.nm, 'type');
           if (f.required) badges += badge('Required', 'req');
           if (f.visRule && f.visRule.source) badges += badge('Conditional', 'cond');
-          if (f.type === 'branch') badges += badge('Branching', 'branch');
+          if (f.type === 'branch' && !(f.visRule && f.visRule.source)) badges += badge('Conditional', 'cond');
           if (f.halfWidth) badges += badge('½ width', 'half');
 
           let condNote = '';
@@ -1435,7 +1578,7 @@
     <span><b>${totalFields}</b> fields tổng</span>
     <span><b>${[...new Set(entries.map(e=>e.catalog))].length}</b> catalog</span>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:8px 14px;background:#FAFAFA;border:0.5px solid #E5E7EB;border-radius:6px;font-size:10px;align-items:center"><span style="font-weight:600;color:#6B7280;margin-right:4px">Chú thích:</span><span style="background:#F0F9FF;color:#0369A1;padding:1px 7px;border-radius:4px;font-weight:600">Type</span><span style="color:#9CA3AF">=</span><span style="color:#555">Loại field</span><span style="color:#ddd">│</span><span style="background:#FEF2F2;color:#991B1B;padding:1px 7px;border-radius:4px;font-weight:600">Required</span><span style="color:#9CA3AF">=</span><span style="color:#555">Bắt buộc điền</span><span style="color:#ddd">│</span><span style="background:#F5F3FF;color:#6D28D9;padding:1px 7px;border-radius:4px;font-weight:600">Conditional</span><span style="color:#9CA3AF">=</span><span style="color:#555">Ẩn/hiện theo điều kiện</span><span style="color:#ddd">│</span><span style="background:#EEF2FF;color:#3730A3;padding:1px 7px;border-radius:4px;font-weight:600">Branching</span><span style="color:#9CA3AF">=</span><span style="color:#555">Mỗi lựa chọn mở ra câu hỏi riêng</span><span style="color:#ddd">│</span><span style="color:#9CA3AF">↳</span><span style="color:#555">= Sub-field thuộc branch cha</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:8px 14px;background:#FAFAFA;border:0.5px solid #E5E7EB;border-radius:6px;font-size:10px;align-items:center"><span style="font-weight:600;color:#6B7280;margin-right:4px">Chú thích:</span><span style="background:#F0F9FF;color:#0369A1;padding:1px 7px;border-radius:4px;font-weight:600">Type</span><span style="color:#9CA3AF">=</span><span style="color:#555">Loại field</span><span style="color:#ddd">│</span><span style="background:#FEF2F2;color:#991B1B;padding:1px 7px;border-radius:4px;font-weight:600">Required</span><span style="color:#9CA3AF">=</span><span style="color:#555">Bắt buộc điền</span><span style="color:#ddd">│</span><span style="background:#F5F3FF;color:#6D28D9;padding:1px 7px;border-radius:4px;font-weight:600">Conditional</span><span style="color:#9CA3AF">=</span><span style="color:#555">Ẩn/hiện theo điều kiện</span><span style="color:#ddd">│</span><span style="color:#9CA3AF">↳</span><span style="color:#555">= Câu hỏi con (hiện theo lựa chọn)</span></div>
 
   ${servicesHTML}
 
@@ -1499,8 +1642,12 @@
       if (f.branchFields) {
         Object.entries(f.branchFields).forEach(([optIdx, subFields]) => {
           const optLabel = (f.options && f.options[parseInt(optIdx)]) || optIdx;
+          // Track half-width pairing within THIS option (reset per option)
+          let subLastWasHalf = false;
           (subFields || []).forEach(sf => {
-            const subRow = _buildNexusRow(sf, false, idToName);
+            const subInline = sf.halfWidth && subLastWasHalf;
+            subLastWasHalf = sf.halfWidth && !subInline;
+            const subRow = _buildNexusRow(sf, subInline, idToName);
             // Use confirmed Nexus visibility_rule format
             subRow.visibility_rule = {
               source_field: branchName,
@@ -1712,7 +1859,7 @@
         { id: 'radio', nm: 'Single Choice', ic: '⚪', ds: 'Chọn 1 trong nhiều phương án.' },
         { id: 'checkbox', nm: 'Multiple Choice', ic: '☑️', ds: 'Tick chọn nhiều giá trị cùng lúc.' },
         { id: 'checklist', nm: 'Checklist', ic: '📋', ds: 'Danh sách cần xác nhận đồng ý.' },
-        { id: 'branch', nm: 'Branching', ic: '🌿', ds: 'Dropdown có sub-questions tự hiện theo option (auto Conditional).' }
+        { id: 'branch', nm: 'Conditional Dropdown', ic: '🌿', ds: 'Dropdown mở ra câu hỏi con theo lựa chọn.' }
       ]},
       { g: 'SMART PICKERS', ds: 'Tìm kiếm đồng bộ tự động qua API.', types: [
         { id: 'country', nm: 'Country', ic: '🌐', ds: 'Bộ chọn quốc gia auto-load.' },
@@ -2240,8 +2387,33 @@
       sv();
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // openFieldMenu — 3-dot dropdown (Edit / Duplicate / Delete)
+    // Toggle halfWidth for a branch sub-field — pairs with the previous sub-field
+    // in the SAME option (same parentBranch + same optIdx)
+    function toggleSubHalfWidth(branchId, optIdx, subIdx, e) {
+      if (e) e.stopPropagation();
+      const parent = fields.find(x => String(x.id) === String(branchId));
+      if (!parent || !parent.branchFields || !parent.branchFields[optIdx]) return;
+      const subs = parent.branchFields[optIdx];
+      if (subIdx < 1) return; // first sub-field has nothing before it to pair with
+      const f = subs[subIdx];
+      const prev = subs[subIdx - 1];
+      if (!f || !prev) return;
+      if (f.halfWidth) {
+        // Unpair
+        f.halfWidth = false;
+        if (!(subIdx >= 2 && subs[subIdx - 2].halfWidth)) prev.halfWidth = false;
+      } else {
+        // Pair with prev — break prev's old pair if needed
+        if (subIdx >= 2 && prev.halfWidth && subs[subIdx - 2].halfWidth) {
+          subs[subIdx - 2].halfWidth = false;
+        }
+        f.halfWidth = true;
+        prev.halfWidth = true;
+      }
+      renderFieldList();
+      renderPreview();
+      sv();
+    }
     // ═══════════════════════════════════════════════════════════
     function openFieldMenu(id, e) {
       if (e) e.stopPropagation();
@@ -2307,11 +2479,38 @@
 
       // Step B: Group into rows respecting halfWidth — but only for TOP-LEVEL items.
       // Sub-fields always full-width (their pairing inside branch is handled by branch editor).
+      //
+      // Pair rules (mirror Nexus origin):
+      //   1) Both items must have halfWidth=true.
+      //   2) Top-level + top-level:
+      //        - both non-conditional → pair
+      //        - both conditional sharing same visRule.source → pair
+      //        - mixed → no pair
+      //   3) Sub-field + sub-field: pair only if SAME parent branch AND SAME option
+      //      (sub-fields in different options have different visibility → never pair).
+      //   4) Top-level + sub-field → never pair.
+      function _canPairItems(a, b) {
+        if (!a || !b) return false;
+        if (!a.f.halfWidth || !b.f.halfWidth) return false;
+        // Sub-field pairing
+        if (a.isSub || b.isSub) {
+          if (!(a.isSub && b.isSub)) return false; // both must be sub
+          // Same parent + same option
+          return String(a.parentBranch.id) === String(b.parentBranch.id)
+              && a.optIdx === b.optIdx;
+        }
+        // Top-level pairing
+        const aSrc = (a.f.visRule && a.f.visRule.source != null) ? a.f.visRule.source : null;
+        const bSrc = (b.f.visRule && b.f.visRule.source != null) ? b.f.visRule.source : null;
+        if (aSrc == null && bSrc == null) return true;
+        if ((aSrc == null) !== (bSrc == null)) return false;
+        return String(aSrc) === String(bSrc);
+      }
       const rows = [];
       let pi = 0;
       while (pi < flat.length) {
         const it = flat[pi];
-        if (!it.isSub && it.f.halfWidth && pi + 1 < flat.length && !flat[pi + 1].isSub && flat[pi + 1].f.halfWidth) {
+        if (_canPairItems(it, flat[pi + 1])) {
           rows.push({ pair: true, items: [flat[pi], flat[pi + 1]] });
           pi += 2;
         } else {
@@ -2352,9 +2551,11 @@
           ? '<span class="bg-sky-50 text-sky-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap" title="Loaded from API">API</span>'
           : '';
 
-        // HalfWidth button — only for top-level (not sub-fields)
+        // HalfWidth button — top-level fields AND branch sub-fields
+        // Sub-fields can pair with the previous sub-field in the SAME option
         let halfBtn = '';
         if (!item.isSub && item.i >= 1) {
+          // Top-level field
           const isActive = !!(f.halfWidth && fields[item.i - 1].halfWidth);
           const tip = isActive ? 'Đang song song với field trước — bấm để bỏ' : 'Hiện song song với field trước';
           const cls = isActive
@@ -2363,6 +2564,17 @@
           const sz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
           const isvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
           halfBtn = `<button onclick="toggleHalfWidth(${f.id},event)" class="${sz} rounded-lg flex items-center justify-center transition flex-shrink-0 border ${cls}" title="${tip}"><svg class="${isvg}" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg></button>`;
+        } else if (item.isSub && item.subIdx >= 1) {
+          // Branch sub-field — can pair with previous sub-field in same option
+          const prevSub = (item.parentBranch.branchFields[item.optIdx] || [])[item.subIdx - 1];
+          const isActive = !!(f.halfWidth && prevSub && prevSub.halfWidth);
+          const tip = isActive ? 'Đang song song với sub-field trước — bấm để bỏ' : 'Hiện song song với sub-field trước';
+          const cls = isActive
+            ? 'bg-nexus/10 text-nexus border-nexus/30'
+            : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600 border-transparent';
+          const sz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
+          const isvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
+          halfBtn = `<button onclick="toggleSubHalfWidth(${item.parentBranch.id},${item.optIdx},${item.subIdx},event)" class="${sz} rounded-lg flex items-center justify-center transition flex-shrink-0 border ${cls}" title="${tip}"><svg class="${isvg}" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg></button>`;
         }
 
         // Click handlers — sub-fields open branch editor at right option
@@ -2435,7 +2647,7 @@
       const rect = btn.getBoundingClientRect();
       const menu = document.createElement('div');
       menu.className = 'field-menu-dropdown';
-      menu.style.cssText = 'position:fixed;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);padding:6px 0;z-index:300;min-width:180px;top:' + (rect.bottom + 6) + 'px;right:' + (window.innerWidth - rect.right) + 'px;';
+      menu.style.cssText = 'position:fixed;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);padding:6px 0;z-index:300;min-width:148px;top:' + (rect.bottom + 6) + 'px;right:' + (window.innerWidth - rect.right) + 'px;';
       function makeBtn(label, iconPath, color, action) {
         const b = document.createElement('button');
         b.style.cssText = 'width:100%;display:flex;align-items:center;gap:10px;padding:8px 14px;font-size:12px;font-weight:600;background:none;border:none;cursor:pointer;text-align:left;color:' + color + ';';
@@ -2445,13 +2657,32 @@
         b.addEventListener('click', () => { closeFieldMenu(); action(); });
         return b;
       }
-      menu.appendChild(makeBtn('Mở branch editor', 'M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7 M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z', '#374151', () => editBranchSubField(branchId, optIdx, subIdx, null)));
+      // Wording aligned with regular field menu (Edit / Duplicate / Delete)
+      // Edit on a branch sub-field opens the branch editor at the right option
+      menu.appendChild(makeBtn('Edit', 'M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7 M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z', '#374151', () => editBranchSubField(branchId, optIdx, subIdx, null)));
+      menu.appendChild(makeBtn('Duplicate', 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z', '#374151', () => duplicateSubField(branchId, optIdx, subIdx)));
       const sep = document.createElement('div');
       sep.style.cssText = 'border-top:1px solid #f1f5f9;margin:4px 0;';
       menu.appendChild(sep);
-      menu.appendChild(makeBtn('Xóa sub-field', 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', '#ef4444', () => deleteSubField(branchId, optIdx, subIdx)));
+      menu.appendChild(makeBtn('Delete', 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', '#ef4444', () => deleteSubField(branchId, optIdx, subIdx)));
       document.body.appendChild(menu);
       setTimeout(() => document.addEventListener('click', closeFieldMenu, { once: true }), 10);
+    }
+    function duplicateSubField(branchId, optIdx, subIdx) {
+      const parent = fields.find(x => String(x.id) === String(branchId));
+      if (!parent || !parent.branchFields || !parent.branchFields[optIdx]) return;
+      const sf = parent.branchFields[optIdx][subIdx];
+      if (!sf) return;
+      const n = JSON.parse(JSON.stringify(sf));
+      n.id = fuid();
+      n.label = sf.label ? sf.label + ' (Bản sao)' : '';
+      n.fieldName = (sf.fieldName || 'field') + '_copy';
+      n.halfWidth = false; // standalone like duplicateField
+      parent.branchFields[optIdx].splice(subIdx + 1, 0, n);
+      renderFieldList();
+      renderPreview();
+      sv();
+      toast('Đã nhân bản sub-field');
     }
     function deleteSubField(branchId, optIdx, subIdx) {
       const parent = fields.find(x => String(x.id) === String(branchId));
@@ -3567,6 +3798,826 @@
         console.error('ld() error:', e);
         switchTab('service');
       }
+    }
+
+    // ════════════════════════════════════════════════════════
+    // REVIEW JSON FEATURE
+    // Verify exported Nexus TIB JSON files + optional reload as template
+    // ════════════════════════════════════════════════════════
+
+    // Holds the parsed + validated JSON for the current Verify session
+    // null when modal closed or no valid file loaded yet
+    let _rjData = null;
+
+    // ── Modal: file picker ──
+    function openReviewJSONPicker() {
+      const m = document.getElementById('rj-picker-modal');
+      if (!m) return;
+      m.classList.remove('opacity-0', 'pointer-events-none');
+      m.classList.add('opacity-100');
+      const inner = document.getElementById('rj-picker-inner');
+      if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+      // Reset file input so onchange fires even for same filename
+      const fi = document.getElementById('rj-file-input');
+      if (fi) fi.value = '';
+    }
+    function closeReviewJSONPicker() {
+      const m = document.getElementById('rj-picker-modal');
+      if (!m) return;
+      m.classList.add('opacity-0', 'pointer-events-none');
+      m.classList.remove('opacity-100');
+      const inner = document.getElementById('rj-picker-inner');
+      if (inner) { inner.classList.add('scale-95'); inner.classList.remove('scale-100'); }
+    }
+
+    // ── File select handler ──
+    function onReviewJSONFileSelected(ev) {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+
+      // Size guard: 1MB
+      if (file.size > 1024 * 1024) {
+        toast('⚠️ File too large (max 1MB)');
+        return;
+      }
+
+      // Type guard: .json or application/json
+      const isJsonExt = /\.json$/i.test(file.name);
+      const isJsonType = file.type === 'application/json' || file.type === '' || file.type === 'text/plain';
+      if (!isJsonExt && !isJsonType) {
+        toast('⚠️ Please choose a .json file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        let raw;
+        try {
+          raw = JSON.parse(e.target.result);
+        } catch (err) {
+          toast('❌ File parse error — not valid JSON');
+          return;
+        }
+
+        try {
+          _validateNexusJSON(raw);
+        } catch (err) {
+          toast('❌ ' + (err.message || 'Not a valid Nexus TIB JSON'));
+          return;
+        }
+
+        // Stash + show Verify Modal
+        _rjData = {
+          raw: raw,
+          filename: file.name,
+          parsedFields: _parseAllRowsToFields(raw.form.rows || [])
+        };
+        closeReviewJSONPicker();
+        _renderReviewJSONVerify();
+        _openReviewJSONVerify();
+      };
+      reader.onerror = function() {
+        toast('❌ Could not read file');
+      };
+      reader.readAsText(file);
+    }
+
+    // ── Validator ──
+    function _validateNexusJSON(data) {
+      if (!data || typeof data !== 'object') throw new Error('Invalid JSON structure');
+      if (!data.form || typeof data.form !== 'object') throw new Error('Missing "form" key — not a Nexus TIB JSON');
+      if (!Array.isArray(data.form.rows)) throw new Error('Missing "form.rows" array — not a Nexus TIB JSON');
+      return true;
+    }
+
+    // ── Reverse parser: JSON row → internal field state ──
+    // Known Nexus types we map back; anything else → 'text' with a console warn
+    const _RJ_KNOWN_TYPES = new Set([
+      'label','text','textarea','number','email','boolean','date','daterange',
+      'select','radio','checkbox','checklist','upload','attachment',
+      'country','language','product'
+    ]);
+
+    function _parseRowToField(row) {
+      const settings = row.settings || {};
+      const rawType = row.type || 'text';
+      let type = rawType;
+      // Nexus uses 'attachment' as the on-wire type for upload fields
+      if (type === 'attachment') type = 'upload';
+      if (!_RJ_KNOWN_TYPES.has(rawType)) {
+        console.warn('[Review JSON] Unknown field type "' + rawType + '" — falling back to text');
+        type = 'text';
+      }
+
+      // Options handling for choice fields
+      let options = [];
+      let optionValues = {};
+      if (Array.isArray(settings.possible_values)) {
+        settings.possible_values.forEach((pv, i) => {
+          if (pv && typeof pv === 'object') {
+            options.push(pv.label != null ? String(pv.label) : '');
+            if (pv.value != null && pv.value !== pv.label) optionValues[i] = String(pv.value);
+          } else {
+            options.push(String(pv));
+          }
+        });
+      }
+
+      // Label resolution
+      let label = settings.label || '';
+      if (type === 'label') label = settings.label || 'Static content';
+
+      // Visibility rule reverse — JSON uses {source_field, operator, values:[]}
+      // Our internal uses {source: <fieldId>, op, values: <string>}
+      // We can't resolve source field ID here; defer to a 2nd pass after all fields parsed
+      let visRule = null;
+      if (row.visibility_rule && row.visibility_rule.source_field) {
+        visRule = {
+          _pendingSourceName: row.visibility_rule.source_field, // resolve later
+          op: row.visibility_rule.operator || 'equals',
+          values: Array.isArray(row.visibility_rule.values) ? (row.visibility_rule.values[0] || '') : (row.visibility_rule.values || '')
+        };
+      }
+
+      const field = {
+        id: fuid(),
+        type: type,
+        label: label,
+        fieldName: row.name || row.id || '',
+        hint: row.description || '',
+        placeholder: settings.placeholder || '',
+        defaultValue: row.default_value || '',
+        required: !!row.is_required,
+        visible: row.visible !== 0,
+        editable: row.editable !== 0,
+        multiple: !!(row.multiple || settings.multiple),
+        halfWidth: !!row.inline_with_previous,
+        options: options,
+        optionValues: optionValues,
+        branchFields: {},
+        visRule: visRule,
+        minLen: row.min_length != null ? row.min_length : '',
+        maxLen: row.max_length != null ? row.max_length : '',
+        pattern: row.regexp || '',
+        content: type === 'label' ? (settings.html || '') : '',
+        inlineStyles: [],
+        isFieldNameManual: false
+      };
+
+      // Product family
+      if (type === 'product' && settings.family) field.productFamily = settings.family;
+      // Accept types for upload — Nexus doesn't standardize this; keep blank
+      if (type === 'upload') {
+        field.acceptTypes = '';
+        field.uploadMode = 'online';
+        field.uploadLink = '';
+      }
+
+      return field;
+    }
+
+    function _parseAllRowsToFields(rows) {
+      // Reset _fid so imported fields get clean IDs starting from 1
+      _fid = 1;
+      const parsed = (rows || []).map(_parseRowToField);
+
+      // ── Pass A: propagate halfWidth back to the previous field of a pair ──
+      // JSON export only marks the 2nd field of a pair with `inline_with_previous: 1`.
+      // The internal renderer needs BOTH fields of a pair to have halfWidth=true
+      // (greedy 2-by-2 grouping). So whenever a field has halfWidth=true, set the
+      // previous sibling's halfWidth=true too. Cascading is safe — long inline
+      // chains stay coherent.
+      for (let i = 1; i < parsed.length; i++) {
+        if (parsed[i].halfWidth && parsed[i - 1] && parsed[i - 1].halfWidth !== true) {
+          parsed[i - 1].halfWidth = true;
+        }
+      }
+
+      // ── Pass B: resolve _pendingSourceName → numeric field.id ──
+      const nameToId = {};
+      parsed.forEach(f => { if (f.fieldName) nameToId[f.fieldName] = f.id; });
+      parsed.forEach(f => {
+        if (f.visRule && f.visRule._pendingSourceName) {
+          const srcId = nameToId[f.visRule._pendingSourceName];
+          if (srcId != null) {
+            f.visRule.source = srcId;
+          } else {
+            // Source not found → drop the rule
+            f.visRule = null;
+            return;
+          }
+          delete f.visRule._pendingSourceName;
+        }
+      });
+      return parsed;
+    }
+
+    // ── Verify modal open/close ──
+    function _openReviewJSONVerify() {
+      const m = document.getElementById('rj-verify-modal');
+      if (!m) return;
+      m.classList.remove('opacity-0', 'pointer-events-none');
+      m.classList.add('opacity-100');
+      const inner = document.getElementById('rj-verify-inner');
+      if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+    }
+    function closeReviewJSONVerify() {
+      const m = document.getElementById('rj-verify-modal');
+      if (!m) return;
+      m.classList.add('opacity-0', 'pointer-events-none');
+      m.classList.remove('opacity-100');
+      const inner = document.getElementById('rj-verify-inner');
+      if (inner) { inner.classList.add('scale-95'); inner.classList.remove('scale-100'); }
+      // Clear stash so re-open shows fresh state
+      _rjData = null;
+    }
+
+    // ── Render Verify modal content ──
+    function _renderReviewJSONVerify() {
+      if (!_rjData) return;
+      const fname = _rjData.filename || 'file.json';
+      const form = _rjData.raw.form || {};
+      const parsedFields = _rjData.parsedFields || [];
+
+      // Filename
+      const fnEl = document.getElementById('rj-v-filename');
+      if (fnEl) fnEl.textContent = fname;
+
+      // Service name (from form.name)
+      const svcName = form.name || '(no service name)';
+      const svcEl = document.getElementById('rj-v-service');
+      if (svcEl) svcEl.textContent = svcName;
+
+      // Description
+      const descWrap = document.getElementById('rj-v-description-wrap');
+      const descEl = document.getElementById('rj-v-description');
+      if (form.description && form.description.trim()) {
+        if (descEl) descEl.textContent = form.description;
+        if (descWrap) descWrap.classList.remove('hidden');
+      } else {
+        if (descWrap) descWrap.classList.add('hidden');
+      }
+
+      // Stats
+      const total = parsedFields.length;
+      const required = parsedFields.filter(f => f.required).length;
+      const conditional = parsedFields.filter(f => f.visRule && f.visRule.source != null).length;
+      const variants = new Set(parsedFields.map(f => f.type)).size;
+      document.getElementById('rj-v-stat-fields').textContent = total;
+      document.getElementById('rj-v-stat-required').textContent = required;
+      document.getElementById('rj-v-stat-conditional').textContent = conditional;
+      document.getElementById('rj-v-stat-types').textContent = variants;
+
+      // Render based on current view (default list)
+      _renderReviewJSONListView();
+      _renderReviewJSONPreviewView();
+      // Reset toggle visual state to "List"
+      setReviewJSONView('list');
+    }
+
+    // ── View toggle ──
+    function setReviewJSONView(view) {
+      const list = document.getElementById('rj-v-fields-list');
+      const prev = document.getElementById('rj-v-fields-preview');
+      const tabL = document.getElementById('rj-v-tab-list');
+      const tabP = document.getElementById('rj-v-tab-preview');
+      if (!list || !prev || !tabL || !tabP) return;
+
+      if (view === 'preview') {
+        list.classList.add('hidden');
+        prev.classList.remove('hidden');
+        tabP.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-700 bg-white shadow-sm transition';
+        tabL.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-500 hover:text-slate-700 transition';
+      } else {
+        prev.classList.add('hidden');
+        list.classList.remove('hidden');
+        tabL.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-700 bg-white shadow-sm transition';
+        tabP.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-500 hover:text-slate-700 transition';
+      }
+    }
+
+    // ── List view: card-based design mirroring real renderFieldList ──
+    // Blocks pair side-by-side when EITHER field is conditional (= sub-field semantic).
+    // Conditional fields are treated as sub-fields in the real tool and forced full-width.
+    function _renderReviewJSONListView() {
+      if (!_rjData) return;
+      const parsedFields = _rjData.parsedFields || [];
+      const listEl = document.getElementById('rj-v-fields-list');
+      listEl.innerHTML = '';
+      // Remove tight list styling — switch to gap-spaced cards
+      listEl.className = 'space-y-2';
+      if (!parsedFields.length) {
+        listEl.innerHTML = '<div class="px-3 py-6 text-center text-[11px] text-slate-400 bg-white border border-slate-200 rounded-xl">No fields in this JSON</div>';
+        return;
+      }
+      // Build id→label map for friendly visRule display
+      const idToLabel = {};
+      parsedFields.forEach(f => { idToLabel[f.id] = f.label || f.fieldName || '(unnamed)'; });
+
+      // Pair logic — mirror real tool's _canPairItems (line 2461):
+      //   - Both must have halfWidth=true
+      //   - Both non-conditional → pair
+      //   - Both conditional with SAME visRule.source → pair
+      //   - One conditional + one non-conditional → no pair
+      //   - Two conditional with different sources → no pair
+      function _rjCanPair(a, b) {
+        if (!a || !b) return false;
+        if (!a.halfWidth || !b.halfWidth) return false;
+        const aSrc = (a.visRule && a.visRule.source != null) ? a.visRule.source : null;
+        const bSrc = (b.visRule && b.visRule.source != null) ? b.visRule.source : null;
+        if (aSrc == null && bSrc == null) return true;
+        if ((aSrc == null) !== (bSrc == null)) return false;
+        return String(aSrc) === String(bSrc);
+      }
+      const rows = [];
+      let pi = 0;
+      while (pi < parsedFields.length) {
+        const cur = parsedFields[pi];
+        const next = parsedFields[pi + 1];
+        if (_rjCanPair(cur, next)) {
+          rows.push([cur, next]);
+          pi += 2;
+        } else {
+          rows.push([cur]);
+          pi++;
+        }
+      }
+
+      rows.forEach(row => {
+        const isPair = row.length === 2;
+        if (isPair) {
+          const pairWrap = document.createElement('div');
+          pairWrap.className = 'grid grid-cols-2 gap-2';
+          row.forEach(f => pairWrap.appendChild(_buildListCard(f, idToLabel, true)));
+          listEl.appendChild(pairWrap);
+        } else {
+          listEl.appendChild(_buildListCard(row[0], idToLabel, false));
+        }
+      });
+    }
+
+    // ── Build a single field card mirroring real tool's renderCard ──
+    function _buildListCard(f, idToLabel, isInPair) {
+      // Conditional = sub-field semantic
+      const isSub = !!(f.visRule && f.visRule.source != null);
+
+      // Outer card wrapper
+      const wrap = document.createElement('div');
+      const pairBorder = isInPair ? 'border-nexus/40 bg-blue-50/[0.3]' : 'border-slate-200';
+      wrap.className = 'fc bg-white border ' + pairBorder + ' hover:border-nexus-border hover:shadow-sm transition rounded-xl overflow-hidden group';
+
+      // Get colors via existing global helpers
+      const colors = (typeof getTypeColor === 'function')
+        ? getTypeColor(f.type)
+        : { bg: '#EFF6FF', border: '#BFDBFE', text: '#155DFC' };
+      const iconSvgInner = (typeof getTypeIconSVG === 'function')
+        ? getTypeIconSVG(f.type)
+        : _rjFieldIcon(f.type);
+
+      // Header row (clickable)
+      const header = document.createElement('button');
+      header.type = 'button';
+      const padding = isInPair ? 'px-2.5 py-2.5' : 'px-3.5 py-3';
+      const rowGap = isInPair ? 'gap-2' : 'gap-3';
+      header.className = 'w-full flex items-center ' + rowGap + ' ' + padding + ' text-left transition';
+      header.setAttribute('aria-expanded', 'false');
+
+      // Drag handle placeholder (visual parity with real card — non-functional in review modal)
+      const dragH = document.createElement('div');
+      dragH.className = 'text-slate-200 select-none text-sm flex-shrink-0';
+      dragH.style.cursor = 'default';
+      dragH.textContent = '⋮⋮';
+      dragH.setAttribute('aria-hidden', 'true');
+      header.appendChild(dragH);
+
+      // Type icon (real tool style with type color)
+      const iconBox = document.createElement('div');
+      const iconSz = isInPair ? 'w-8 h-8' : 'w-9 h-9';
+      iconBox.className = iconSz + ' rounded-lg flex items-center justify-center flex-shrink-0';
+      iconBox.style.cssText = 'background:' + colors.bg + ';border:1px solid ' + colors.border + ';color:' + colors.text;
+      iconBox.innerHTML = iconSvgInner;
+      header.appendChild(iconBox);
+
+      // Info block (label + meta + badges)
+      const info = document.createElement('div');
+      info.className = 'flex-1 min-w-0';
+
+      const labelLine = document.createElement('div');
+      labelLine.className = 'flex items-center gap-1.5 flex-wrap';
+      const labelSz = isInPair ? 'text-[13px]' : 'text-[14px]';
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'font-semibold ' + labelSz + ' text-slate-800 truncate';
+      labelSpan.textContent = f.label || '(no label)';
+      labelLine.appendChild(labelSpan);
+
+      // Required badge — red pill, full word
+      if (f.required && f.type !== 'label') {
+        const req = document.createElement('span');
+        req.className = 'bg-red-50 text-red-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap';
+        req.textContent = 'Required';
+        labelLine.appendChild(req);
+      }
+      // Conditional badge — purple pill, full word
+      if (isSub) {
+        const cond = document.createElement('span');
+        cond.className = 'bg-purple-50 text-purple-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap';
+        cond.textContent = 'Conditional';
+        cond.title = 'Conditional visibility — shown only when parent rule matches';
+        labelLine.appendChild(cond);
+      }
+      // API badge — sky pill (for product/country/language)
+      if (f.type === 'product' || f.type === 'country' || f.type === 'language') {
+        const api = document.createElement('span');
+        api.className = 'bg-sky-50 text-sky-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap';
+        api.textContent = 'API';
+        api.title = 'Loaded from API';
+        labelLine.appendChild(api);
+      }
+      info.appendChild(labelLine);
+
+      const metaSz = isInPair ? 'text-[11px]' : 'text-[12px]';
+      const meta = document.createElement('div');
+      meta.className = metaSz + ' text-slate-500 mt-0.5 truncate';
+      meta.textContent = _rjFieldMeta(f);
+      info.appendChild(meta);
+
+      header.appendChild(info);
+
+      // HalfWidth icon (▯▯) — show for any field that has halfWidth=true
+      // (conditional fields can also have halfWidth — they pair with other conditional
+      // fields sharing the same visRule.source, mirroring real tool behavior)
+      if (f.halfWidth) {
+        const halfIcon = document.createElement('div');
+        const hSz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
+        const hSvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
+        halfIcon.className = hSz + ' rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 text-nexus border border-blue-200';
+        halfIcon.title = 'Half-width — paired with adjacent field';
+        halfIcon.innerHTML = '<svg class="' + hSvg + '" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg>';
+        header.appendChild(halfIcon);
+      }
+
+      // 3-dot menu button — visual identical to real tool, click = toggle expand detail
+      const menuBtn = document.createElement('div');
+      const menuSz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
+      const menuSvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
+      menuBtn.className = menuSz + ' rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-slate-600 transition flex-shrink-0';
+      menuBtn.title = 'Click to view field details';
+      menuBtn.style.transition = 'transform 0.2s, color 0.2s';
+      menuBtn.innerHTML = '<svg class="' + menuSvg + '" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>';
+      header.appendChild(menuBtn);
+
+      // Detail panel — appears below the header inside the card
+      const detail = document.createElement('div');
+      detail.className = 'hidden border-t border-slate-200 bg-slate-50/60 px-3.5 py-3';
+      detail.innerHTML = _buildFieldDetailHTML(f, idToLabel);
+
+      // Click handler — toggle expand + animate 3-dot
+      header.addEventListener('click', () => {
+        const isOpen = !detail.classList.contains('hidden');
+        if (isOpen) {
+          detail.classList.add('hidden');
+          menuBtn.style.transform = '';
+          menuBtn.style.color = '';
+        } else {
+          detail.classList.remove('hidden');
+          menuBtn.style.transform = 'rotate(90deg)';
+          menuBtn.style.color = '#155DFC';
+        }
+        header.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
+
+      wrap.appendChild(header);
+      wrap.appendChild(detail);
+      return wrap;
+    }
+
+    // ── Smart detail HTML: only show properties with values ──
+    function _buildFieldDetailHTML(f, idToLabel) {
+      const rows = [];
+
+      const add = (key, val) => {
+        if (val == null || val === '' || (typeof val === 'string' && !val.trim())) return;
+        rows.push(
+          '<div class="grid grid-cols-[110px_1fr] gap-2 py-1">' +
+            '<div class="text-[10px] uppercase tracking-wide font-semibold text-slate-500">' + key + '</div>' +
+            '<div class="text-[11px] text-slate-700 break-words">' + val + '</div>' +
+          '</div>'
+        );
+      };
+      const escape = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+      // Basic identity
+      add('Field name', f.fieldName ? '<span class="font-mono text-[10.5px]">' + escape(f.fieldName) + '</span>' : '');
+      add('Type', '<span class="font-mono text-[10.5px]">' + escape(f.type) + '</span>');
+      add('Hint', f.hint ? escape(f.hint) : '');
+      add('Placeholder', f.placeholder ? escape(f.placeholder) : '');
+      add('Default value', f.defaultValue ? escape(f.defaultValue) : '');
+
+      // Flags as readable list (only true ones)
+      const flagBits = [];
+      if (f.required) flagBits.push('Required');
+      if (f.visible === false) flagBits.push('Hidden (visible=0)');
+      if (f.editable === false) flagBits.push('Read-only (editable=0)');
+      if (f.multiple) flagBits.push('Allows multiple');
+      if (f.halfWidth) flagBits.push('Half-width inline');
+      if (flagBits.length) add('Behavior', flagBits.join(' · '));
+
+      // Validation
+      const valBits = [];
+      if (f.minLen && f.minLen > 0) valBits.push('Min length: ' + f.minLen);
+      if (f.maxLen && f.maxLen > 0) valBits.push('Max length: ' + f.maxLen);
+      if (f.pattern) valBits.push('Regex: <span class="font-mono text-[10.5px]">' + escape(f.pattern) + '</span>');
+      if (valBits.length) add('Validation', valBits.join(' · '));
+
+      // Options (choice fields)
+      if (Array.isArray(f.options) && f.options.length) {
+        const lis = f.options.map((opt, i) => {
+          const val = (f.optionValues && f.optionValues[i] != null && f.optionValues[i] !== '') ? f.optionValues[i] : null;
+          const tag = val ? ' <span class="font-mono text-[9.5px] text-slate-400">= ' + escape(val) + '</span>' : '';
+          return '<li class="flex gap-1.5"><span class="text-slate-400 shrink-0">' + (i + 1) + '.</span><span>' + escape(opt) + tag + '</span></li>';
+        }).join('');
+        add('Options', '<ul class="space-y-0.5">' + lis + '</ul>');
+      }
+
+      // Conditional rule
+      if (f.visRule && f.visRule.source != null) {
+        const srcLabel = idToLabel[f.visRule.source] || ('field #' + f.visRule.source);
+        const opMap = { equals: '=', not_equals: '≠', contains: 'contains' };
+        const op = opMap[f.visRule.op] || f.visRule.op || '=';
+        const rhs = '"' + escape(f.visRule.values || '') + '"';
+        add('Show when', '<span class="font-semibold text-slate-700">' + escape(srcLabel) + '</span> <span class="text-amber-700 font-bold">' + op + '</span> ' + rhs);
+      }
+
+      // Content (label type)
+      if (f.type === 'label' && f.content) {
+        const trimmed = f.content.length > 200 ? f.content.substring(0, 200) + '…' : f.content;
+        add('HTML content', '<div class="bg-white border border-slate-200 rounded p-2 text-[10.5px] font-mono text-slate-600 max-h-24 overflow-y-auto">' + escape(trimmed) + '</div>');
+      }
+
+      // Product family (smart picker)
+      if (f.productFamily) add('Product family', escape(f.productFamily));
+
+      if (!rows.length) return '<div class="text-[10px] text-slate-400 italic text-center py-1">No additional details</div>';
+      return '<div class="divide-y divide-slate-200/70">' + rows.join('') + '</div>';
+    }
+
+    // ── Form preview view: render half-width side-by-side (mirrors renderPreview logic) ──
+    // Conditional fields are treated as sub-fields → forced full-width (no pairing)
+    function _renderReviewJSONPreviewView() {
+      if (!_rjData) return;
+      const parsedFields = _rjData.parsedFields || [];
+      const prevEl = document.getElementById('rj-v-fields-preview');
+      prevEl.innerHTML = '';
+      if (!parsedFields.length) {
+        prevEl.innerHTML = '<div class="text-center py-6 text-[11px] text-slate-400">No fields to preview</div>';
+        return;
+      }
+
+      // Pair logic mirrors real tool — see list view _rjCanPair for full rules
+      function _rjPvCanPair(a, b) {
+        if (!a || !b) return false;
+        if (!a.halfWidth || !b.halfWidth) return false;
+        const aSrc = (a.visRule && a.visRule.source != null) ? a.visRule.source : null;
+        const bSrc = (b.visRule && b.visRule.source != null) ? b.visRule.source : null;
+        if (aSrc == null && bSrc == null) return true;
+        if ((aSrc == null) !== (bSrc == null)) return false;
+        return String(aSrc) === String(bSrc);
+      }
+      const pvRows = [];
+      let pi = 0;
+      while (pi < parsedFields.length) {
+        const pf = parsedFields[pi];
+        const np = parsedFields[pi + 1];
+        if (_rjPvCanPair(pf, np)) {
+          pvRows.push([pf, np]);
+          pi += 2;
+        } else {
+          pvRows.push([pf]);
+          pi++;
+        }
+      }
+
+      const container = document.createElement('div');
+      container.className = 'space-y-3';
+
+      pvRows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = row.length === 2 ? 'grid grid-cols-2 gap-3' : '';
+        row.forEach(f => rowDiv.appendChild(_buildPreviewFieldNode(f)));
+        container.appendChild(rowDiv);
+      });
+
+      prevEl.appendChild(container);
+    }
+
+    // ── Build single field node for preview view (mimics real form rendering) ──
+    function _buildPreviewFieldNode(f) {
+      const wrap = document.createElement('div');
+      wrap.className = 'bg-white border border-slate-200 rounded-md p-2.5';
+
+      // Label line
+      if (f.type !== 'label') {
+        const lbl = document.createElement('div');
+        lbl.className = 'flex items-center gap-1.5 mb-1.5';
+        const t = document.createElement('span');
+        t.className = 'text-[11.5px] font-semibold text-slate-700';
+        t.textContent = f.label || '(no label)';
+        lbl.appendChild(t);
+        if (f.required) {
+          const s = document.createElement('span');
+          s.className = 'text-red-500 text-[11px]';
+          s.textContent = '*';
+          lbl.appendChild(s);
+        }
+        if (f.visRule && f.visRule.source != null) {
+          const c = document.createElement('span');
+          c.className = 'text-[8.5px] font-bold px-1 py-0.5 rounded tracking-wide leading-tight';
+          c.style.cssText = 'background:#FEF3C7;color:#92400E';
+          c.textContent = 'IF';
+          lbl.appendChild(c);
+        }
+        wrap.appendChild(lbl);
+
+        if (f.hint) {
+          const h = document.createElement('div');
+          h.className = 'text-[10px] text-slate-400 italic mb-1.5';
+          h.textContent = f.hint;
+          wrap.appendChild(h);
+        }
+      }
+
+      // Field-type-specific preview
+      wrap.appendChild(_buildPreviewInput(f));
+      return wrap;
+    }
+
+    function _buildPreviewInput(f) {
+      const escape = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const ph = f.placeholder ? ' placeholder="' + escape(f.placeholder) + '"' : '';
+      const dv = f.defaultValue ? ' value="' + escape(f.defaultValue) + '"' : '';
+      const base = 'class="w-full bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600 px-2 py-1.5 pointer-events-none"';
+      const div = document.createElement('div');
+
+      switch (f.type) {
+        case 'label': {
+          const safe = (f.content || '<span class="text-slate-400 italic">Static label content</span>');
+          div.className = 'text-[11.5px] text-slate-600 leading-relaxed';
+          div.innerHTML = safe;
+          return div;
+        }
+        case 'textarea':
+          div.innerHTML = '<textarea ' + base + ph + ' rows="2">' + escape(f.defaultValue || '') + '</textarea>';
+          return div.firstChild;
+        case 'number':
+          div.innerHTML = '<input type="number" ' + base + ph + dv + '>';
+          return div.firstChild;
+        case 'email':
+          div.innerHTML = '<input type="email" ' + base + ph + dv + '>';
+          return div.firstChild;
+        case 'date':
+          div.innerHTML = '<input type="date" ' + base + dv + '>';
+          return div.firstChild;
+        case 'daterange':
+          div.className = 'grid grid-cols-2 gap-1.5';
+          div.innerHTML = '<input type="date" ' + base + '><input type="date" ' + base + '>';
+          return div;
+        case 'boolean': {
+          div.className = 'inline-flex items-center gap-1.5';
+          div.innerHTML = '<div class="w-8 h-4 bg-slate-200 rounded-full relative"><div class="w-3 h-3 bg-white border border-slate-300 rounded-full absolute top-0.5 left-0.5"></div></div><span class="text-[11px] text-slate-500">No</span>';
+          return div;
+        }
+        case 'select': {
+          const opts = (f.options || []).map(o => '<option>' + escape(o) + '</option>').join('');
+          div.innerHTML = '<select ' + base + '><option value="" class="text-slate-400">' + (f.placeholder ? escape(f.placeholder) : 'Choose...') + '</option>' + opts + '</select>';
+          return div.firstChild;
+        }
+        case 'radio':
+        case 'checkbox':
+        case 'checklist': {
+          const type = (f.type === 'radio') ? 'radio' : 'checkbox';
+          const items = (f.options || []).map(o =>
+            '<label class="flex items-center gap-1.5 text-[11px] text-slate-600"><input type="' + type + '" disabled class="pointer-events-none"> ' + escape(o) + '</label>'
+          ).join('');
+          div.className = 'space-y-1 bg-slate-50 border border-slate-200 rounded px-2 py-1.5';
+          div.innerHTML = items || '<div class="text-[10px] text-slate-400 italic">No options defined</div>';
+          return div;
+        }
+        case 'upload':
+          div.className = 'border border-dashed border-slate-300 rounded text-center py-2 text-[10px] text-slate-400 bg-slate-50';
+          div.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="inline-block mr-1 align-middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' + (f.multiple ? 'Upload files...' : 'Upload file...');
+          return div;
+        case 'country':
+        case 'language':
+        case 'product':
+          div.innerHTML = '<input type="text" ' + base + ' placeholder="🔍 Search ' + f.type + '..." disabled>';
+          return div.firstChild;
+        default:
+          // text + fallback
+          div.innerHTML = '<input type="text" ' + base + ph + dv + '>';
+          return div.firstChild;
+      }
+    }
+
+    // ── Field meta string for breakdown row ──
+    function _rjFieldMeta(f) {
+      const parts = [f.type];
+      if (f.fieldName) parts.push(f.fieldName);
+      if (f.type === 'select' || f.type === 'radio' || f.type === 'checkbox' || f.type === 'checklist') {
+        if (f.options && f.options.length) parts.push(f.options.length + ' options');
+      } else if (f.type === 'text' || f.type === 'textarea') {
+        if (f.maxLen && f.maxLen > 0) parts.push('max ' + f.maxLen);
+        else if (f.minLen && f.minLen > 0) parts.push('min ' + f.minLen);
+      } else if (f.type === 'upload' && f.multiple) {
+        parts.push('multi-file');
+      }
+      return parts.join(' · ');
+    }
+
+    // ── SVG icon per field type (inline 14px slate) ──
+    function _rjFieldIcon(type) {
+      const stroke = 'stroke="currentColor" stroke-width="2" fill="none"';
+      switch (type) {
+        case 'label':     return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>';
+        case 'text':      return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
+        case 'textarea':  return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></svg>';
+        case 'number':    return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>';
+        case 'email':     return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+        case 'boolean':   return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3"/></svg>';
+        case 'date':      return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+        case 'daterange': return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>';
+        case 'select':    return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="6 9 12 15 18 9"/></svg>';
+        case 'radio':     return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
+        case 'checkbox':  return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+        case 'checklist': return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="9 11 12 14 22 4"/><line x1="3" y1="6" x2="3" y2="6.01"/><line x1="3" y1="12" x2="3" y2="12.01"/><line x1="3" y1="18" x2="3" y2="18.01"/></svg>';
+        case 'upload':    return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+        case 'country':   return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>';
+        case 'language':  return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M4 7h16M9 4v3M14 4v3"/><path d="M5 21l4-10 4 10M6 18h6M16 11l2 5 2-5M14 21l4-10 4 10"/></svg>';
+        case 'product':   return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M6 11l1.5-7h9L18 11M4 11h16l-1 9H5z"/></svg>';
+        default:          return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      }
+    }
+
+    // ── Reload as template ──
+    // Smart behavior: if session has data → confirm; else → load + reset selection
+    // Uses existing _templateMode mechanism so fields auto-apply when user picks a service
+    function reloadImportedAsTemplate() {
+      if (!_rjData) return;
+
+      const sessionHasFields = fields.length > 0;
+      const sessionHasDesc = (document.getElementById('desc-input').value || '').trim().length > 0;
+      const sessionHasSel = !!(sel && sel.n);
+
+      if (sessionHasFields || sessionHasDesc || sessionHasSel) {
+        const bits = [];
+        if (sessionHasSel) bits.push('selected service "' + sel.n + '"');
+        if (sessionHasFields) bits.push(fields.length + ' field(s)');
+        if (sessionHasDesc) bits.push('service description');
+        const msg = 'Replace your current work?\n\nThis will discard: ' + bits.join(', ') + '.\n\nYou\'ll need to pick a service to apply the imported template.';
+        if (!confirm(msg)) return;
+      }
+
+      // Snapshot data before closing modal (close clears _rjData)
+      const importedFields = _rjData.parsedFields.map(f => JSON.parse(JSON.stringify(f)));
+      const importedDesc = (_rjData.raw.form && _rjData.raw.form.description) || '';
+      const importedSvcName = (_rjData.raw.form && _rjData.raw.form.name) || 'Imported template';
+
+      // Reuse existing _templateMode mechanism — fields will be loaded by pS() when user picks
+      // No source catalog/category since the imported JSON doesn't store them — leave blank so
+      // no service gets greyed out as "source" in the picker
+      _templateMode = {
+        sourceLabel: importedSvcName,
+        sourceCatalog: '',
+        sourceCategory: '',
+        sourceService: '',  // empty → no service gets blocked as "source"
+        fields: importedFields,
+        description: importedDesc
+      };
+
+      // Reset designer state — fields will be loaded after user picks service via pS()
+      sel = { s: '', g: '', n: '' };
+      fields = []; _fid = 1; activeId = null; previewState = {};
+      sq = '';
+      const si = document.getElementById('search-input');
+      if (si) si.value = '';
+      const di = document.getElementById('desc-input');
+      if (di) di.value = '';
+      const dp = document.getElementById('desc-path');
+      if (dp) dp.style.display = 'none';
+
+      // Close modal + show banner on Step 1 + go to Service tab Step 1
+      closeReviewJSONVerify();
+      if (typeof renderTemplateBanner === 'function') renderTemplateBanner();
+      if (typeof goStep === 'function') goStep(1);
+      switchTab('service');
+
+      if (typeof renderCols === 'function') renderCols();
+      if (typeof dLock === 'function') dLock();
+      if (typeof checkWords === 'function') checkWords();
+      if (typeof sv === 'function') sv();
+      if (typeof renderFieldList === 'function') renderFieldList();
+      if (typeof renderPreview === 'function') renderPreview();
+
+      toast('🎯 Template loaded (' + importedFields.length + ' fields) — pick a service to apply');
     }
 
     window.onload = function() {
