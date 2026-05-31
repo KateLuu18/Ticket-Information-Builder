@@ -7,7 +7,7 @@
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- Google Fonts Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
   
@@ -63,12 +63,12 @@
       to { opacity: 1; transform: translateY(0); }
     }
     /* Label/Rich text link styling in preview */
-    #preview-body a, #ew-live-preview-box a {
+    #preview-body a, #ew-live-preview-box a, .rt-rich a {
       color: #155DFC;
       text-decoration: underline;
       font-weight: 600;
     }
-    #preview-body a:hover, #ew-live-preview-box a:hover {
+    #preview-body a:hover, #ew-live-preview-box a:hover, .rt-rich a:hover {
       color: #0f4ecf;
     }
 
@@ -136,18 +136,22 @@
 }
 #fta-modal .fta-close:hover { background: rgba(255,255,255,0.25); }
 
+/* Horizontal progress (restored) */
 #fta-modal .fta-progress { padding: 14px 22px 0; border-bottom: 1px solid #f1f5f9; }
 #fta-modal .fta-prog-steps { display: flex; align-items: center; padding-bottom: 14px; }
 #fta-modal .fta-prog-step { display: flex; align-items: center; gap: 6px; flex: 1; }
 #fta-modal .fta-prog-step:last-child { flex: 0; }
-#fta-modal .fta-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #e2e8f0; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #94a3b8; flex-shrink: 0; transition: all 0.2s; }
-#fta-modal .fta-dot.active { border-color: #155DFC; background: #155DFC; color: #fff; }
-#fta-modal .fta-dot.done { border-color: #155DFC; background: #dbeafe; color: #155DFC; }
+#fta-modal .fta-dot { width: 11px; height: 11px; border-radius: 50%; border: 2px solid #e2e8f0; background: #fff; font-size: 0; flex-shrink: 0; transition: all 0.2s; }
+#fta-modal .fta-dot.active { border-color: #155DFC; background: #155DFC; }
+#fta-modal .fta-dot.done { border-color: #155DFC; background: #dbeafe; }
 #fta-modal .fta-plabel { font-size: 11px; font-weight: 700; color: #94a3b8; white-space: nowrap; transition: all 0.2s; }
-#fta-modal .fta-plabel.active { color: #155DFC; }
-#fta-modal .fta-plabel.done { color: #155DFC; }
+#fta-modal .fta-plabel.active, #fta-modal .fta-plabel.done { color: #155DFC; }
 #fta-modal .fta-pline { flex: 1; height: 2px; background: #e2e8f0; margin: 0 5px; transition: all 0.2s; }
 #fta-modal .fta-pline.done { background: #155DFC; }
+
+/* Fixed-height content area — frame never resizes; only long list scrolls internally */
+#fta-modal .fta-scroll { height: 320px; overflow-y: auto; padding-right: 4px; margin-right: -4px; align-content: start; }
+
 
 #fta-modal .fta-body { padding: 16px 22px; }
 #fta-modal .fta-step { display: none; }
@@ -157,18 +161,16 @@
 #fta-modal .fta-step-heading { font-size: 14px; font-weight: 600; color: #1e293b; line-height: 1.4; grid-row: 1; grid-column: 2; }
 #fta-modal .fta-step-sub { font-size: 11px; color: #94a3b8; font-style: italic; grid-row: 2; grid-column: 2; margin-top: 2px; }
 
-/* Step 1 — Categories: single-zone card */
-#fta-modal .fta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Step 1 — Categories: single-zone vertical card */
+#fta-modal .fta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
 #fta-modal .fta-choice { padding: 12px 14px; text-align: left; background: #fff; border: 0.5px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.15s; width: 100%; display: flex; flex-direction: column; gap: 3px; }
 #fta-modal .fta-choice:hover { border-color: #BFDBFE; background: #fafbfc; }
 #fta-modal .fta-choice.active { border-color: #155DFC; background: #F8FAFF; box-shadow: 0 0 0 2px rgba(21,93,252,0.08); }
-#fta-modal .fta-choice .c-en-zone { display: none; }
 #fta-modal .fta-choice .c-icon { width: 36px; height: 36px; border-radius: 9px; background: #EFF6FF; border: 0.5px solid #BFDBFE; display: flex; align-items: center; justify-content: center; color: #155DFC; flex-shrink: 0; transition: all 0.15s; }
 #fta-modal .fta-choice.active .c-icon { background: #DBEAFE; border-color: #93C5FD; }
-#fta-modal .fta-choice .c-text { flex: 1; min-width: 0; }
 #fta-modal .fta-choice .c-title { font-weight: 700; font-size: 14px; color: #1e293b; line-height: 1.35; margin: 0; }
 #fta-modal .fta-choice.active .c-title { color: #155DFC; }
-#fta-modal .fta-choice .c-sub { display: block; font-size: 11px; font-style: italic; color: #64748b; line-height: 1.45; padding: 0; background: none; border-top: none; margin: 0; padding-left: 46px; }
+#fta-modal .fta-choice .c-sub { display: block; font-size: 11px; font-style: italic; color: #64748b; line-height: 1.45; margin: 0; padding-left: 46px; }
 #fta-modal .fta-choice.active .c-sub { color: #475569; }
 #fta-modal .fta-choice .c-sub i { font-style: italic; }
 #fta-modal .fta-choice.fullwidth { grid-column: 1 / span 2; }
@@ -185,11 +187,11 @@
 #fta-modal .fta-sub-text { flex: 1; min-width: 0; }
 #fta-modal .fta-sub-title { display: block; font-size: 14px; font-weight: 700; color: #1e293b; line-height: 1.35; }
 #fta-modal .fta-sub.active .fta-sub-title { color: #155DFC; }
-#fta-modal .fta-sub .s-note { display: block; font-size: 11px; font-style: italic; color: #64748b; line-height: 1.45; margin: 0; padding: 0; padding-left: 46px; background: none; border-top: none; font-weight: 400; }
+#fta-modal .fta-sub .s-note { display: block; font-size: 11px; font-style: italic; color: #64748b; line-height: 1.45; margin: 0; padding-left: 46px; background: none; border-top: none; font-weight: 400; }
 #fta-modal .fta-sub.active .s-note { color: #475569; }
 #fta-modal .fta-sub .s-note i { font-style: italic; }
 
-#fta-modal .fta-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 12px; border-top: 0.5px solid #f1f5f9; }
+#fta-modal .fta-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid #f1f5f9; flex-shrink: 0; }
 #fta-modal .fta-btn-back { padding: 8px 14px; background: #fff; border: 0.5px solid #cbd5e1; border-radius: 8px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer; }
 #fta-modal .fta-btn-back:hover { background: #f8fafc; }
 #fta-modal .fta-btn-back:disabled { opacity: 0.3; cursor: not-allowed; }
@@ -239,6 +241,17 @@
 
 #fta-modal .fta-info { padding:10px 12px; border-radius:8px; font-size:11px; line-height:1.6; margin-top:6px; }
 #fta-modal .fta-info-blue { background:#EFF6FF; border:0.5px solid #BFDBFE; color:#1E40AF; }
+
+    /* ── RICH TEXT HELPER (Label / Rich text edit form) ── */
+    #ew-rt-editor:empty:before { content: attr(data-placeholder); color: #94A3B8; font-style: italic; pointer-events: none; }
+    #ew-rt-editor:focus { border-color: #155DFC; outline: none; }
+    #ew-rt-editor a { color: #155DFC; text-decoration: underline; font-weight: 600; }
+    #ew-rt-editor ul, #ew-live-preview-box ul, #preview-body ul, .rt-rich ul { margin: 6px 0; padding-left: 22px; list-style: disc; }
+    #ew-rt-editor ol, #ew-live-preview-box ol, #preview-body ol, .rt-rich ol { margin: 6px 0; padding-left: 22px; list-style: decimal; }
+    #ew-rt-editor b, #ew-rt-editor strong { font-weight: 700; }
+    #ew-rt-link-modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 10000; align-items: center; justify-content: center; }
+    #ew-rt-link-modal.rt-open { display: flex; }
+    .ew-rt-mode-active { background: #fff !important; color: #155DFC !important; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
   </style>
 </head>
 <body class="font-sans text-slate-900 min-h-screen flex flex-col antialiased">
@@ -277,6 +290,14 @@
             <div id="svc-dropdown-list" class="max-h-72 overflow-y-auto custom-scrollbar p-2"></div>
             <div class="px-3 py-2.5 border-t border-slate-100 flex gap-2" id="svc-dropdown-footer"></div>
           </div>
+        </div>
+
+        <div class="relative">
+          <button id="btn-review-json" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-lg transition" onclick="openReviewJSONPicker()" title="Verify any exported JSON file">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v3M11 14v0.01"/></svg>
+            <span>Review JSON</span>
+          </button>
+          <span class="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none tracking-wider shadow-sm pointer-events-none">TRY</span>
         </div>
 
         <div class="relative">
@@ -541,120 +562,85 @@
 
     <div class="fta-progress">
       <div class="fta-prog-steps">
-        <div class="fta-prog-step">
-          <div class="fta-dot active" id="fta-pd1">1</div>
-          <span class="fta-plabel active" id="fta-pl1">Input kind</span>
-        </div>
+        <div class="fta-prog-step"><div class="fta-dot active" id="fta-pd1"></div><span class="fta-plabel active" id="fta-pl1">Input kind</span></div>
         <div class="fta-pline" id="fta-pline1"></div>
-        <div class="fta-prog-step">
-          <div class="fta-dot" id="fta-pd2">2</div>
-          <span class="fta-plabel" id="fta-pl2">Detail</span>
-        </div>
+        <div class="fta-prog-step"><div class="fta-dot" id="fta-pd2"></div><span class="fta-plabel" id="fta-pl2">Detail</span></div>
         <div class="fta-pline" id="fta-pline2"></div>
-        <div class="fta-prog-step">
-          <div class="fta-dot" id="fta-pd3">3</div>
-          <span class="fta-plabel" id="fta-pl3">Visibility</span>
-        </div>
+        <div class="fta-prog-step"><div class="fta-dot" id="fta-pd3"></div><span class="fta-plabel" id="fta-pl3">Visibility</span></div>
         <div class="fta-pline" id="fta-pline3"></div>
-        <div class="fta-prog-step" style="flex:0">
-          <div class="fta-dot" id="fta-pd4">✓</div>
-          <span class="fta-plabel" id="fta-pl4">Result</span>
-        </div>
+        <div class="fta-prog-step" style="flex:0"><div class="fta-dot" id="fta-pd4"></div><span class="fta-plabel" id="fta-pl4">Result</span></div>
       </div>
     </div>
 
     <div class="fta-body">
 
       <div class="fta-step visible" id="fta-step1">
-        <div class="fta-step-header"><div class="fta-step-badge">Step 1 / 3</div><div class="fta-step-heading">What kind of input do you need?</div><div class="fta-step-sub">Bạn cần loại input nào? Chọn loại dữ liệu user sẽ nhập.</div></div>
-        <div class="fta-grid">
+        <div class="fta-step-header"><div class="fta-step-badge">Input kind</div><div class="fta-step-heading">What kind of input do you need?</div><div class="fta-step-sub">Bạn cần loại thông tin nào? Chọn kiểu dữ liệu người điền sẽ cung cấp.</div></div>
+        <div class="fta-scroll"><div class="fta-grid">
           <button class="fta-choice" onclick="FTA.sel1('list',this)">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg></div>
-              <div class="c-title">Pick from a list</div>
-            </div>
-            <div class="c-sub">User chọn từ list cấu hình sẵn — status, category, platform...</div>
+            <div style="display:flex;align-items:center;gap:10px"><div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1.2" fill="currentColor"/><circle cx="4" cy="12" r="1.2" fill="currentColor"/><circle cx="4" cy="18" r="1.2" fill="currentColor"/></svg></div><div class="c-title">Pick from a list</div></div>
+            <div class="c-sub">Người điền chọn từ danh sách có sẵn — trạng thái, hạng mục, nền tảng...</div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('input',this)">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/><line x1="4" y1="18" x2="10" y2="18"/></svg></div>
-              <div class="c-title">Type text or numbers</div>
-            </div>
-            <div class="c-sub">User tự nhập dữ liệu — UserID, TransID, mô tả...</div>
+            <div style="display:flex;align-items:center;gap:10px"><div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/><line x1="4" y1="18" x2="10" y2="18"/></svg></div><div class="c-title">Type text or numbers</div></div>
+            <div class="c-sub">Người điền tự nhập dữ liệu — UserID, TransID, mô tả...</div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('date',this)">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-              <div class="c-title">Date or time range</div>
-            </div>
-            <div class="c-sub">1 ngày cụ thể, hoặc khoảng thời gian từ ngày → đến ngày.</div>
+            <div style="display:flex;align-items:center;gap:10px"><div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="c-title">Date or time range</div></div>
+            <div class="c-sub">Một ngày cụ thể, hoặc khoảng thời gian từ ngày → đến ngày.</div>
           </button>
           <button class="fta-choice" onclick="FTA.sel1('file',this)">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div>
-              <div class="c-title">Attach files</div>
-            </div>
-            <div class="c-sub">User upload screenshot, document, report...</div>
+            <div style="display:flex;align-items:center;gap:10px"><div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div><div class="c-title">Attach files</div></div>
+            <div class="c-sub">Cho phép người điền đính kèm ảnh, tài liệu, báo cáo...</div>
           </button>
           <button class="fta-choice fullwidth" onclick="FTA.sel1('display',this)">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-              <div class="c-title">Display info only</div>
-            </div>
-            <div class="c-sub">Hiện note, warning, link — không thu thập data.</div>
+            <div style="display:flex;align-items:center;gap:10px"><div class="c-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><div class="c-title">Display info only</div></div>
+            <div class="c-sub">Chỉ hiển thị nội dung để người điền đọc, không thu thập dữ liệu. VD: lưu ý, cảnh báo, link hướng dẫn.</div>
           </button>
-        </div>
-        <div class="fta-nav">
-          <div></div>
-          <button class="fta-btn-next" id="fta-next1" disabled onclick="FTA.goStep(2)">Next →</button>
-        </div>
+        </div></div>
+        <div class="fta-nav"><div></div><button class="fta-btn-next" id="fta-next1" disabled onclick="FTA.goStep(2)">Next →</button></div>
       </div>
 
       <div class="fta-step" id="fta-step2">
-        <div class="fta-step-header"><div class="fta-step-badge">Step 2 / 3</div><div class="fta-step-heading">Tell me more about the data</div><div class="fta-step-sub">Mô tả chi tiết hơn về dữ liệu</div></div>
-
-        <div id="fta-sub-list" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('list-segmented',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="6" height="12" rx="1"/><rect x="11" y="6" width="4" height="12" rx="1"/><rect x="17" y="6" width="4" height="12" rx="1"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Under 5 options — shown inline (e.g. iOS / Android / PC)</span></span></div><span class="s-note"><i>Dưới 5 lựa chọn — hiện thẳng ra ngoài, không cần bấm dropdown</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-dropdown',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="4" rx="1"/><polyline points="7 14 12 19 17 14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">5 to 30 options — collapsed in a dropdown</span></span></div><span class="s-note"><i>5-30 lựa chọn — thu gọn vào dropdown, giúp form không bị dài</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-checkbox',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Multiple values at once (multi-select)</span></span></div><span class="s-note"><i>Cho user chọn nhiều giá trị cùng lúc — lưu dạng mảng (array)</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-checklist',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Todo-style checklist — items to tick off</span></span></div><span class="s-note"><i>Danh sách đầu việc cần tích hoàn thành — dùng cho checklist vận hành</i></span></button>
+        <div class="fta-step-header"><div class="fta-step-badge">Detail</div><div class="fta-step-heading">Tell me more about the data</div><div class="fta-step-sub">Mô tả chi tiết hơn về dữ liệu</div></div>
+        <div class="fta-scroll">
+<div id="fta-sub-list" class="fta-subs">
+          <button class="fta-sub" onclick="FTA.sel2('list-segmented',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="6" height="12" rx="1"/><rect x="11" y="6" width="4" height="12" rx="1"/><rect x="17" y="6" width="4" height="12" rx="1"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Under 5 options — shown inline (e.g. iOS / Android / PC)</span></span></div><span class="s-note"><i>Ít lựa chọn (dưới 5) — hiển thị sẵn tất cả để người điền chọn nhanh</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-dropdown',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="4" rx="1"/><polyline points="7 14 12 19 17 14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">5 to 30 options — collapsed in a dropdown</span></span></div><span class="s-note"><i>Nhiều lựa chọn (5–30) — thu gọn trong danh sách thả xuống cho gọn gàng</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-checkbox',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Multiple values at once (multi-select)</span></span></div><span class="s-note"><i>Cho phép người điền chọn nhiều mục cùng lúc. VD: chạy trên cả iOS và Android</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-checklist',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Todo-style checklist — items to tick off</span></span></div><span class="s-note"><i>Danh sách hạng mục cần tích "đã hoàn thành". VD: checklist xác nhận trước khi gửi</i></span></button>
+          <div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em"><span style="flex:1;height:0.5px;background:#e2e8f0"></span>Hoặc dùng danh sách tự động (auto-load)<span style="flex:1;height:0.5px;background:#e2e8f0"></span></div>
+          <button class="fta-sub" onclick="FTA.sel2('list-country',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Country — auto-loaded list</span></span></div><span class="s-note"><i>Danh sách quốc gia/vùng tự động cập nhật — không phải nhập tay, luôn chuẩn</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-language',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c0 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Language — auto-loaded list</span></span></div><span class="s-note"><i>Danh sách ngôn ngữ tự động cập nhật — không phải nhập tay</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-product',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Game / product — synced from Nexus</span></span></div><span class="s-note"><i>Danh sách game/sản phẩm đồng bộ từ hệ thống — luôn khớp dữ liệu thật</i></span></button>
         </div>
         <div id="fta-sub-input" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('text-short',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="17" x2="17" y2="17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Short text — under 100 chars (name, code, ID)</span></span></div><span class="s-note"><i>Chuỗi ngắn có cả chữ + số (vd: TXN-001, ABC123)</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('text-long',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Long description (multi-line)</span></span></div><span class="s-note"><i>Mô tả dài nhiều dòng — không giới hạn ký tự, phù hợp mô tả lỗi</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('text-email',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Email address</span></span></div><span class="s-note"><i>Tự động kiểm tra định dạng có @ và domain hợp lệ</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('num-calc',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="9" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="15" y2="20"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Pure number (e.g. count, days, port)</span></span></div><span class="s-note"><i>Chỉ dùng khi giá trị là SỐ THUẦN — không chứa chữ nào</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('num-bool',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Yes / No confirmation</span></span></div><span class="s-note"><i>User chỉ tick/bỏ tick — đồng ý điều khoản, đã kiểm tra...</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-short',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="17" x2="17" y2="17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Short text — under 100 chars (name, code, ID)</span></span></div><span class="s-note"><i>Một dòng ngắn gồm chữ và số. VD: mã giao dịch TXN-001, tên studio</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-long',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Long description (multi-line)</span></span></div><span class="s-note"><i>Đoạn văn nhiều dòng. VD: mô tả chi tiết sự cố, các bước tái hiện lỗi</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('text-email',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Email address</span></span></div><span class="s-note"><i>Ô nhập email — tự động kiểm tra đúng định dạng</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('num-calc',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="9" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="15" y2="20"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Pure number (e.g. count, days, port)</span></span></div><span class="s-note"><i>Chỉ cho phép nhập số. VD: số lượng, số ngày. (Mã có cả chữ → chọn "Một dòng ngắn")</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('num-bool',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Yes / No confirmation</span></span></div><span class="s-note"><i>Câu hỏi Có/Không. VD: "Đã đồng ý điều khoản?", "Đã kiểm thử UAT?"</i></span></button>
         </div>
         <div id="fta-sub-date" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('spec-date',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A single date (e.g. incident date, release date)</span></span></div><span class="s-note"><i>Một ngày cụ thể — lưu dạng ISO YYYY-MM-DD</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('spec-daterange',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A date range — from → to (e.g. maintenance window)</span></span></div><span class="s-note"><i>Khoảng thời gian từ → đến — lưu dạng [start, end]</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-date',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A single date (e.g. incident date, release date)</span></span></div><span class="s-note"><i>Chọn một ngày cụ thể. VD: ngày phát hiện lỗi, ngày dự kiến phát hành</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('spec-daterange',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">A date range — from → to (e.g. maintenance window)</span></span></div><span class="s-note"><i>Chọn khoảng "từ ngày → đến ngày". VD: thời gian bảo trì, đợt khuyến mãi</i></span></button>
         </div>
         <div id="fta-sub-file" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('spec-file',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">User uploads files (e.g. screenshots, Excel reports)</span></span></div><span class="s-note"><i>User tải file lên ticket — config được format: image/*, .xlsx, .pdf...</i></span></button>
-          <div class="fta-info fta-info-blue">💡 Need to share a template link AND let users upload? Pick <strong>Display info only</strong> in Step 1. <span style="font-style:italic;color:#94a3b8">Cần vừa share link template vừa cho user upload? Chọn "Display info only" ở Step 1.</span></div>
+          <button class="fta-sub" onclick="FTA.sel2('spec-file',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Upload only — người điền đính kèm tệp</span></span></div><span class="s-note"><i>Cho phép người điền đính kèm tệp. VD: ảnh chụp lỗi, file Excel, báo cáo</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('label-link',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Template link + Upload (combo)</span></span></div><span class="s-note"><i>Hiển thị đoạn chú ý kèm link tải tệp mẫu, ngay bên dưới có ô để người điền nộp lại. VD: "Tải file Excel mẫu [tại đây], điền rồi đính kèm lại bên dưới."</i></span></button>
         </div>
-        <div id="fta-sub-display" class="fta-subs">
-          <button class="fta-sub" onclick="FTA.sel2('label-text',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice / warning / guide (display only)</span></span></div><span class="s-note"><i>Hỗ trợ Rich Text — bold, italic, link nhúng</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('label-link',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Notice + template link + upload combo</span></span></div><span class="s-note"><i>Tạo 2 fields liên tiếp: label (link) → attachment (upload)</i></span></button>
         </div>
-
-        <div class="fta-nav">
-          <button class="fta-btn-back" onclick="FTA.goStep(1)">← Back</button>
-          <button class="fta-btn-next" id="fta-next2" disabled onclick="FTA.goStep(3)">Next →</button>
-        </div>
+        <div class="fta-nav"><button class="fta-btn-back" onclick="FTA.goStep(1)">← Back</button><button class="fta-btn-next" id="fta-next2" disabled onclick="FTA.goStep(3)">Next →</button></div>
       </div>
 
       <div class="fta-step" id="fta-step3">
-        <div class="fta-step-header"><div class="fta-step-badge">Step 3 / 3</div><div class="fta-step-heading">Should this field always show?</div><div class="fta-step-sub">Field này có luôn hiển thị không?</div></div>
-        <div style="display:flex;flex-direction:column;gap:7px">
-          <button class="fta-sub" id="fta-cond-no" onclick="FTA.selCond('no',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Always visible — to every user</span></span></div><span class="s-note"><i>Field độc lập, không phụ thuộc vào lựa chọn nào khác</i></span></button>
-          <button class="fta-sub" id="fta-cond-yes" onclick="FTA.selCond('yes',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8.5V19l-4-2v-4.5L3 4z"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Conditional — show based on another answer</span></span></div><span class="s-note"><i>VD: chọn "iOS" → hiện thêm "App Store ID"; chọn "Android" → hiện "Play Store ID"</i></span></button>
+        <div class="fta-step-header"><div class="fta-step-badge">Visibility</div><div class="fta-step-heading">Should this field always show?</div><div class="fta-step-sub">Field này có luôn hiển thị không?</div></div>
+        <div class="fta-scroll" style="display:flex;flex-direction:column;gap:7px">
+
+          <button class="fta-sub" id="fta-cond-no" onclick="FTA.selCond('no',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Always visible — to every user</span></span></div><span class="s-note"><i>Luôn hiển thị với mọi người điền — không phụ thuộc câu trả lời nào</i></span></button>
+          <button class="fta-sub" id="fta-cond-yes" onclick="FTA.selCond('yes',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8.5V19l-4-2v-4.5L3 4z"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Conditional — show based on another answer</span></span></div><span class="s-note"><i>Chỉ hiển thị khi người điền chọn một đáp án nhất định. VD: chọn "iOS" → mới hỏi "App Store ID"</i></span></button>
         </div>
-        <div class="fta-nav">
-          <button class="fta-btn-back" onclick="FTA.goStep(2)">← Back</button>
-          <button class="fta-btn-next" id="fta-next3" disabled onclick="FTA.showResult()">See result →</button>
-        </div>
+        <div class="fta-nav"><button class="fta-btn-back" onclick="FTA.goStep(2)">← Back</button><button class="fta-btn-next" id="fta-next3" disabled onclick="FTA.showResult()">See result →</button></div>
       </div>
 
       <div class="fta-result" id="fta-result">
@@ -707,6 +693,141 @@
   </div>
 </div>
 
+  <!-- ── Review JSON: File picker modal ── -->
+  <input type="file" id="rj-file-input" accept=".json,application/json" style="display:none" onchange="onReviewJSONFileSelected(event)">
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-[200] opacity-0 pointer-events-none transition-all duration-200" id="rj-picker-modal" onclick="if(event.target===this)closeReviewJSONPicker()">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md flex flex-col overflow-hidden transform scale-95 transition-all duration-200" id="rj-picker-inner">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg width="16" height="16" fill="none" stroke="#155DFC" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v3M11 14v0.01"/></svg>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-slate-800 leading-tight">Review JSON</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Verify any exported JSON file</div>
+          </div>
+        </div>
+        <button onclick="closeReviewJSONPicker()" class="text-slate-300 hover:text-slate-500 p-1" aria-label="Close">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="px-5 py-5">
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-5 text-[11.5px] text-slate-600 leading-relaxed">
+          <div class="font-semibold text-slate-800 mb-0.5">What this does</div>
+          Select a JSON file you exported from this tool to preview its fields. You can optionally reload it as a new template to edit. <span class="italic text-slate-400">Chọn file JSON đã export để xem lại fields. Có thể reload làm template để edit tiếp.</span>
+        </div>
+
+        <div class="text-center">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 inline-flex items-center justify-center mb-3">
+            <svg width="24" height="24" fill="none" stroke="#155DFC" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="10" y1="13" x2="14" y2="13"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
+          </div>
+          <div class="text-[13px] font-semibold text-slate-800 mb-3.5">Select a JSON file from your computer</div>
+          <button onclick="document.getElementById('rj-file-input').click()" class="h-[34px] px-5 bg-nexus hover:bg-blue-700 text-white text-[12.5px] font-semibold rounded-lg inline-flex items-center gap-1.5 transition">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            Choose file
+          </button>
+        </div>
+
+        <div class="text-[10px] text-slate-400 text-center mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-center gap-1.5">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          JSON files only · Max 1MB
+        </div>
+      </div>
+
+      <div class="px-5 py-2.5 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <button onclick="closeReviewJSONPicker()" class="h-[30px] px-3.5 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-[11.5px] font-semibold rounded-md transition">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Review JSON: Verify modal ── -->
+  <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-[201] opacity-0 pointer-events-none transition-all duration-200" id="rj-verify-modal" onclick="if(event.target===this)closeReviewJSONVerify()">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden transform scale-95 transition-all duration-200" id="rj-verify-inner">
+      <div class="px-5 py-3.5 border-b border-emerald-200" style="background:#ECFDF5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="inline-flex items-center gap-1 bg-emerald-700 text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wider leading-tight">
+                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                REVIEW MODE
+              </span>
+              <div id="rj-v-filename" class="text-xs font-semibold text-emerald-900 truncate font-mono">file.json</div>
+            </div>
+            <div class="text-[11px] text-emerald-700">Read-only · Nothing changes until you reload as template</div>
+          </div>
+          <button onclick="closeReviewJSONVerify()" class="text-emerald-700 hover:text-emerald-900 p-1 shrink-0" aria-label="Close">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar px-5 py-4">
+        <!-- Service breadcrumb card -->
+        <div class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 mb-3.5">
+          <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-400 mb-1">Service</div>
+          <div id="rj-v-service" class="text-[12.5px] text-slate-800 font-medium leading-snug">—</div>
+          <div id="rj-v-description-wrap" class="hidden mt-2 pt-2 border-t border-slate-200">
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-400 mb-1">Description</div>
+            <div id="rj-v-description" class="text-[11.5px] text-slate-600 leading-relaxed italic"></div>
+          </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-cols-4 gap-2 mb-3.5">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-fields" class="text-[20px] font-bold text-slate-800 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Fields</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-required" class="text-[20px] font-bold text-red-700 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Required</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-conditional" class="text-[20px] font-bold text-amber-700 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Conditional</div>
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-lg py-2.5 text-center">
+            <div id="rj-v-stat-types" class="text-[20px] font-bold text-slate-800 leading-none">0</div>
+            <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-500 mt-1">Variants</div>
+          </div>
+        </div>
+
+        <!-- Fields breakdown with view toggle -->
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="text-[9px] uppercase tracking-wider font-semibold text-slate-400">Fields breakdown</div>
+          <div class="inline-flex bg-slate-100 rounded-md p-0.5" role="tablist">
+            <button id="rj-v-tab-list" onclick="setReviewJSONView('list')" class="h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-700 bg-white shadow-sm transition" role="tab">
+              <span class="inline-flex items-center gap-1">
+                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+                List
+              </span>
+            </button>
+            <button id="rj-v-tab-preview" onclick="setReviewJSONView('preview')" class="h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-500 hover:text-slate-700 transition" role="tab">
+              <span class="inline-flex items-center gap-1">
+                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+                Form preview
+              </span>
+            </button>
+          </div>
+        </div>
+        <div id="rj-v-fields-list" class="border border-slate-200 rounded-lg overflow-hidden"></div>
+        <div id="rj-v-fields-preview" class="hidden border border-slate-200 rounded-lg bg-slate-50/50 p-4"></div>
+      </div>
+
+      <div class="px-5 py-2.5 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+        <button onclick="reloadImportedAsTemplate()" class="h-[30px] text-slate-500 hover:text-slate-700 text-[11.5px] font-medium inline-flex items-center gap-1.5 transition" title="Replace current session with this template">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          <span class="underline underline-offset-2">Reload as template</span>
+        </button>
+        <button onclick="closeReviewJSONVerify()" class="h-[32px] px-4 bg-nexus hover:bg-blue-700 text-white text-[12px] font-semibold rounded-md inline-flex items-center gap-1.5 transition">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Looks good — close
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 font-medium text-xs flex items-center gap-2 transform translate-y-2 opacity-0 pointer-events-none transition-all duration-300 z-50"></div>
 
   <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-[200] opacity-0 pointer-events-none transition-all duration-200" id="mo-type" onclick="if(event.target===this)closeTypePicker()">
@@ -732,7 +853,7 @@
           </div>
           <div style="flex:1;min-width:0">
             <div style="font-size:12px;font-weight:600;color:#78350F">Not sure which type to pick?</div>
-            <div style="font-size:11px;color:#B45309;margin-top:1px;font-style:italic">Không chắc chọn loại nào? Trả lời 2 câu hỏi → tool gợi ý cho bạn</div>
+            <div style="font-size:11px;color:#B45309;margin-top:1px;font-style:italic">Không chắc chọn loại nào? Trả lời 2-3 câu hỏi → tool gợi ý cho bạn</div>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" style="flex-shrink:0"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
@@ -825,7 +946,7 @@
 
     let CURR_LANG = 'vi';
 
-    const H = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const H = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     const ESC = s => String(s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
     function toast(m, dur = 3000) {
@@ -854,7 +975,7 @@
       { g: 'Lựa chọn', id: 'radio', nm: 'Single Choice', ic: '⚪', ds: 'Pick exactly one option' },
       { g: 'Lựa chọn', id: 'checkbox', nm: 'Multiple Choice', ic: '☑️', ds: 'Pick any subset of options' },
       { g: 'Lựa chọn', id: 'checklist', nm: 'Checklist', ic: '📋', ds: 'A todo-style checklist of items to confirm' },
-      { g: 'Lựa chọn', id: 'branch', nm: 'Dropdown', ic: '🌿', ds: 'Expands different sub-questions depending on pick' },
+      { g: 'Lựa chọn', id: 'branch', nm: 'Branching dropdown', ic: '🌿', ds: 'Expands different sub-questions depending on pick' },
       { g: 'File', id: 'upload', nm: 'Attachment', ic: '📎', ds: 'One or more uploaded files attached to the ticket' },
       { g: 'Smart', id: 'country', nm: 'Country', ic: '🌐', ds: 'Searchable auto-loaded list of countries' },
       { g: 'Smart', id: 'language', nm: 'Language', ic: '🗣️', ds: 'Searchable auto-loaded list of languages' },
@@ -951,6 +1072,30 @@
       str = str.replace(/__+/g, '_');
       str = str.replace(/^_+|_+$/g, '');
       return str;
+    }
+
+    // Ensure fieldName uniqueness across all fields (incl. branch sub-fields).
+    // If `name` is already taken, append _2, _3, ... until unique.
+    // Pass `excludeId` to skip the field being edited (so it doesn't conflict with itself).
+    function ensureUniqueFieldName(name, excludeId) {
+      if (!name) return name;
+      const existing = new Set();
+      const collect = (fs) => {
+        if (!Array.isArray(fs)) return;
+        fs.forEach(f => {
+          if (excludeId == null || String(f.id) !== String(excludeId)) {
+            if (f.fieldName) existing.add(f.fieldName);
+          }
+          if (f.branchFields && typeof f.branchFields === 'object') {
+            Object.values(f.branchFields).forEach(subs => collect(subs));
+          }
+        });
+      };
+      collect(fields);
+      if (!existing.has(name)) return name;
+      let i = 2;
+      while (existing.has(name + '_' + i)) i++;
+      return name + '_' + i;
     }
 
     const RAW_SVC=[
@@ -1288,7 +1433,7 @@
         function addField(f, depth, parentLabel, parentOpt) {
           const tInfo = TI(f.type);
           const labelText = f.type === 'label'
-            ? (String(f.content||'').replace(/<[^>]*>/g,'').slice(0,60)||'(Label / Rich text)')
+            ? (f.content || '(Label / Rich text)')
             : (f.label || '(chưa đặt tên)');
           const seqLabel = depth > 0 ? '' : String(seq++);
           const indent = depth > 0;
@@ -1296,7 +1441,7 @@
           if (f.type !== 'label') badges += badge(tInfo.nm, 'type');
           if (f.required) badges += badge('Required', 'req');
           if (f.visRule && f.visRule.source) badges += badge('Conditional', 'cond');
-          if (f.type === 'branch') badges += badge('Branching', 'branch');
+          if (f.type === 'branch' && !(f.visRule && f.visRule.source)) badges += badge('Conditional', 'cond');
           if (f.halfWidth) badges += badge('½ width', 'half');
 
           let condNote = '';
@@ -1368,7 +1513,7 @@
           if (r.condNote) extra.push('<div style="color:#7C3AED;font-size:10px;font-style:italic;background:#F5F3FF;padding:3px 8px;border-radius:4px;margin-top:3px">👁 ' + r.condNote + '</div>');
           html += `<tr style="background:${bg}">
             <td style="padding:6px 8px;border:0.5px solid #E5E7EB;text-align:center;color:#9CA3AF;font-size:10px">${r.seqLabel}</td>
-            <td style="padding:6px 8px;border:0.5px solid #E5E7EB;font-weight:${r.indent?'400':'500'};${indent}">${prefix}${H(r.labelText)}</td>
+            <td style="padding:6px 8px;border:0.5px solid #E5E7EB;font-weight:${r.indent?'400':'500'};${indent}">${prefix}${r.type === 'label' ? r.labelText : H(r.labelText)}</td>
             <td style="padding:6px 8px;border:0.5px solid #E5E7EB;font-family:monospace;font-size:10px;color:#6B7280">${H(r.fieldName)}</td>
             <td style="padding:6px 8px;border:0.5px solid #E5E7EB">${r.badges}</td>
             <td style="padding:6px 8px;border:0.5px solid #E5E7EB;color:#4B5563;line-height:1.6">${extra.join('')}</td>
@@ -1386,9 +1531,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Nexus TIB — ${dateStr}</title>
+<base target="_blank">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #fff; color: #111; padding: 32px 40px; max-width: 900px; margin: 0 auto; }
+  body { font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; background: #fff; color: #111; padding: 32px 40px; max-width: 900px; margin: 0 auto; }
   @media print {
     body { padding: 16px 20px; max-width: none; }
     .no-print { display: none !important; }
@@ -1404,6 +1550,14 @@
   .print-btn { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; padding: 8px 18px; background: #155DFC; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
   .print-btn:hover { background: #0f4ecf; }
   .doc-footer { margin-top: 24px; padding-top: 10px; border-top: 0.5px solid #E5E7EB; display: flex; justify-content: space-between; font-size: 9px; color: #9CA3AF; }
+  .service-block table td { vertical-align: top; line-height: 1.6; }
+  .service-block table td ul { margin: 4px 0; padding-left: 18px; list-style: disc; }
+  .service-block table td ol { margin: 4px 0; padding-left: 18px; list-style: decimal; }
+  .service-block table td li { line-height: 1.6; }
+  .service-block table td a { color: #155DFC; text-decoration: underline; }
+  .service-block table td b, .service-block table td strong { font-weight: 600; }
+  .service-block table td p { margin: 0 0 4px; }
+  .service-block table td br + b, .service-block table td br + strong { line-height: 1.6; }
 </style>
 </head>
 <body>
@@ -1425,7 +1579,7 @@
     <span><b>${totalFields}</b> fields tổng</span>
     <span><b>${[...new Set(entries.map(e=>e.catalog))].length}</b> catalog</span>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:8px 14px;background:#FAFAFA;border:0.5px solid #E5E7EB;border-radius:6px;font-size:10px;align-items:center"><span style="font-weight:600;color:#6B7280;margin-right:4px">Chú thích:</span><span style="background:#F0F9FF;color:#0369A1;padding:1px 7px;border-radius:4px;font-weight:600">Type</span><span style="color:#9CA3AF">=</span><span style="color:#555">Loại field</span><span style="color:#ddd">│</span><span style="background:#FEF2F2;color:#991B1B;padding:1px 7px;border-radius:4px;font-weight:600">Required</span><span style="color:#9CA3AF">=</span><span style="color:#555">Bắt buộc điền</span><span style="color:#ddd">│</span><span style="background:#F5F3FF;color:#6D28D9;padding:1px 7px;border-radius:4px;font-weight:600">Conditional</span><span style="color:#9CA3AF">=</span><span style="color:#555">Ẩn/hiện theo điều kiện</span><span style="color:#ddd">│</span><span style="background:#EEF2FF;color:#3730A3;padding:1px 7px;border-radius:4px;font-weight:600">Branching</span><span style="color:#9CA3AF">=</span><span style="color:#555">Mỗi lựa chọn mở ra câu hỏi riêng</span><span style="color:#ddd">│</span><span style="color:#9CA3AF">↳</span><span style="color:#555">= Sub-field thuộc branch cha</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:8px 14px;background:#FAFAFA;border:0.5px solid #E5E7EB;border-radius:6px;font-size:10px;align-items:center"><span style="font-weight:600;color:#6B7280;margin-right:4px">Chú thích:</span><span style="background:#F0F9FF;color:#0369A1;padding:1px 7px;border-radius:4px;font-weight:600">Type</span><span style="color:#9CA3AF">=</span><span style="color:#555">Loại field</span><span style="color:#ddd">│</span><span style="background:#FEF2F2;color:#991B1B;padding:1px 7px;border-radius:4px;font-weight:600">Required</span><span style="color:#9CA3AF">=</span><span style="color:#555">Bắt buộc điền</span><span style="color:#ddd">│</span><span style="background:#F5F3FF;color:#6D28D9;padding:1px 7px;border-radius:4px;font-weight:600">Conditional</span><span style="color:#9CA3AF">=</span><span style="color:#555">Ẩn/hiện theo điều kiện</span><span style="color:#ddd">│</span><span style="color:#9CA3AF">↳</span><span style="color:#555">= Câu hỏi con (hiện theo lựa chọn)</span></div>
 
   ${servicesHTML}
 
@@ -1489,8 +1643,12 @@
       if (f.branchFields) {
         Object.entries(f.branchFields).forEach(([optIdx, subFields]) => {
           const optLabel = (f.options && f.options[parseInt(optIdx)]) || optIdx;
+          // Track half-width pairing within THIS option (reset per option)
+          let subLastWasHalf = false;
           (subFields || []).forEach(sf => {
-            const subRow = _buildNexusRow(sf, false, idToName);
+            const subInline = sf.halfWidth && subLastWasHalf;
+            subLastWasHalf = sf.halfWidth && !subInline;
+            const subRow = _buildNexusRow(sf, subInline, idToName);
             // Use confirmed Nexus visibility_rule format
             subRow.visibility_rule = {
               source_field: branchName,
@@ -1588,8 +1746,7 @@
         case 'boolean':
           return {
             label,
-            true_label: 'Có',
-            false_label: 'Không'
+            placeholder: f.placeholder || ''
           };
 
         default:
@@ -1666,7 +1823,14 @@
         fields.push({ id: fuid(), type: 'product', label: 'Game bị ảnh hưởng', hint: 'Game liên quan đến sự cố Passport', fieldName: 'game_lien_quan', required: true, multiple: false, productFamily: 'Game', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
         const loaiSuCoId = fuid();
         fields.push({ id: loaiSuCoId, type: 'select', label: 'Loại sự cố', hint: 'Phân loại sự cố Passport', fieldName: 'loai_su_co', required: true, multiple: false, visible: true, editable: true, options: ['Không đăng nhập được', 'Mất liên kết tài khoản', 'Lỗi OTP / xác thực', 'Tài khoản bị khóa nhầm', 'Khác'], optionValues: {0:'login_fail',1:'unlink',2:'otp_error',3:'wrong_ban',4:'other'}, branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'branch', label: 'Kênh đăng nhập gặp sự cố', hint: 'Chọn kênh login bị lỗi', fieldName: 'kenh_login', required: true, visible: true, editable: true, options: ['Zing Account', 'Facebook', 'Google', 'Apple ID'], optionValues: {0:'zing',1:'fb',2:'gg',3:'apple'}, branchFields: { 0: [{ id: fuid(), type: 'text', label: 'Số điện thoại đăng ký Zing', hint: 'SĐT liên kết với tài khoản', required: true }, { id: fuid(), type: 'email', label: 'Email Zing Account', hint: 'Email đăng ký tài khoản Zing', required: false }], 1: [{ id: fuid(), type: 'text', label: 'Facebook UID / Link profile', hint: 'Link hoặc UID số Facebook', required: true }], 2: [{ id: fuid(), type: 'email', label: 'Gmail liên kết', hint: 'Địa chỉ Gmail dùng để đăng nhập', required: true }], 3: [{ id: fuid(), type: 'text', label: 'Apple ID (email)', hint: 'Email Apple ID đã dùng', required: true }, { id: fuid(), type: 'boolean', label: 'Đã dùng "Ẩn email" của Apple?', hint: 'Apple Hide My Email feature', required: false }] }, halfWidth: false });
+        const kenhLoginId = fuid();
+        fields.push({ id: kenhLoginId, type: 'select', label: 'Kênh đăng nhập gặp sự cố', hint: 'Chọn kênh login bị lỗi', fieldName: 'kenh_login', required: true, multiple: false, visible: true, editable: true, options: ['Zing Account', 'Facebook', 'Google', 'Apple ID'], optionValues: {0:'zing',1:'fb',2:'gg',3:'apple'}, branchFields: {}, halfWidth: false });
+        fields.push({ id: fuid(), type: 'text', label: 'Số điện thoại đăng ký Zing', hint: 'SĐT liên kết với tài khoản', fieldName: 'zing_sdt', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Zing Account' } });
+        fields.push({ id: fuid(), type: 'email', label: 'Email Zing Account', hint: 'Email đăng ký tài khoản Zing', fieldName: 'zing_email', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Zing Account' } });
+        fields.push({ id: fuid(), type: 'text', label: 'Facebook UID / Link profile', hint: 'Link hoặc UID số Facebook', fieldName: 'fb_uid', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Facebook' } });
+        fields.push({ id: fuid(), type: 'email', label: 'Gmail liên kết', hint: 'Địa chỉ Gmail dùng để đăng nhập', fieldName: 'gmail_lien_ket', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Google' } });
+        fields.push({ id: fuid(), type: 'text', label: 'Apple ID (email)', hint: 'Email Apple ID đã dùng', fieldName: 'apple_id', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Apple ID' } });
+        fields.push({ id: fuid(), type: 'boolean', label: 'Đã dùng "Ẩn email" của Apple?', hint: 'Apple Hide My Email feature', fieldName: 'apple_hide_email', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Apple ID' } });
         fields.push({ id: fuid(), type: 'date', label: 'Thời điểm phát sinh sự cố', hint: 'Ngày xảy ra lỗi', fieldName: 'ngay_su_co', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
         fields.push({ id: fuid(), type: 'textarea', label: 'Mô tả chi tiết lỗi (khi chọn "Khác")', hint: 'Chỉ hiển thị khi chọn loại sự cố là Khác', placeholder: 'Mô tả chi tiết...', fieldName: 'mo_ta_khac', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: loaiSuCoId, op: 'equals', values: 'Khác' } });
         fields.push({ id: fuid(), type: 'upload', label: 'Screenshot / Video lỗi', hint: 'Đính kèm bằng chứng để xử lý nhanh hơn', fieldName: 'evidence', required: false, multiple: true, acceptTypes: 'image/*,video/*', uploadMode: 'online', uploadLink: '', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
@@ -1701,8 +1865,7 @@
         { id: 'select', nm: 'Dropdown', ic: '🔽', ds: 'Danh sách cuộn xuống gọn gàng.' },
         { id: 'radio', nm: 'Single Choice', ic: '⚪', ds: 'Chọn 1 trong nhiều phương án.' },
         { id: 'checkbox', nm: 'Multiple Choice', ic: '☑️', ds: 'Tick chọn nhiều giá trị cùng lúc.' },
-        { id: 'checklist', nm: 'Checklist', ic: '📋', ds: 'Danh sách cần xác nhận đồng ý.' },
-        { id: 'branch', nm: 'Branching', ic: '🌿', ds: 'Dropdown có sub-questions tự hiện theo option (auto Conditional).' }
+        { id: 'checklist', nm: 'Checklist', ic: '📋', ds: 'Danh sách cần xác nhận đồng ý.' }
       ]},
       { g: 'SMART PICKERS', ds: 'Tìm kiếm đồng bộ tự động qua API.', types: [
         { id: 'country', nm: 'Country', ic: '🌐', ds: 'Bộ chọn quốc gia auto-load.' },
@@ -1872,6 +2035,11 @@
         errEl.classList.remove('hidden');
         if (nextBtn) nextBtn.disabled = true;
         return false;
+      } else if (val.length > 64) {
+        errEl.textContent = '⚠️ Field name tối đa 64 ký tự (giới hạn DB Nexus).';
+        errEl.classList.remove('hidden');
+        if (nextBtn) nextBtn.disabled = true;
+        return false;
       } else if (!/^[a-z0-9_]+$/.test(val)) {
         errEl.textContent = '⚠️ Chỉ chấp nhận chữ thường (a-z), số (0-9) và dấu gạch dưới (_).';
         errEl.classList.remove('hidden');
@@ -1909,23 +2077,44 @@
       let h = '';
       if (isLbl) {
         h += `<div class="bg-blue-50/50 border border-blue-100 text-slate-500 text-xs p-4 rounded-xl flex items-start gap-2.5 mb-4"><span class="text-base shrink-0 text-blue-500">i</span><div>Label hiển thị nội dung tĩnh, hỗ trợ HTML cơ bản — không thu thập dữ liệu.</div></div>`;
-        h += renderRow('Content', 'Plain text or HTML.', true,
-          `<textarea class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm font-semibold focus:outline-none focus:border-nexus min-h-[120px] text-slate-800 font-mono transition" id="ew-content" placeholder='VD: Tải template <a href="...">tại đây</a>' oninput="onLabelContentInput(this.value)">${H(EW.content)}</textarea>
-          <div class="flex flex-wrap gap-1.5 mt-2">
-            <button type="button" onclick="insertLabelSnippet('link')" class="px-2 py-1 text-[10px] font-bold bg-slate-100 hover:bg-nexus hover:text-white rounded-md text-slate-600 transition">+ Link</button>
-            <button type="button" onclick="insertLabelSnippet('bold')" class="px-2 py-1 text-[10px] font-bold bg-slate-100 hover:bg-nexus hover:text-white rounded-md text-slate-600 transition">+ In đậm</button>
-            <button type="button" onclick="insertLabelSnippet('note')" class="px-2 py-1 text-[10px] font-bold bg-slate-100 hover:bg-nexus hover:text-white rounded-md text-slate-600 transition">+ Ghi chú</button>
-          </div>`, 'Hỗ trợ HTML: <a href>, <b>, <br>, <span style>...');
+        h += renderRow('Content', 'Plain text or HTML.', true, `
+          <div class="inline-flex bg-slate-100 rounded-lg p-0.5 mb-2">
+            <button type="button" id="ew-rt-mode-visual" onclick="rtSwitchMode('visual')" class="ew-rt-mode-active px-3 py-1 text-[11px] font-semibold rounded-md text-slate-500 hover:text-slate-700 transition inline-flex items-center gap-1.5">✨ Visual</button>
+            <button type="button" id="ew-rt-mode-code" onclick="rtSwitchMode('code')" class="px-3 py-1 text-[11px] font-semibold rounded-md text-slate-500 hover:text-slate-700 transition inline-flex items-center gap-1.5"><span class="font-mono">&lt;/&gt;</span> Code (HTML)</button>
+          </div>
+          <div id="ew-rt-vwrap">
+            <div class="flex gap-1 p-1.5 bg-slate-50 rounded-t-xl border border-slate-300 border-b-0 flex-wrap">
+              <button type="button" onmousedown="event.preventDefault();rtFmt('bold')" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1"><b>B</b> Đậm</button>
+              <button type="button" onmousedown="event.preventDefault();rtFmt('italic')" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1"><i>I</i> Nghiêng</button>
+              <button type="button" onmousedown="event.preventDefault();rtFmt('insertUnorderedList')" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1">≡ Bullet</button>
+              <button type="button" onmousedown="event.preventDefault();rtShowLinkModal()" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1">🔗 Link</button>
+              <button type="button" onmousedown="event.preventDefault();rtBr()" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1">↵ Xuống dòng</button>
+            </div>
+            <div id="ew-rt-editor" class="min-h-[110px] p-3 border border-slate-300 rounded-b-xl text-sm leading-relaxed bg-white text-slate-800" contenteditable="true" data-placeholder="Gõ nội dung hướng dẫn ở đây..." oninput="rtSyncVisual()"></div>
+          </div>
+          <textarea id="ew-content" class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-nexus min-h-[110px] text-slate-800 font-mono transition hidden" oninput="rtSyncCode()" placeholder='VD: Tải template <a href="...">tại đây</a>'></textarea>
+          <div id="ew-rt-link-modal">
+            <div class="bg-white rounded-xl p-4 w-[90%] max-w-[340px]" style="box-shadow:0 20px 50px rgba(0,0,0,0.2)">
+              <div class="text-sm font-bold text-slate-800 mb-3">Chèn link</div>
+              <input id="ew-rt-link-text" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs mb-2 focus:outline-none focus:border-nexus" placeholder="Văn bản hiển thị" value="tại đây" onkeydown="if(event.key==='Enter'){event.preventDefault();rtInsertLink();}">
+              <input id="ew-rt-link-url" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs mb-2 focus:outline-none focus:border-nexus" placeholder="https://..." onkeydown="if(event.key==='Enter'){event.preventDefault();rtInsertLink();}else if(event.key==='Escape'){event.preventDefault();rtCloseLinkModal();}">
+              <div class="flex gap-2 justify-end mt-2">
+                <button type="button" onclick="rtCloseLinkModal()" class="px-3 py-1.5 text-xs font-semibold border border-slate-300 bg-white rounded-md text-slate-700 hover:bg-slate-50">Huỷ</button>
+                <button type="button" onclick="rtInsertLink()" class="px-3 py-1.5 text-xs font-semibold bg-nexus text-white rounded-md hover:bg-nexus-hover">Chèn</button>
+              </div>
+            </div>
+          </div>
+        `, 'Hỗ trợ HTML: &lt;a href&gt;, &lt;b&gt;, &lt;br&gt;, &lt;span style&gt;...');
         h += renderRow('Preview', 'Live preview.', false,
           `<div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 min-h-[48px] text-xs text-slate-800" id="ew-live-preview-box">${EW.content || '<span class=\"text-slate-400 italic\">Nội dung sẽ hiển thị ở đây...</span>'}</div>`,
           'Xem trước nội dung trên live form.');
         h += `<div class="py-3 pt-5 border-t border-slate-100 mt-2"><button type="button" onclick="toggleAdvancedAccordion()" class="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition w-full text-left"><span id="accordion-arrow" class="text-[10px]">&#9658;</span><span class="uppercase tracking-wider">Advanced — Translater key</span></button><div id="advanced-accordion-content" class="hidden mt-5"><div class="grid grid-cols-1 md:grid-cols-12 gap-x-6 items-start"><div class="md:col-span-4"><label class="block text-xs font-bold text-slate-800">Translater key <span class="text-red-500">*</span></label><span class="block text-[11px] text-slate-400 mt-1 leading-relaxed italic">Mã định danh nội bộ, dùng cho hệ thống dịch.</span></div><div class="md:col-span-8"><input class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-bold font-mono text-slate-800 focus:outline-none focus:border-nexus transition" id="ew-fieldName" value="${H(autoKey)}" placeholder="key" oninput="onFieldNameManualInput(this.value)"><div id="ew-fieldname-error" class="hidden text-xs text-red-500 font-bold mt-1.5"></div></div></div></div></div>`;
-        setTimeout(() => validateFieldName(autoKey), 10);
+        setTimeout(() => { rtInitEditor(); validateFieldName(autoKey); }, 10);
         return h;
       }
       h += renderRow('Label', 'Shown to the form user.', true,
         `<input class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 transition" id="ew-label" value="${H(EW.label)}" placeholder="VD: Họ và tên" oninput="onLabelInput(this.value)">`,
-        'Tên hiển thị của câu hỏi cho người dùng.');
+        'Tên hiển thị của câu hỏi cho người điền.');
       h += renderRow('Description', 'Helper text shown below the input.', false,
         `<textarea class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm focus:outline-none focus:border-nexus min-h-[80px] text-slate-800 transition" id="ew-description" placeholder="VD: Nhập tên đầy đủ trên CCCD." oninput="EW.description=this.value">${H(EW.description)}</textarea>`,
         'Hướng dẫn thêm hiển thị bên dưới ô nhập liệu.');
@@ -1943,7 +2132,10 @@
     function onLabelContentInput(val) {
       EW.content = val;
       const pb = document.getElementById('ew-live-preview-box');
-      if (pb) pb.innerHTML = val || '<span class="text-slate-400 italic">Nội dung sẽ hiển thị ở đây...</span>';
+      if (pb) {
+        pb.innerHTML = val || '<span class="text-slate-400 italic">Nội dung sẽ hiển thị ở đây...</span>';
+        pb.querySelectorAll('a').forEach(a => { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer'); });
+      }
       checkEWNextBtn();
       if (!EW.isFieldNameManual) {
         const cleanSlug = toCleanFieldName(val);
@@ -1963,6 +2155,125 @@
       ta.selectionStart = ta.selectionEnd = start + snippet.length;
       ta.focus();
       onLabelContentInput(ta.value);
+    }
+
+    // ── Rich Text Helper — Visual/Code editor cho field Label / Rich text ──
+    let _rtSavedRange = null;
+    function _rtSaveSel() {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const r = sel.getRangeAt(0);
+        const ed = document.getElementById('ew-rt-editor');
+        if (ed && ed.contains(r.commonAncestorContainer)) _rtSavedRange = r.cloneRange();
+      }
+    }
+    function _rtRestoreSel() {
+      if (_rtSavedRange) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(_rtSavedRange);
+      }
+    }
+    function rtSwitchMode(mode) {
+      const vBtn = document.getElementById('ew-rt-mode-visual');
+      const cBtn = document.getElementById('ew-rt-mode-code');
+      const vWrap = document.getElementById('ew-rt-vwrap');
+      const code = document.getElementById('ew-content');
+      const ed = document.getElementById('ew-rt-editor');
+      if (!vBtn || !cBtn || !vWrap || !code || !ed) return;
+      if (mode === 'visual') {
+        vBtn.classList.add('ew-rt-mode-active');
+        cBtn.classList.remove('ew-rt-mode-active');
+        ed.innerHTML = code.value;
+        vWrap.classList.remove('hidden');
+        code.classList.add('hidden');
+        rtSyncVisual();
+      } else {
+        cBtn.classList.add('ew-rt-mode-active');
+        vBtn.classList.remove('ew-rt-mode-active');
+        code.value = ed.innerHTML;
+        vWrap.classList.add('hidden');
+        code.classList.remove('hidden');
+        rtSyncCode();
+      }
+    }
+    function rtFmt(cmd) {
+      const ed = document.getElementById('ew-rt-editor');
+      if (!ed) return;
+      ed.focus();
+      document.execCommand(cmd, false, null);
+      rtSyncVisual();
+    }
+    function rtBr() {
+      const ed = document.getElementById('ew-rt-editor');
+      if (!ed) return;
+      ed.focus();
+      document.execCommand('insertHTML', false, '<br>');
+      rtSyncVisual();
+    }
+    function rtShowLinkModal() {
+      const ed = document.getElementById('ew-rt-editor');
+      if (ed) ed.focus();
+      _rtSaveSel();
+      const modal = document.getElementById('ew-rt-link-modal');
+      if (modal) modal.classList.add('rt-open');
+      setTimeout(() => {
+        const urlInp = document.getElementById('ew-rt-link-url');
+        if (urlInp) urlInp.focus();
+      }, 30);
+    }
+    function rtCloseLinkModal() {
+      const modal = document.getElementById('ew-rt-link-modal');
+      if (modal) modal.classList.remove('rt-open');
+      const urlInp = document.getElementById('ew-rt-link-url');
+      if (urlInp) urlInp.value = '';
+      const textInp = document.getElementById('ew-rt-link-text');
+      if (textInp) textInp.value = 'tại đây';
+    }
+    function rtInsertLink() {
+      const textInp = document.getElementById('ew-rt-link-text');
+      const urlInp = document.getElementById('ew-rt-link-url');
+      if (!textInp || !urlInp) return;
+      const text = (textInp.value || 'tại đây').trim();
+      const url = urlInp.value.trim();
+      if (!url) { rtCloseLinkModal(); return; }
+      const ed = document.getElementById('ew-rt-editor');
+      if (!ed) { rtCloseLinkModal(); return; }
+      ed.focus();
+      _rtRestoreSel();
+      const safeUrl = url.replace(/"/g, '&quot;');
+      const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      document.execCommand('insertHTML', false, '<a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + safeText + '</a>');
+      urlInp.value = '';
+      textInp.value = 'tại đây';
+      rtCloseLinkModal();
+      rtSyncVisual();
+    }
+    function rtSyncVisual() {
+      const ed = document.getElementById('ew-rt-editor');
+      if (!ed) return;
+      let html = ed.innerHTML;
+      // Normalize "empty" cases (just <br>, <div><br></div>, or whitespace) so :empty placeholder shows
+      const stripped = html.replace(/<br\s*\/?>/gi, '').replace(/<div>\s*<\/div>/gi, '').replace(/&nbsp;/gi, '').trim();
+      if (stripped === '') { ed.innerHTML = ''; html = ''; }
+      const code = document.getElementById('ew-content');
+      if (code) code.value = html;
+      if (typeof onLabelContentInput === 'function') onLabelContentInput(html);
+    }
+    function rtSyncCode() {
+      const code = document.getElementById('ew-content');
+      if (!code) return;
+      if (typeof onLabelContentInput === 'function') onLabelContentInput(code.value);
+    }
+    function rtInitEditor() {
+      const ed = document.getElementById('ew-rt-editor');
+      const code = document.getElementById('ew-content');
+      if (!ed) return;
+      const content = (typeof EW !== 'undefined' && EW && EW.content) ? EW.content : '';
+      ed.innerHTML = content;
+      if (code) code.value = content;
+      ed.addEventListener('keyup', _rtSaveSel);
+      ed.addEventListener('mouseup', _rtSaveSel);
     }
 
     function renderEWConfigure() {
@@ -2023,7 +2334,7 @@
 
     function renderEWRules() {
       const full = HAS_FULL_RULES.includes(EW.type);
-      let h = renderRow('Required', 'Người dùng bắt buộc điền field này.', false, `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-required" ${EW.required ? 'checked' : ''} onchange="EW.required=this.checked" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`, 'Bật ON nếu bắt buộc, OFF nếu tùy chọn.');
+      let h = renderRow('Required', 'Người điền bắt buộc nhập field này.', false, `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-required" ${EW.required ? 'checked' : ''} onchange="EW.required=this.checked" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`, 'Bật ON nếu bắt buộc, OFF nếu tùy chọn.');
       if (!full) return h + `<div class="bg-slate-50 border border-slate-200 text-slate-400 text-xs p-3.5 rounded-xl mt-4">ℹ️ Chỉ có rule Required áp dụng cho loại field này.</div>`;
       h += renderRow('Min/Max length', 'Giới hạn ký tự.', false, `<div class="grid grid-cols-2 gap-4"><div><span class="block text-xs font-bold text-slate-700 mb-1">Min</span><input class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold focus:outline-none focus:border-nexus" type="number" id="ew-minLen" value="${EW.minLen || 0}" min="0" oninput="EW.minLen=parseInt(this.value)||0"></div><div><span class="block text-xs font-bold text-slate-700 mb-1">Max</span><input class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold focus:outline-none focus:border-nexus" type="number" id="ew-maxLen" value="${EW.maxLen || 255}" min="1" oninput="EW.maxLen=parseInt(this.value)||255"></div></div>`, 'Số ký tự min/max.');
       h += renderRow('Pattern (regex)', 'Restrict input format.', false, `<input class="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs font-bold font-mono text-nexus focus:outline-none focus:border-nexus transition" id="ew-pattern" value="${H(EW.pattern || '')}" placeholder="Regex..." oninput="EW.pattern=this.value"><div class="flex flex-wrap gap-1.5 mt-2"><button onclick="applyPattern('^[0-9]+$')" class="px-2.5 py-1 text-[10px] font-bold bg-slate-100 hover:bg-nexus hover:text-white rounded-md text-slate-600 transition">Số nguyên</button><button onclick="applyPattern('^[a-zA-Z0-9]+$')" class="px-2.5 py-1 text-[10px] font-bold bg-slate-100 hover:bg-nexus hover:text-white rounded-md text-slate-600 transition">Chữ + số không dấu</button></div>`, 'Regex ràng buộc định dạng nhập. Để trống nếu không cần.');
@@ -2057,10 +2368,10 @@
       h += `<div class="mb-6 pb-6 border-b border-slate-100"><span class="block text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-2">SHOW CONDITIONALLY</span><p class="text-sm font-semibold text-slate-800">Hiện có điều kiện</p>${isCondRow}${conditionCard}</div>`;
       const visSwitch = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-vis" ${EW.visible !== false ? 'checked' : ''} class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
       if (EW.type === 'label') {
-        h += `<div class="mt-4">${renderRow('Visible', 'Hiển thị cho người dùng.', false, visSwitch, 'Tắt để ẩn hoàn toàn khỏi form.')}</div>`;
+        h += `<div class="mt-4">${renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn hoàn toàn khỏi form.')}</div>`;
       } else {
         const editSwitch = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-edit2" ${EW.editable !== false ? 'checked' : ''} class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
-        h += `<div class="mt-4">${renderRow('Visible', 'Hiển thị cho người dùng.', false, visSwitch, 'Tắt để ẩn khỏi form.')}${renderRow('Editable', 'Cho phép người dùng sửa.', false, editSwitch, 'Tắt để chuyển sang read-only.')}</div>`;
+        h += `<div class="mt-4">${renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn khỏi form.')}${renderRow('Editable', 'Cho phép người điền sửa.', false, editSwitch, 'Tắt để chuyển sang read-only.')}</div>`;
       }
       return h;
     }
@@ -2097,6 +2408,12 @@
       if (vis) EW.visible = vis.checked;
       if (edt) EW.editable = edt.checked;
       if (!EW.fieldName) EW.fieldName = toCleanFieldName(EW.label || EW.content || 'field');
+      // Ensure uniqueness across all fields (incl. branch sub-fields)
+      // Pass EW.id as excludeId so editing existing field doesn't collide with itself
+      const origName = EW.fieldName;
+      const uniqueName = ensureUniqueFieldName(EW.fieldName, EW_isNew ? null : EW.id);
+      const nameChanged = uniqueName !== origName;
+      if (nameChanged) EW.fieldName = uniqueName;
       const req = document.getElementById('ew-required');
       if (req) EW.required = req.checked;
       const wasNew = EW_isNew;
@@ -2107,7 +2424,10 @@
       renderFieldList();
       renderPreview();
       sv();
-      toast(wasNew ? '✅ Đã tạo câu hỏi!' : '✅ Đã lưu câu hỏi!');
+      // Single combined toast — avoid back-to-back toast eating each other
+      const baseMsg = wasNew ? '✅ Đã tạo câu hỏi' : '✅ Đã lưu câu hỏi';
+      const renameMsg = nameChanged ? ' · Field name đổi thành "' + uniqueName + '"' : '';
+      toast(baseMsg + renameMsg, nameChanged ? 4500 : 3000);
     }
 
     function deleteField(id, e) {
@@ -2120,7 +2440,12 @@
         if (!(idx >= 2 && fields[idx - 2].halfWidth)) fields[idx - 1].halfWidth = false;
       }
       fields.splice(idx, 1);
-      if (String(activeId) === String(id)) activeId = fields.length ? fields[fields.length - 1].id : null;
+      // Move focus to next field (now at same idx after splice), or previous if was last
+      if (String(activeId) === String(id)) {
+        if (fields.length === 0) activeId = null;
+        else if (idx < fields.length) activeId = fields[idx].id;
+        else activeId = fields[fields.length - 1].id;
+      }
       renderFieldList(); renderPreview(); sv(); toast('🗑 Đã xóa câu hỏi');
     }
 
@@ -2131,7 +2456,17 @@
       const n = JSON.parse(JSON.stringify(f));
       n.id = fuid();
       n.label = f.label ? f.label + ' (Bản sao)' : '';
-      n.fieldName = (f.fieldName || 'field') + '_copy';
+      // Ensure fieldName is unique across all fields incl. branch sub-fields
+      n.fieldName = ensureUniqueFieldName((f.fieldName || 'field') + '_copy');
+      // Regenerate branch sub-field IDs to avoid collision with original sub-fields
+      if (n.branchFields && typeof n.branchFields === 'object') {
+        Object.values(n.branchFields).forEach(subs => {
+          if (Array.isArray(subs)) subs.forEach(sf => {
+            sf.id = fuid();
+            if (sf.fieldName) sf.fieldName = ensureUniqueFieldName(sf.fieldName + '_copy');
+          });
+        });
+      }
       n.halfWidth = false; // duplicate is standalone
       fields.splice(fields.findIndex(x => String(x.id) === String(id)) + 1, 0, n);
       activeId = n.id;
@@ -2230,8 +2565,33 @@
       sv();
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // openFieldMenu — 3-dot dropdown (Edit / Duplicate / Delete)
+    // Toggle halfWidth for a branch sub-field — pairs with the previous sub-field
+    // in the SAME option (same parentBranch + same optIdx)
+    function toggleSubHalfWidth(branchId, optIdx, subIdx, e) {
+      if (e) e.stopPropagation();
+      const parent = fields.find(x => String(x.id) === String(branchId));
+      if (!parent || !parent.branchFields || !parent.branchFields[optIdx]) return;
+      const subs = parent.branchFields[optIdx];
+      if (subIdx < 1) return; // first sub-field has nothing before it to pair with
+      const f = subs[subIdx];
+      const prev = subs[subIdx - 1];
+      if (!f || !prev) return;
+      if (f.halfWidth) {
+        // Unpair
+        f.halfWidth = false;
+        if (!(subIdx >= 2 && subs[subIdx - 2].halfWidth)) prev.halfWidth = false;
+      } else {
+        // Pair with prev — break prev's old pair if needed
+        if (subIdx >= 2 && prev.halfWidth && subs[subIdx - 2].halfWidth) {
+          subs[subIdx - 2].halfWidth = false;
+        }
+        f.halfWidth = true;
+        prev.halfWidth = true;
+      }
+      renderFieldList();
+      renderPreview();
+      sv();
+    }
     // ═══════════════════════════════════════════════════════════
     function openFieldMenu(id, e) {
       if (e) e.stopPropagation();
@@ -2297,11 +2657,38 @@
 
       // Step B: Group into rows respecting halfWidth — but only for TOP-LEVEL items.
       // Sub-fields always full-width (their pairing inside branch is handled by branch editor).
+      //
+      // Pair rules (mirror Nexus origin):
+      //   1) Both items must have halfWidth=true.
+      //   2) Top-level + top-level:
+      //        - both non-conditional → pair
+      //        - both conditional sharing same visRule.source → pair
+      //        - mixed → no pair
+      //   3) Sub-field + sub-field: pair only if SAME parent branch AND SAME option
+      //      (sub-fields in different options have different visibility → never pair).
+      //   4) Top-level + sub-field → never pair.
+      function _canPairItems(a, b) {
+        if (!a || !b) return false;
+        if (!a.f.halfWidth || !b.f.halfWidth) return false;
+        // Sub-field pairing
+        if (a.isSub || b.isSub) {
+          if (!(a.isSub && b.isSub)) return false; // both must be sub
+          // Same parent + same option
+          return String(a.parentBranch.id) === String(b.parentBranch.id)
+              && a.optIdx === b.optIdx;
+        }
+        // Top-level pairing
+        const aSrc = (a.f.visRule && a.f.visRule.source != null) ? a.f.visRule.source : null;
+        const bSrc = (b.f.visRule && b.f.visRule.source != null) ? b.f.visRule.source : null;
+        if (aSrc == null && bSrc == null) return true;
+        if ((aSrc == null) !== (bSrc == null)) return false;
+        return String(aSrc) === String(bSrc);
+      }
       const rows = [];
       let pi = 0;
       while (pi < flat.length) {
         const it = flat[pi];
-        if (!it.isSub && it.f.halfWidth && pi + 1 < flat.length && !flat[pi + 1].isSub && flat[pi + 1].f.halfWidth) {
+        if (_canPairItems(it, flat[pi + 1])) {
           rows.push({ pair: true, items: [flat[pi], flat[pi + 1]] });
           pi += 2;
         } else {
@@ -2342,9 +2729,11 @@
           ? '<span class="bg-sky-50 text-sky-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap" title="Loaded from API">API</span>'
           : '';
 
-        // HalfWidth button — only for top-level (not sub-fields)
+        // HalfWidth button — top-level fields AND branch sub-fields
+        // Sub-fields can pair with the previous sub-field in the SAME option
         let halfBtn = '';
         if (!item.isSub && item.i >= 1) {
+          // Top-level field
           const isActive = !!(f.halfWidth && fields[item.i - 1].halfWidth);
           const tip = isActive ? 'Đang song song với field trước — bấm để bỏ' : 'Hiện song song với field trước';
           const cls = isActive
@@ -2353,6 +2742,17 @@
           const sz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
           const isvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
           halfBtn = `<button onclick="toggleHalfWidth(${f.id},event)" class="${sz} rounded-lg flex items-center justify-center transition flex-shrink-0 border ${cls}" title="${tip}"><svg class="${isvg}" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg></button>`;
+        } else if (item.isSub && item.subIdx >= 1) {
+          // Branch sub-field — can pair with previous sub-field in same option
+          const prevSub = (item.parentBranch.branchFields[item.optIdx] || [])[item.subIdx - 1];
+          const isActive = !!(f.halfWidth && prevSub && prevSub.halfWidth);
+          const tip = isActive ? 'Đang song song với sub-field trước — bấm để bỏ' : 'Hiện song song với sub-field trước';
+          const cls = isActive
+            ? 'bg-nexus/10 text-nexus border-nexus/30'
+            : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600 border-transparent';
+          const sz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
+          const isvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
+          halfBtn = `<button onclick="toggleSubHalfWidth(${item.parentBranch.id},${item.optIdx},${item.subIdx},event)" class="${sz} rounded-lg flex items-center justify-center transition flex-shrink-0 border ${cls}" title="${tip}"><svg class="${isvg}" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg></button>`;
         }
 
         // Click handlers — sub-fields open branch editor at right option
@@ -2425,7 +2825,7 @@
       const rect = btn.getBoundingClientRect();
       const menu = document.createElement('div');
       menu.className = 'field-menu-dropdown';
-      menu.style.cssText = 'position:fixed;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);padding:6px 0;z-index:300;min-width:180px;top:' + (rect.bottom + 6) + 'px;right:' + (window.innerWidth - rect.right) + 'px;';
+      menu.style.cssText = 'position:fixed;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.10);padding:6px 0;z-index:300;min-width:148px;top:' + (rect.bottom + 6) + 'px;right:' + (window.innerWidth - rect.right) + 'px;';
       function makeBtn(label, iconPath, color, action) {
         const b = document.createElement('button');
         b.style.cssText = 'width:100%;display:flex;align-items:center;gap:10px;padding:8px 14px;font-size:12px;font-weight:600;background:none;border:none;cursor:pointer;text-align:left;color:' + color + ';';
@@ -2435,13 +2835,32 @@
         b.addEventListener('click', () => { closeFieldMenu(); action(); });
         return b;
       }
-      menu.appendChild(makeBtn('Mở branch editor', 'M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7 M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z', '#374151', () => editBranchSubField(branchId, optIdx, subIdx, null)));
+      // Wording aligned with regular field menu (Edit / Duplicate / Delete)
+      // Edit on a branch sub-field opens the branch editor at the right option
+      menu.appendChild(makeBtn('Edit', 'M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7 M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z', '#374151', () => editBranchSubField(branchId, optIdx, subIdx, null)));
+      menu.appendChild(makeBtn('Duplicate', 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z', '#374151', () => duplicateSubField(branchId, optIdx, subIdx)));
       const sep = document.createElement('div');
       sep.style.cssText = 'border-top:1px solid #f1f5f9;margin:4px 0;';
       menu.appendChild(sep);
-      menu.appendChild(makeBtn('Xóa sub-field', 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', '#ef4444', () => deleteSubField(branchId, optIdx, subIdx)));
+      menu.appendChild(makeBtn('Delete', 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', '#ef4444', () => deleteSubField(branchId, optIdx, subIdx)));
       document.body.appendChild(menu);
       setTimeout(() => document.addEventListener('click', closeFieldMenu, { once: true }), 10);
+    }
+    function duplicateSubField(branchId, optIdx, subIdx) {
+      const parent = fields.find(x => String(x.id) === String(branchId));
+      if (!parent || !parent.branchFields || !parent.branchFields[optIdx]) return;
+      const sf = parent.branchFields[optIdx][subIdx];
+      if (!sf) return;
+      const n = JSON.parse(JSON.stringify(sf));
+      n.id = fuid();
+      n.label = sf.label ? sf.label + ' (Bản sao)' : '';
+      n.fieldName = (sf.fieldName || 'field') + '_copy';
+      n.halfWidth = false; // standalone like duplicateField
+      parent.branchFields[optIdx].splice(subIdx + 1, 0, n);
+      renderFieldList();
+      renderPreview();
+      sv();
+      toast('Đã nhân bản sub-field');
     }
     function deleteSubField(branchId, optIdx, subIdx) {
       const parent = fields.find(x => String(x.id) === String(branchId));
@@ -2458,20 +2877,40 @@
 
     function updatePreviewState(fieldName, val) { previewState[fieldName] = val; evaluatePreviewConditions(); }
     function evaluatePreviewConditions() {
+      // Build flat lookup of ALL fields (top-level + branch sub-fields) for resolving visRule.source
+      // Sub-field visRule.source may reference either a top-level field or another sub-field
+      const allFieldsFlat = [];
       fields.forEach(f => {
+        allFieldsFlat.push(f);
+        if (f.branchFields && typeof f.branchFields === 'object') {
+          Object.values(f.branchFields).forEach(subs => {
+            if (Array.isArray(subs)) subs.forEach(sf => allFieldsFlat.push(sf));
+          });
+        }
+      });
+      const _evalOne = (f) => {
         const el = document.getElementById(`pv-wrapper-${f.id}`);
         if (!el) return;
         if (f.visible === false) { el.classList.add('hidden'); return; }
         if (f.visRule && f.visRule.source) {
-          const srcField = fields.find(x => String(x.id) === String(f.visRule.source));
+          const srcField = allFieldsFlat.find(x => String(x.id) === String(f.visRule.source));
           if (!srcField) return;
           const currentVal = String(previewState[srcField.fieldName] || '').trim().toLowerCase();
           const ruleVals = String(f.visRule.values || '').split(',').map(v => v.trim().toLowerCase());
           const isMatch = ruleVals.includes(currentVal);
           const shouldShow = f.visRule.op === 'not_equals' ? !isMatch : isMatch;
           if (shouldShow) { el.classList.remove('hidden'); el.classList.add('fade-item-enter'); }
-          else { el.classList.add('hidden'); previewState[f.fieldName] = ''; }
+          else { el.classList.add('hidden'); /* M5 fix: keep previewState value — don't reset */ }
         } else { el.classList.remove('hidden'); }
+      };
+      // Evaluate top-level fields AND recurse into branch sub-fields (m10 fix)
+      fields.forEach(f => {
+        _evalOne(f);
+        if (f.branchFields && typeof f.branchFields === 'object') {
+          Object.values(f.branchFields).forEach(subs => {
+            if (Array.isArray(subs)) subs.forEach(_evalOne);
+          });
+        }
       });
       // Fix pair-row layout: khi 1 field trong cặp bị ẩn, field còn lại expand full-width
       document.querySelectorAll('#preview-body .pv-pair-row').forEach(row => {
@@ -2499,6 +2938,18 @@
     function renderPreview() {
       const container = document.getElementById('preview-body');
       const desc = document.getElementById('desc-input')?.value || '';
+      // Defensive: ensure every field (incl. branch sub-fields) has a non-empty fieldName
+      // to prevent multiple fields sharing previewState[''] collision
+      const _ensureFn = (fs) => {
+        if (!Array.isArray(fs)) return;
+        fs.forEach(f => {
+          if (!f.fieldName) f.fieldName = '_field_' + f.id;
+          if (f.branchFields && typeof f.branchFields === 'object') {
+            Object.values(f.branchFields).forEach(subs => _ensureFn(subs));
+          }
+        });
+      };
+      _ensureFn(fields);
       if (!fields.length) {
         container.innerHTML = '<div style="border:1.5px dashed #cbd5e1;border-radius:12px;padding:40px 24px;text-align:center;color:#94a3b8;font-size:13px;margin:8px 0;">No fields yet &#8212; add a field on the left to see the preview.</div>';
         return;
@@ -2555,7 +3006,7 @@
                   const sfs = f.branchFields[optIdx] || [];
                   if (sfs.length) {
                     h += `<div id="pv-sub-branch-${f.id}-${optIdx}" class="hidden mt-2 p-3 bg-slate-50 border-l-4 border-nexus rounded-r-xl space-y-3.5 fade-item-enter"><div class="text-[9px] font-extrabold text-nexus uppercase tracking-wider">Mở rộng: "${H(opt)}"</div>`;
-                    sfs.forEach(sf => { h += `<div class="space-y-1"><label class="block text-[11px] font-bold text-slate-700">${H(sf.label || 'Câu hỏi phụ')}${sf.required ? '<span class="text-red-500 font-bold ml-0.5">*</span>' : ''}</label>${sf.hint ? `<p class="text-[9px] text-slate-400">${H(sf.hint)}</p>` : ''}<input type="text" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none"></div>`; });
+                    sfs.forEach(sf => { const sfFn = sf.fieldName || ('_sub_' + sf.id); if (previewState[sfFn] === undefined) previewState[sfFn] = sf.defaultValue || ''; h += `<div class="space-y-1"><label class="block text-[11px] font-bold text-slate-700">${H(sf.label || 'Câu hỏi phụ')}${sf.required ? '<span class="text-red-500 font-bold ml-0.5">*</span>' : ''}</label>${sf.hint ? `<p class="text-[9px] text-slate-400">${H(sf.hint)}</p>` : ''}<input type="text" class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:outline-none" value="${H(previewState[sfFn])}" oninput="updatePreviewState('${sfFn}', this.value)"></div>`; });
                     h += `</div>`;
                   }
                 });
@@ -3049,7 +3500,7 @@
     function _popItem(fmt, bg, color, iconPath, title, desc, recommended) {
       return '<div onclick="doExport(\'' + fmt + '\')" style="display:flex;align-items:center;gap:10px;padding:11px 10px;border-radius:10px;cursor:pointer;'
         + (recommended ? 'background:#F8FAFF;border:0.5px solid #BFDBFE;' : '')
-        + '" onmouseover="if(!this.style.borderColor)this.style.background=\'#f8fafc\'" onmouseout="if(!this.style.borderColor)this.style.background=\'\'"">'
+        + '" onmouseover="if(!this.style.borderColor)this.style.background=\'#f8fafc\'" onmouseout="if(!this.style.borderColor)this.style.background=\'\'">'
         + '<div style="width:32px;height:32px;border-radius:8px;background:' + bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
         + '<svg style="width:16px;height:16px" fill="none" stroke="' + color + '" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="' + iconPath + '"/></svg></div>'
         + '<div style="font-size:13px;font-weight:600;color:#1e293b;flex:1">' + title
@@ -3106,7 +3557,7 @@
     // ═══════════════════════════════════════════════════════════
     const FTA_RESULT_MAP = {
       'list-segmented':  { type: 'radio',     name: 'Single Choice Button',
-        desc: 'Hiện tất cả option ra ngoài, người dùng bấm chọn 1.',
+        desc: 'Hiện tất cả option ra ngoài, người điền bấm chọn 1.',
         cfg: 'Field type: <b>radio</b> · Hiển thị inline tất cả option',
         callout: '💡 Phù hợp: iOS / Android / PC · Có / Không / Không rõ',
         sim: '<div style="display:flex;gap:6px;flex-wrap:wrap"><button style="padding:6px 12px;border:1px solid #93c5fd;background:#eef4ff;color:#155DFC;border-radius:6px;font-size:12px;font-weight:700">iOS</button><button style="padding:6px 12px;border:1px solid #cbd5e1;background:#fff;color:#64748b;border-radius:6px;font-size:12px;font-weight:700">Android</button><button style="padding:6px 12px;border:1px solid #cbd5e1;background:#fff;color:#64748b;border-radius:6px;font-size:12px;font-weight:700">PC</button></div>' },
@@ -3116,7 +3567,7 @@
         callout: '💡 Phù hợp: Hạng mục lỗi, Loại dịch vụ, Severity',
         sim: '<select style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#1e293b;font-size:12px;width:200px"><option>-- Chọn hạng mục --</option><option>Bug đồ họa</option><option>Bug logic</option><option>Bug network</option></select>' },
       'list-checkbox':   { type: 'checkbox',  name: 'Multiple Choice Checkbox',
-        desc: 'Người dùng tick chọn nhiều giá trị cùng lúc, lưu dạng mảng.',
+        desc: 'Người điền tick chọn nhiều giá trị cùng lúc, lưu dạng mảng.',
         cfg: 'Field type: <b>checkbox</b> · Multi-select bật mặc định',
         callout: '💡 Phù hợp: Platform (iOS + Android), Vai trò đa role',
         sim: '<div style="display:flex;flex-direction:column;gap:4px"><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:#f8fafc"><input type="checkbox" checked> iOS</label><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:#f8fafc"><input type="checkbox" checked> Android</label><label style="display:flex;gap:6px;align-items:center;font-size:12px;color:#f8fafc"><input type="checkbox"> PC</label></div>' },
@@ -3133,17 +3584,17 @@
       'text-long':       { type: 'textarea',  name: 'Long Text',
         desc: 'Đoạn văn nhiều dòng — phù hợp mô tả chi tiết, kế hoạch dài.',
         cfg: 'Field type: <b>textarea</b> · Không giới hạn dòng',
-        callout: '💡 Phù hợp: Mô tả lỗi, Phương án triển khai, Ghi chú dài',
+        callout: '💡 Phù hợp: Mô tả lỗi, Phương án triển khai<br>⚠️ <b>Lưu ý:</b> Long Text là <b>plain text</b> — không hỗ trợ in đậm, gạch đầu dòng, hay link. Nếu cần hiển thị nội dung có format (cảnh báo, hướng dẫn), dùng field <b>Label / Rich text</b> kèm helper Visual/Code.',
         sim: '<textarea placeholder="Mô tả chi tiết..." style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:220px;min-height:48px"></textarea>' },
       'text-email':      { type: 'email',     name: 'Email',
         desc: 'Tự động kiểm tra định dạng @ và domain hợp lệ.',
-        cfg: 'Field type: <b>email</b> · Validate format khi user nhập',
+        cfg: 'Field type: <b>email</b> · Validate format khi người điền nhập',
         callout: '💡 Phù hợp: Email liên hệ, Email nhân sự nhận thông báo',
         sim: '<input type="email" placeholder="dev@vng.com.vn" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:220px">' },
       'num-calc':        { type: 'number',    name: 'Number',
         desc: 'Số thuần túy — chỉ cho phép nhập digit 0-9.',
         cfg: 'Field type: <b>number</b> · Không chấp nhận chữ',
-        callout: '⚠️ Cảnh báo: Mã có cả chữ + số (vd TXN-001) → dùng Short Text',
+        callout: '⚠️ <b>Lưu ý:</b><br>• Mã có cả chữ+số (TXN-001) → dùng <b>Short Text</b><br>• SĐT, mã có dấu +/() (VD: +84...) → dùng <b>Short Text</b><br>• Number chỉ nhận digit 0–9 thuần túy.',
         sim: '<input type="number" placeholder="VD: 100" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:220px">' },
       'num-bool':        { type: 'boolean',   name: 'Yes / No (Boolean)',
         desc: 'Toggle đơn giản — tích hoặc không tích.',
@@ -3161,7 +3612,7 @@
         callout: '💡 Phù hợp: Thời gian bảo trì, Thời gian khuyến mãi',
         sim: '<div style="display:flex;gap:6px"><input type="date" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px"><input type="date" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px"></div>' },
       'spec-file':       { type: 'upload',    name: 'Attachment Upload',
-        desc: 'Người dùng upload file lên ticket — có thể giới hạn định dạng.',
+        desc: 'Người điền upload file lên ticket — có thể giới hạn định dạng.',
         cfg: 'Field type: <b>upload</b> · Cấu hình accept types (image/*, .pdf...)',
         callout: '💡 Phù hợp: Screenshot lỗi, File spec, Báo cáo Excel',
         sim: '<div style="border:2px dashed #cbd5e1;padding:12px;border-radius:6px;text-align:center;font-size:11px;color:#94a3b8;background:#0f172a">📎 Kéo thả file để upload</div>' },
@@ -3170,15 +3621,30 @@
         cfg: 'Field type: <b>label</b> · Hỗ trợ HTML cơ bản (link, in đậm, br)',
         callout: '💡 Phù hợp: Banner cảnh báo, Hướng dẫn điền form, Thông báo',
         sim: '<div style="padding:8px 10px;background:#eef4ff;border-left:3px solid #155DFC;border-radius:4px;font-size:11px;color:#1e3a8a">ℹ️ Vui lòng điền đầy đủ thông tin trước khi submit.</div>' },
-      'label-link':      { type: 'label',     name: 'Label kèm link tải template',
-        desc: 'Label chứa link tải file template — thường dùng kèm field Upload riêng để user nộp lại.',
-        cfg: 'Tạo 2 field liên tiếp: <b>label</b> (link tải) + <b>upload</b> (nộp lại)',
-        callout: '💡 Phù hợp: Tải template Excel/Word → user điền → upload lại',
-        sim: '<div style="padding:8px 10px;background:#eef4ff;border-left:3px solid #155DFC;border-radius:4px;font-size:11px;color:#1e3a8a">📥 Tải template <a href="#" style="color:#155DFC;text-decoration:underline;font-weight:700">tại đây</a> rồi upload lại bên dưới.</div>' }
+      'label-link':      { type: 'label',     name: 'Template link + Upload (combo)',
+        desc: 'Hiển thị đoạn chú ý kèm link tải tệp mẫu, ngay dưới có ô cho người điền nộp lại.',
+        cfg: '<b>Bước 1:</b> Tạo field <b>Label</b> — dán nội dung hướng dẫn kèm link, ví dụ: "Tải file mẫu [tại đây](link), điền xong rồi nộp lại bên dưới."<br><b>Bước 2:</b> Ngay dưới đó, tạo thêm field <b>Attachment</b> để người điền upload file.',
+        callout: '💡 Hai field này đứng cạnh nhau — người điền đọc hướng dẫn rồi upload luôn. Phù hợp: tải mẫu Excel/Word → điền → đính kèm lại.',
+        sim: '<div style="padding:8px 10px;background:#eef4ff;border-left:3px solid #155DFC;border-radius:4px;font-size:11px;color:#1e3a8a">📥 Tải template <a href="#" style="color:#155DFC;text-decoration:underline;font-weight:700">tại đây</a> rồi upload lại bên dưới.</div>' },
+      'list-country':     { type: 'country',  name: 'Country Picker',
+        desc: 'Danh sách quốc gia/vùng tự động cập nhật — người điền gõ để tìm nhanh.',
+        cfg: 'Field type: <b>country</b> · Tự động đồng bộ qua hệ thống, có thể bật multi-select',
+        callout: '💡 Phù hợp: Quốc gia phát hành, vùng bị ảnh hưởng. Không phải nhập tay → luôn chuẩn.',
+        sim: '<input type="text" placeholder="🔍 Tìm quốc gia (VD: Vietnam, Thailand...)" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:240px">' },
+      'list-language':    { type: 'language', name: 'Language Picker',
+        desc: 'Danh sách ngôn ngữ tự động cập nhật — người điền gõ để tìm nhanh.',
+        cfg: 'Field type: <b>language</b> · Tự động đồng bộ qua hệ thống',
+        callout: '💡 Phù hợp: Ngôn ngữ game hỗ trợ, ngôn ngữ liên hệ.',
+        sim: '<input type="text" placeholder="🔍 Tìm ngôn ngữ (VD: Tiếng Việt, English...)" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:240px">' },
+      'list-product':     { type: 'product',  name: 'Game / Product Picker',
+        desc: 'Danh sách game/sản phẩm đồng bộ trực tiếp từ Nexus — luôn khớp dữ liệu thật.',
+        cfg: 'Field type: <b>product</b> · Đồng bộ Game Product từ hệ thống',
+        callout: '💡 Phù hợp: Chọn game liên quan, sản phẩm bị ảnh hưởng. Tránh gõ sai tên game.',
+        sim: '<select style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#1e293b;font-size:12px;width:240px"><option>-- Chọn game/sản phẩm --</option><option>Auto-load từ Nexus...</option></select>' }
     };
 
     const FTA_CAT_LABEL = { list: 'Pick from list', input: 'Type input', date: 'Date / Time', file: 'File attachment', display: 'Display info' };
-    const FTA_SUB_ID = { list: 'fta-sub-list', input: 'fta-sub-input', date: 'fta-sub-date', file: 'fta-sub-file', display: 'fta-sub-display' };
+    const FTA_SUB_ID = { list: 'fta-sub-list', input: 'fta-sub-input', date: 'fta-sub-date', file: 'fta-sub-file' };
 
     // Close alternatives + reasoning why NOT picked — keyed by chosen detail
     const FTA_ALTERNATIVES = {
@@ -3230,6 +3696,15 @@
       'label-link':      [
         { detail: 'label-text',     whyNot: "Display-only, no upload — but you needed users to attach files." },
         { detail: 'spec-file',      whyNot: "Upload only, no instructions or template link." }
+      ],
+      'list-country':    [
+        { detail: 'list-dropdown',  whyNot: "You'd type every country by hand — error-prone and never updates." }
+      ],
+      'list-language':   [
+        { detail: 'list-dropdown',  whyNot: "Manual list of languages — easy to miss some, no auto-update." }
+      ],
+      'list-product':    [
+        { detail: 'list-dropdown',  whyNot: "Hand-typed game names risk typos and won't match the real product list." }
       ]
     };
 
@@ -3245,6 +3720,12 @@
         document.querySelectorAll('#fta-step1 .fta-choice').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('fta-next1').disabled = false;
+        // Display info only has a single sub-type -> skip Step 2 entirely (Option D)
+        if (cat === 'display') {
+          FTA.detail = 'label-text';
+          setTimeout(() => { if (FTA.cat === cat && FTA.step === 1) FTA.goStep(3); }, 250);
+          return;
+        }
         // Auto-advance after 250ms
         setTimeout(() => { if (FTA.cat === cat && FTA.step === 1) FTA.goStep(2); }, 250);
       },
@@ -3265,9 +3746,21 @@
         setTimeout(() => { if (FTA.cond === cond && FTA.step === 3) FTA.showResult(); }, 250);
       },
       goStep(n) {
+        // Display path has no Detail step — redirect step 2 to step 1
+        if (n === 2 && FTA.cat === 'display') n = 1;
         FTA.step = n;
+        FTA._applyPathVisibility();
         FTA._renderProgress();
         FTA._showStep(n);
+      },
+      // Hide the Detail progress node when the path skips it (display)
+      _applyPathVisibility() {
+        const skipDetail = FTA.cat === 'display';
+        const d2 = document.getElementById('fta-pd2');
+        const step2node = d2 ? d2.closest('.fta-prog-step') : null;
+        const line2 = document.getElementById('fta-pline2');
+        if (step2node) step2node.style.display = skipDetail ? 'none' : '';
+        if (line2) line2.style.display = skipDetail ? 'none' : '';
       },
       _renderProgress() {
         for (let i = 1; i <= 4; i++) {
@@ -3343,10 +3836,10 @@
               + '<button onclick="FTA.switchTo(\'' + a.detail + '\')" style="text-align:left;background:#fff;border:0.5px solid #e2e8f0;border-radius:9px;padding:10px 12px;cursor:pointer;display:flex;align-items:flex-start;gap:10px;transition:all 0.15s;width:100%" onmouseover="this.style.borderColor=\'#BFDBFE\';this.style.background=\'#FAFBFC\'" onmouseout="this.style.borderColor=\'#e2e8f0\';this.style.background=\'#fff\'">'
               +   '<div style="width:28px;height:28px;border-radius:7px;background:' + c.bg + ';border:0.5px solid ' + c.border + ';color:' + c.text + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' + svg + '</div>'
               +   '<div style="flex:1;min-width:0">'
-              +     '<div style="font-size:12px;font-weight:700;color:#1e293b">' + ar.name + '</div>'
+              +     '<div style="font-size:12px;font-weight:700;color:#1e293b">' + H(ar.name) + '</div>'
               +     '<div style="font-size:10px;color:#B45309;margin-top:3px;line-height:1.5;display:flex;align-items:flex-start;gap:4px">'
               +       '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;color:#f59e0b"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
-              +       '<span><b style="color:#92400E">Why not:</b> ' + a.whyNot + '</span>'
+              +       '<span><b style="color:#92400E">Why not:</b> ' + H(a.whyNot) + '</span>'
               +     '</div>'
               +     '<div style="font-size:10px;color:#155DFC;font-weight:600;margin-top:4px">Use this instead →</div>'
               +   '</div>'
@@ -3359,9 +3852,9 @@
 
         const condLabel = FTA.cond === 'yes' ? 'Conditional' : 'Always visible';
         document.getElementById('fta-pills').innerHTML =
-          '<span class="fta-pill">' + (FTA_CAT_LABEL[FTA.cat] || FTA.cat) + '</span>' +
+          '<span class="fta-pill">' + H(FTA_CAT_LABEL[FTA.cat] || FTA.cat) + '</span>' +
           '<span class="fta-pill-arrow">›</span>' +
-          '<span class="fta-pill">' + r.name + '</span>' +
+          '<span class="fta-pill">' + H(r.name) + '</span>' +
           '<span class="fta-pill-arrow">›</span>' +
           '<span class="fta-pill">' + condLabel + '</span>';
       },
@@ -3373,8 +3866,14 @@
       },
       apply() {
         if (!FTA.detail) return;
+        const applyBtn = document.getElementById('fta-btn-apply');
+        if (applyBtn && applyBtn.disabled) return; // already applying — guard against double-click
+        if (applyBtn) applyBtn.disabled = true;
         const r = FTA_RESULT_MAP[FTA.detail];
-        if (!r) return;
+        if (!r) {
+          if (applyBtn) applyBtn.disabled = false;
+          return;
+        }
         // Open editor wizard pre-filled with the recommended type
         EW = JSON.parse(JSON.stringify(newField(r.type)));
         EW_isNew = true;
@@ -3385,12 +3884,15 @@
         }
         FieldTypeAdvisor.close();
         openEditorWizard();
+        // Re-enable for next time FTA opens
+        if (applyBtn) applyBtn.disabled = false;
       },
       reset() {
         FTA.cat = null; FTA.detail = null; FTA.cond = null; FTA.step = 1;
         document.querySelectorAll('#fta-modal .fta-choice, #fta-modal .fta-sub').forEach(b => b.classList.remove('active'));
         ['fta-next1', 'fta-next2', 'fta-next3'].forEach(id => { const b = document.getElementById(id); if (b) b.disabled = true; });
         FTA._renderProgress();
+        FTA._applyPathVisibility();
         FTA._showStep(1);
       },
       // Escape hatch: close Advisor, open Type Picker
@@ -3513,11 +4015,20 @@
 
     // ── Storage ──
     const STORAGE_KEY = 'nexus_tib_v19_clean_desc';
+    let _svLastErrorAt = 0;
     function sv() {
       try {
         const payload = { sel, tab, desc: document.getElementById('desc-input') ? document.getElementById('desc-input').value : '', fields, _fid, activeId, currLang: CURR_LANG, sessionServices };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-      } catch(e) {}
+      } catch(e) {
+        console.error('sv() save error:', e);
+        // Debounce: only toast once per 30s to avoid spam during rapid edits
+        const now = Date.now();
+        if (now - _svLastErrorAt > 30000) {
+          _svLastErrorAt = now;
+          if (typeof toast === 'function') toast('⚠️ Không lưu được — kiểm tra dung lượng storage');
+        }
+      }
     }
     function ld() {
       try {
@@ -3557,6 +4068,834 @@
         console.error('ld() error:', e);
         switchTab('service');
       }
+    }
+
+    // ════════════════════════════════════════════════════════
+    // REVIEW JSON FEATURE
+    // Verify exported Nexus TIB JSON files + optional reload as template
+    // ════════════════════════════════════════════════════════
+
+    // Holds the parsed + validated JSON for the current Verify session
+    // null when modal closed or no valid file loaded yet
+    let _rjData = null;
+
+    // ── Modal: file picker ──
+    function openReviewJSONPicker() {
+      const m = document.getElementById('rj-picker-modal');
+      if (!m) return;
+      m.classList.remove('opacity-0', 'pointer-events-none');
+      m.classList.add('opacity-100');
+      const inner = document.getElementById('rj-picker-inner');
+      if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+      // Reset file input so onchange fires even for same filename
+      const fi = document.getElementById('rj-file-input');
+      if (fi) fi.value = '';
+    }
+    function closeReviewJSONPicker() {
+      const m = document.getElementById('rj-picker-modal');
+      if (!m) return;
+      m.classList.add('opacity-0', 'pointer-events-none');
+      m.classList.remove('opacity-100');
+      const inner = document.getElementById('rj-picker-inner');
+      if (inner) { inner.classList.add('scale-95'); inner.classList.remove('scale-100'); }
+    }
+
+    // ── File select handler ──
+    function onReviewJSONFileSelected(ev) {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+
+      // Size guard: 1MB
+      if (file.size > 1024 * 1024) {
+        toast('⚠️ File too large (max 1MB)');
+        return;
+      }
+
+      // Type guard: .json or application/json
+      const isJsonExt = /\.json$/i.test(file.name);
+      const isJsonType = file.type === 'application/json' || file.type === '' || file.type === 'text/plain';
+      if (!isJsonExt && !isJsonType) {
+        toast('⚠️ Please choose a .json file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        let raw;
+        try {
+          raw = JSON.parse(e.target.result);
+        } catch (err) {
+          toast('❌ File parse error — not valid JSON');
+          return;
+        }
+
+        try {
+          _validateNexusJSON(raw);
+        } catch (err) {
+          toast('❌ ' + (err.message || 'Not a valid Nexus TIB JSON'));
+          return;
+        }
+
+        // Stash + show Verify Modal
+        _rjData = {
+          raw: raw,
+          filename: file.name,
+          parsedFields: _parseAllRowsToFields(raw.form.rows || [])
+        };
+        closeReviewJSONPicker();
+        _renderReviewJSONVerify();
+        _openReviewJSONVerify();
+      };
+      reader.onerror = function() {
+        toast('❌ Could not read file');
+      };
+      reader.readAsText(file);
+    }
+
+    // ── Validator ──
+    function _validateNexusJSON(data) {
+      if (!data || typeof data !== 'object') throw new Error('Invalid JSON structure');
+      if (!data.form || typeof data.form !== 'object') throw new Error('Missing "form" key — not a Nexus TIB JSON');
+      if (!Array.isArray(data.form.rows)) throw new Error('Missing "form.rows" array — not a Nexus TIB JSON');
+      return true;
+    }
+
+    // ── Reverse parser: JSON row → internal field state ──
+    // Known Nexus types we map back; anything else → 'text' with a console warn
+    const _RJ_KNOWN_TYPES = new Set([
+      'label','text','textarea','number','email','boolean','date','daterange',
+      'select','radio','checkbox','checklist','upload','attachment',
+      'country','language','product'
+    ]);
+
+    function _parseRowToField(row) {
+      const settings = row.settings || {};
+      const rawType = row.type || 'text';
+      let type = rawType;
+      // Nexus uses 'attachment' as the on-wire type for upload fields
+      if (type === 'attachment') type = 'upload';
+      if (!_RJ_KNOWN_TYPES.has(rawType)) {
+        console.warn('[Review JSON] Unknown field type "' + rawType + '" — falling back to text');
+        type = 'text';
+      }
+
+      // Options handling for choice fields
+      let options = [];
+      let optionValues = {};
+      if (Array.isArray(settings.possible_values)) {
+        settings.possible_values.forEach((pv, i) => {
+          if (pv && typeof pv === 'object') {
+            options.push(pv.label != null ? String(pv.label) : '');
+            if (pv.value != null && pv.value !== pv.label) optionValues[i] = String(pv.value);
+          } else {
+            options.push(String(pv));
+          }
+        });
+      }
+
+      // Label resolution
+      let label = settings.label || '';
+      if (type === 'label') label = settings.label || 'Static content';
+
+      // Visibility rule reverse — JSON uses {source_field, operator, values:[]}
+      // Our internal uses {source: <fieldId>, op, values: <string>}
+      // We can't resolve source field ID here; defer to a 2nd pass after all fields parsed
+      let visRule = null;
+      if (row.visibility_rule && row.visibility_rule.source_field) {
+        visRule = {
+          _pendingSourceName: row.visibility_rule.source_field, // resolve later
+          op: row.visibility_rule.operator || 'equals',
+          values: Array.isArray(row.visibility_rule.values) ? (row.visibility_rule.values[0] || '') : (row.visibility_rule.values || '')
+        };
+      }
+
+      const field = {
+        id: fuid(),
+        type: type,
+        label: label,
+        fieldName: row.name || row.id || '',
+        hint: row.description || '',
+        placeholder: settings.placeholder || '',
+        defaultValue: row.default_value || '',
+        required: !!row.is_required,
+        visible: row.visible !== 0,
+        editable: row.editable !== 0,
+        multiple: !!(row.multiple || settings.multiple),
+        halfWidth: !!row.inline_with_previous,
+        options: options,
+        optionValues: optionValues,
+        branchFields: {},
+        visRule: visRule,
+        minLen: row.min_length != null ? row.min_length : '',
+        maxLen: row.max_length != null ? row.max_length : '',
+        pattern: row.regexp || '',
+        content: type === 'label' ? (settings.html || '') : '',
+        inlineStyles: [],
+        isFieldNameManual: false
+      };
+
+      // Product family
+      if (type === 'product' && settings.family) field.productFamily = settings.family;
+      // Accept types for upload — Nexus doesn't standardize this; keep blank
+      if (type === 'upload') {
+        field.acceptTypes = '';
+        field.uploadMode = 'online';
+        field.uploadLink = '';
+      }
+
+      return field;
+    }
+
+    function _parseAllRowsToFields(rows) {
+      // Backup global _fid — preview parsing should not pollute it.
+      // If the user applies the import, reloadImportedAsTemplate resets _fid via pS() flow.
+      // If the user cancels, _fid is restored to original value so subsequent new fields
+      // don't collide with existing field IDs.
+      const _savedFid = _fid;
+      _fid = 1;
+      const parsed = (rows || []).map(_parseRowToField);
+
+      // ── Pass A: propagate halfWidth back to the previous field of a pair ──
+      // JSON export only marks the 2nd field of a pair with `inline_with_previous: 1`.
+      // The internal renderer needs BOTH fields of a pair to have halfWidth=true
+      // (greedy 2-by-2 grouping). So whenever a field has halfWidth=true, set the
+      // previous sibling's halfWidth=true too. Cascading is safe — long inline
+      // chains stay coherent.
+      for (let i = 1; i < parsed.length; i++) {
+        if (parsed[i].halfWidth && parsed[i - 1] && parsed[i - 1].halfWidth !== true) {
+          parsed[i - 1].halfWidth = true;
+        }
+      }
+
+      // ── Pass B: resolve _pendingSourceName → numeric field.id ──
+      const nameToId = {};
+      parsed.forEach(f => { if (f.fieldName) nameToId[f.fieldName] = f.id; });
+      parsed.forEach(f => {
+        if (f.visRule && f.visRule._pendingSourceName) {
+          const srcId = nameToId[f.visRule._pendingSourceName];
+          if (srcId != null) {
+            f.visRule.source = srcId;
+          } else {
+            // Source not found → drop the rule
+            f.visRule = null;
+            return;
+          }
+          delete f.visRule._pendingSourceName;
+        }
+      });
+      // Restore global _fid — the apply path (reloadImportedAsTemplate) will recompute
+      // it correctly via pS()→_collectAllFieldIds when the user picks a service.
+      _fid = _savedFid;
+      return parsed;
+    }
+
+    // ── Verify modal open/close ──
+    function _openReviewJSONVerify() {
+      const m = document.getElementById('rj-verify-modal');
+      if (!m) return;
+      m.classList.remove('opacity-0', 'pointer-events-none');
+      m.classList.add('opacity-100');
+      const inner = document.getElementById('rj-verify-inner');
+      if (inner) { inner.classList.remove('scale-95'); inner.classList.add('scale-100'); }
+    }
+    function closeReviewJSONVerify() {
+      const m = document.getElementById('rj-verify-modal');
+      if (!m) return;
+      m.classList.add('opacity-0', 'pointer-events-none');
+      m.classList.remove('opacity-100');
+      const inner = document.getElementById('rj-verify-inner');
+      if (inner) { inner.classList.add('scale-95'); inner.classList.remove('scale-100'); }
+      // Clear stash so re-open shows fresh state
+      _rjData = null;
+    }
+
+    // ── Render Verify modal content ──
+    function _renderReviewJSONVerify() {
+      if (!_rjData) return;
+      const fname = _rjData.filename || 'file.json';
+      const form = _rjData.raw.form || {};
+      const parsedFields = _rjData.parsedFields || [];
+
+      // Filename
+      const fnEl = document.getElementById('rj-v-filename');
+      if (fnEl) fnEl.textContent = fname;
+
+      // Service name (from form.name)
+      const svcName = form.name || '(no service name)';
+      const svcEl = document.getElementById('rj-v-service');
+      if (svcEl) svcEl.textContent = svcName;
+
+      // Description
+      const descWrap = document.getElementById('rj-v-description-wrap');
+      const descEl = document.getElementById('rj-v-description');
+      if (form.description && form.description.trim()) {
+        if (descEl) descEl.textContent = form.description;
+        if (descWrap) descWrap.classList.remove('hidden');
+      } else {
+        if (descWrap) descWrap.classList.add('hidden');
+      }
+
+      // Stats
+      const total = parsedFields.length;
+      const required = parsedFields.filter(f => f.required).length;
+      const conditional = parsedFields.filter(f => f.visRule && f.visRule.source != null).length;
+      const variants = new Set(parsedFields.map(f => f.type)).size;
+      document.getElementById('rj-v-stat-fields').textContent = total;
+      document.getElementById('rj-v-stat-required').textContent = required;
+      document.getElementById('rj-v-stat-conditional').textContent = conditional;
+      document.getElementById('rj-v-stat-types').textContent = variants;
+
+      // Render based on current view (default list)
+      _renderReviewJSONListView();
+      _renderReviewJSONPreviewView();
+      // Reset toggle visual state to "List"
+      setReviewJSONView('list');
+    }
+
+    // ── View toggle ──
+    function setReviewJSONView(view) {
+      const list = document.getElementById('rj-v-fields-list');
+      const prev = document.getElementById('rj-v-fields-preview');
+      const tabL = document.getElementById('rj-v-tab-list');
+      const tabP = document.getElementById('rj-v-tab-preview');
+      if (!list || !prev || !tabL || !tabP) return;
+
+      if (view === 'preview') {
+        list.classList.add('hidden');
+        prev.classList.remove('hidden');
+        tabP.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-700 bg-white shadow-sm transition';
+        tabL.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-500 hover:text-slate-700 transition';
+      } else {
+        prev.classList.add('hidden');
+        list.classList.remove('hidden');
+        tabL.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-700 bg-white shadow-sm transition';
+        tabP.className = 'h-[22px] px-2.5 text-[10px] font-semibold rounded text-slate-500 hover:text-slate-700 transition';
+      }
+    }
+
+    // ── List view: card-based design mirroring real renderFieldList ──
+    // Blocks pair side-by-side when EITHER field is conditional (= sub-field semantic).
+    // Conditional fields are treated as sub-fields in the real tool and forced full-width.
+    function _renderReviewJSONListView() {
+      if (!_rjData) return;
+      const parsedFields = _rjData.parsedFields || [];
+      const listEl = document.getElementById('rj-v-fields-list');
+      listEl.innerHTML = '';
+      // Remove tight list styling — switch to gap-spaced cards
+      listEl.className = 'space-y-2';
+      if (!parsedFields.length) {
+        listEl.innerHTML = '<div class="px-3 py-6 text-center text-[11px] text-slate-400 bg-white border border-slate-200 rounded-xl">No fields in this JSON</div>';
+        return;
+      }
+      // Build id→label map for friendly visRule display
+      const idToLabel = {};
+      parsedFields.forEach(f => { idToLabel[f.id] = f.label || f.fieldName || '(unnamed)'; });
+
+      // Pair logic — mirror real tool's _canPairItems (line 2461):
+      //   - Both must have halfWidth=true
+      //   - Both non-conditional → pair
+      //   - Both conditional with SAME visRule.source → pair
+      //   - One conditional + one non-conditional → no pair
+      //   - Two conditional with different sources → no pair
+      function _rjCanPair(a, b) {
+        if (!a || !b) return false;
+        if (!a.halfWidth || !b.halfWidth) return false;
+        const aSrc = (a.visRule && a.visRule.source != null) ? a.visRule.source : null;
+        const bSrc = (b.visRule && b.visRule.source != null) ? b.visRule.source : null;
+        if (aSrc == null && bSrc == null) return true;
+        if ((aSrc == null) !== (bSrc == null)) return false;
+        return String(aSrc) === String(bSrc);
+      }
+      const rows = [];
+      let pi = 0;
+      while (pi < parsedFields.length) {
+        const cur = parsedFields[pi];
+        const next = parsedFields[pi + 1];
+        if (_rjCanPair(cur, next)) {
+          rows.push([cur, next]);
+          pi += 2;
+        } else {
+          rows.push([cur]);
+          pi++;
+        }
+      }
+
+      rows.forEach(row => {
+        const isPair = row.length === 2;
+        if (isPair) {
+          const pairWrap = document.createElement('div');
+          pairWrap.className = 'grid grid-cols-2 gap-2';
+          row.forEach(f => pairWrap.appendChild(_buildListCard(f, idToLabel, true)));
+          listEl.appendChild(pairWrap);
+        } else {
+          listEl.appendChild(_buildListCard(row[0], idToLabel, false));
+        }
+      });
+    }
+
+    // ── Build a single field card mirroring real tool's renderCard ──
+    function _buildListCard(f, idToLabel, isInPair) {
+      // Conditional = sub-field semantic
+      const isSub = !!(f.visRule && f.visRule.source != null);
+
+      // Outer card wrapper
+      const wrap = document.createElement('div');
+      const pairBorder = isInPair ? 'border-nexus/40 bg-blue-50/[0.3]' : 'border-slate-200';
+      wrap.className = 'fc bg-white border ' + pairBorder + ' hover:border-nexus-border hover:shadow-sm transition rounded-xl overflow-hidden group';
+
+      // Get colors via existing global helpers
+      const colors = (typeof getTypeColor === 'function')
+        ? getTypeColor(f.type)
+        : { bg: '#EFF6FF', border: '#BFDBFE', text: '#155DFC' };
+      const iconSvgInner = (typeof getTypeIconSVG === 'function')
+        ? getTypeIconSVG(f.type)
+        : _rjFieldIcon(f.type);
+
+      // Header row (clickable)
+      const header = document.createElement('button');
+      header.type = 'button';
+      const padding = isInPair ? 'px-2.5 py-2.5' : 'px-3.5 py-3';
+      const rowGap = isInPair ? 'gap-2' : 'gap-3';
+      header.className = 'w-full flex items-center ' + rowGap + ' ' + padding + ' text-left transition';
+      header.setAttribute('aria-expanded', 'false');
+
+      // Drag handle placeholder (visual parity with real card — non-functional in review modal)
+      const dragH = document.createElement('div');
+      dragH.className = 'text-slate-200 select-none text-sm flex-shrink-0';
+      dragH.style.cursor = 'default';
+      dragH.textContent = '⋮⋮';
+      dragH.setAttribute('aria-hidden', 'true');
+      header.appendChild(dragH);
+
+      // Type icon (real tool style with type color)
+      const iconBox = document.createElement('div');
+      const iconSz = isInPair ? 'w-8 h-8' : 'w-9 h-9';
+      iconBox.className = iconSz + ' rounded-lg flex items-center justify-center flex-shrink-0';
+      iconBox.style.cssText = 'background:' + colors.bg + ';border:1px solid ' + colors.border + ';color:' + colors.text;
+      iconBox.innerHTML = iconSvgInner;
+      header.appendChild(iconBox);
+
+      // Info block (label + meta + badges)
+      const info = document.createElement('div');
+      info.className = 'flex-1 min-w-0';
+
+      const labelLine = document.createElement('div');
+      labelLine.className = 'flex items-center gap-1.5 flex-wrap';
+      const labelSz = isInPair ? 'text-[13px]' : 'text-[14px]';
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'font-semibold ' + labelSz + ' text-slate-800 truncate';
+      labelSpan.textContent = f.label || '(no label)';
+      labelLine.appendChild(labelSpan);
+
+      // Required badge — red pill, full word
+      if (f.required && f.type !== 'label') {
+        const req = document.createElement('span');
+        req.className = 'bg-red-50 text-red-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap';
+        req.textContent = 'Required';
+        labelLine.appendChild(req);
+      }
+      // Conditional badge — purple pill, full word
+      if (isSub) {
+        const cond = document.createElement('span');
+        cond.className = 'bg-purple-50 text-purple-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap';
+        cond.textContent = 'Conditional';
+        cond.title = 'Conditional visibility — shown only when parent rule matches';
+        labelLine.appendChild(cond);
+      }
+      // API badge — sky pill (for product/country/language)
+      if (f.type === 'product' || f.type === 'country' || f.type === 'language') {
+        const api = document.createElement('span');
+        api.className = 'bg-sky-50 text-sky-600 text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap';
+        api.textContent = 'API';
+        api.title = 'Loaded from API';
+        labelLine.appendChild(api);
+      }
+      info.appendChild(labelLine);
+
+      const metaSz = isInPair ? 'text-[11px]' : 'text-[12px]';
+      const meta = document.createElement('div');
+      meta.className = metaSz + ' text-slate-500 mt-0.5 truncate';
+      meta.textContent = _rjFieldMeta(f);
+      info.appendChild(meta);
+
+      header.appendChild(info);
+
+      // HalfWidth icon (▯▯) — show for any field that has halfWidth=true
+      // (conditional fields can also have halfWidth — they pair with other conditional
+      // fields sharing the same visRule.source, mirroring real tool behavior)
+      if (f.halfWidth) {
+        const halfIcon = document.createElement('div');
+        const hSz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
+        const hSvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
+        halfIcon.className = hSz + ' rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 text-nexus border border-blue-200';
+        halfIcon.title = 'Half-width — paired with adjacent field';
+        halfIcon.innerHTML = '<svg class="' + hSvg + '" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/></svg>';
+        header.appendChild(halfIcon);
+      }
+
+      // 3-dot menu button — visual identical to real tool, click = toggle expand detail
+      const menuBtn = document.createElement('div');
+      const menuSz = isInPair ? 'w-7 h-7' : 'w-8 h-8';
+      const menuSvg = isInPair ? 'w-3.5 h-3.5' : 'w-4 h-4';
+      menuBtn.className = menuSz + ' rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-slate-600 transition flex-shrink-0';
+      menuBtn.title = 'Click to view field details';
+      menuBtn.style.transition = 'transform 0.2s, color 0.2s';
+      menuBtn.innerHTML = '<svg class="' + menuSvg + '" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>';
+      header.appendChild(menuBtn);
+
+      // Detail panel — appears below the header inside the card
+      const detail = document.createElement('div');
+      detail.className = 'hidden border-t border-slate-200 bg-slate-50/60 px-3.5 py-3';
+      detail.innerHTML = _buildFieldDetailHTML(f, idToLabel);
+
+      // Click handler — toggle expand + animate 3-dot
+      header.addEventListener('click', () => {
+        const isOpen = !detail.classList.contains('hidden');
+        if (isOpen) {
+          detail.classList.add('hidden');
+          menuBtn.style.transform = '';
+          menuBtn.style.color = '';
+        } else {
+          detail.classList.remove('hidden');
+          menuBtn.style.transform = 'rotate(90deg)';
+          menuBtn.style.color = '#155DFC';
+        }
+        header.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
+
+      wrap.appendChild(header);
+      wrap.appendChild(detail);
+      return wrap;
+    }
+
+    // ── Smart detail HTML: only show properties with values ──
+    function _buildFieldDetailHTML(f, idToLabel) {
+      const rows = [];
+
+      const add = (key, val) => {
+        if (val == null || val === '' || (typeof val === 'string' && !val.trim())) return;
+        rows.push(
+          '<div class="grid grid-cols-[110px_1fr] gap-2 py-1">' +
+            '<div class="text-[10px] uppercase tracking-wide font-semibold text-slate-500">' + key + '</div>' +
+            '<div class="text-[11px] text-slate-700 break-words">' + val + '</div>' +
+          '</div>'
+        );
+      };
+      const escape = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+      // Basic identity
+      add('Field name', f.fieldName ? '<span class="font-mono text-[10.5px]">' + escape(f.fieldName) + '</span>' : '');
+      add('Type', '<span class="font-mono text-[10.5px]">' + escape(f.type) + '</span>');
+      add('Hint', f.hint ? escape(f.hint) : '');
+      add('Placeholder', f.placeholder ? escape(f.placeholder) : '');
+      add('Default value', f.defaultValue ? escape(f.defaultValue) : '');
+
+      // Flags as readable list (only true ones)
+      const flagBits = [];
+      if (f.required) flagBits.push('Required');
+      if (f.visible === false) flagBits.push('Hidden (visible=0)');
+      if (f.editable === false) flagBits.push('Read-only (editable=0)');
+      if (f.multiple) flagBits.push('Allows multiple');
+      if (f.halfWidth) flagBits.push('Half-width inline');
+      if (flagBits.length) add('Behavior', flagBits.join(' · '));
+
+      // Validation
+      const valBits = [];
+      if (f.minLen && f.minLen > 0) valBits.push('Min length: ' + f.minLen);
+      if (f.maxLen && f.maxLen > 0) valBits.push('Max length: ' + f.maxLen);
+      if (f.pattern) valBits.push('Regex: <span class="font-mono text-[10.5px]">' + escape(f.pattern) + '</span>');
+      if (valBits.length) add('Validation', valBits.join(' · '));
+
+      // Options (choice fields)
+      if (Array.isArray(f.options) && f.options.length) {
+        const lis = f.options.map((opt, i) => {
+          const val = (f.optionValues && f.optionValues[i] != null && f.optionValues[i] !== '') ? f.optionValues[i] : null;
+          const tag = val ? ' <span class="font-mono text-[9.5px] text-slate-400">= ' + escape(val) + '</span>' : '';
+          return '<li class="flex gap-1.5"><span class="text-slate-400 shrink-0">' + (i + 1) + '.</span><span>' + escape(opt) + tag + '</span></li>';
+        }).join('');
+        add('Options', '<ul class="space-y-0.5">' + lis + '</ul>');
+      }
+
+      // Conditional rule
+      if (f.visRule && f.visRule.source != null) {
+        const srcLabel = idToLabel[f.visRule.source] || ('field #' + f.visRule.source);
+        const opMap = { equals: '=', not_equals: '≠', contains: 'contains' };
+        const op = opMap[f.visRule.op] || f.visRule.op || '=';
+        const rhs = '"' + escape(f.visRule.values || '') + '"';
+        add('Show when', '<span class="font-semibold text-slate-700">' + escape(srcLabel) + '</span> <span class="text-amber-700 font-bold">' + op + '</span> ' + rhs);
+      }
+
+      // Content (label type)
+      if (f.type === 'label' && f.content) {
+        const trimmed = f.content.length > 200 ? f.content.substring(0, 200) + '…' : f.content;
+        add('HTML content', '<div class="bg-white border border-slate-200 rounded p-2 text-[10.5px] font-mono text-slate-600 max-h-24 overflow-y-auto">' + escape(trimmed) + '</div>');
+      }
+
+      // Product family (smart picker)
+      if (f.productFamily) add('Product family', escape(f.productFamily));
+
+      if (!rows.length) return '<div class="text-[10px] text-slate-400 italic text-center py-1">No additional details</div>';
+      return '<div class="divide-y divide-slate-200/70">' + rows.join('') + '</div>';
+    }
+
+    // ── Form preview view: render half-width side-by-side (mirrors renderPreview logic) ──
+    // Conditional fields are treated as sub-fields → forced full-width (no pairing)
+    function _renderReviewJSONPreviewView() {
+      if (!_rjData) return;
+      const parsedFields = _rjData.parsedFields || [];
+      const prevEl = document.getElementById('rj-v-fields-preview');
+      prevEl.innerHTML = '';
+      if (!parsedFields.length) {
+        prevEl.innerHTML = '<div class="text-center py-6 text-[11px] text-slate-400">No fields to preview</div>';
+        return;
+      }
+
+      // Pair logic mirrors real tool — see list view _rjCanPair for full rules
+      function _rjPvCanPair(a, b) {
+        if (!a || !b) return false;
+        if (!a.halfWidth || !b.halfWidth) return false;
+        const aSrc = (a.visRule && a.visRule.source != null) ? a.visRule.source : null;
+        const bSrc = (b.visRule && b.visRule.source != null) ? b.visRule.source : null;
+        if (aSrc == null && bSrc == null) return true;
+        if ((aSrc == null) !== (bSrc == null)) return false;
+        return String(aSrc) === String(bSrc);
+      }
+      const pvRows = [];
+      let pi = 0;
+      while (pi < parsedFields.length) {
+        const pf = parsedFields[pi];
+        const np = parsedFields[pi + 1];
+        if (_rjPvCanPair(pf, np)) {
+          pvRows.push([pf, np]);
+          pi += 2;
+        } else {
+          pvRows.push([pf]);
+          pi++;
+        }
+      }
+
+      const container = document.createElement('div');
+      container.className = 'space-y-3';
+
+      pvRows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = row.length === 2 ? 'grid grid-cols-2 gap-3' : '';
+        row.forEach(f => rowDiv.appendChild(_buildPreviewFieldNode(f)));
+        container.appendChild(rowDiv);
+      });
+
+      prevEl.appendChild(container);
+    }
+
+    // ── Build single field node for preview view (mimics real form rendering) ──
+    function _buildPreviewFieldNode(f) {
+      const wrap = document.createElement('div');
+      wrap.className = 'bg-white border border-slate-200 rounded-md p-2.5';
+
+      // Label line
+      if (f.type !== 'label') {
+        const lbl = document.createElement('div');
+        lbl.className = 'flex items-center gap-1.5 mb-1.5';
+        const t = document.createElement('span');
+        t.className = 'text-[11.5px] font-semibold text-slate-700';
+        t.textContent = f.label || '(no label)';
+        lbl.appendChild(t);
+        if (f.required) {
+          const s = document.createElement('span');
+          s.className = 'text-red-500 text-[11px]';
+          s.textContent = '*';
+          lbl.appendChild(s);
+        }
+        if (f.visRule && f.visRule.source != null) {
+          const c = document.createElement('span');
+          c.className = 'text-[8.5px] font-bold px-1 py-0.5 rounded tracking-wide leading-tight';
+          c.style.cssText = 'background:#FEF3C7;color:#92400E';
+          c.textContent = 'IF';
+          lbl.appendChild(c);
+        }
+        wrap.appendChild(lbl);
+
+        if (f.hint) {
+          const h = document.createElement('div');
+          h.className = 'text-[10px] text-slate-400 italic mb-1.5';
+          h.textContent = f.hint;
+          wrap.appendChild(h);
+        }
+      }
+
+      // Field-type-specific preview
+      wrap.appendChild(_buildPreviewInput(f));
+      return wrap;
+    }
+
+    function _buildPreviewInput(f) {
+      const escape = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const ph = f.placeholder ? ' placeholder="' + escape(f.placeholder) + '"' : '';
+      const dv = f.defaultValue ? ' value="' + escape(f.defaultValue) + '"' : '';
+      const base = 'class="w-full bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600 px-2 py-1.5 pointer-events-none"';
+      const div = document.createElement('div');
+
+      switch (f.type) {
+        case 'label': {
+          const safe = (f.content || '<span class="text-slate-400 italic">Static label content</span>');
+          div.className = 'rt-rich text-[11px] text-slate-600 leading-normal';
+          div.innerHTML = safe;
+          div.querySelectorAll('a').forEach(a => { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer'); });
+          return div;
+        }
+        case 'textarea':
+          div.innerHTML = '<textarea ' + base + ph + ' rows="2">' + escape(f.defaultValue || '') + '</textarea>';
+          return div.firstChild;
+        case 'number':
+          div.innerHTML = '<input type="number" ' + base + ph + dv + '>';
+          return div.firstChild;
+        case 'email':
+          div.innerHTML = '<input type="email" ' + base + ph + dv + '>';
+          return div.firstChild;
+        case 'date':
+          div.innerHTML = '<input type="date" ' + base + dv + '>';
+          return div.firstChild;
+        case 'daterange':
+          div.className = 'grid grid-cols-2 gap-1.5';
+          div.innerHTML = '<input type="date" ' + base + '><input type="date" ' + base + '>';
+          return div;
+        case 'boolean': {
+          div.className = 'inline-flex items-center gap-1.5';
+          div.innerHTML = '<div class="w-8 h-4 bg-slate-200 rounded-full relative"><div class="w-3 h-3 bg-white border border-slate-300 rounded-full absolute top-0.5 left-0.5"></div></div><span class="text-[11px] text-slate-500">No</span>';
+          return div;
+        }
+        case 'select': {
+          const opts = (f.options || []).map(o => '<option>' + escape(o) + '</option>').join('');
+          div.innerHTML = '<select ' + base + '><option value="" class="text-slate-400">' + (f.placeholder ? escape(f.placeholder) : 'Choose...') + '</option>' + opts + '</select>';
+          return div.firstChild;
+        }
+        case 'radio':
+        case 'checkbox':
+        case 'checklist': {
+          const type = (f.type === 'radio') ? 'radio' : 'checkbox';
+          const items = (f.options || []).map(o =>
+            '<label class="flex items-center gap-1.5 text-[11px] text-slate-600"><input type="' + type + '" disabled class="pointer-events-none"> ' + escape(o) + '</label>'
+          ).join('');
+          div.className = 'space-y-1 bg-slate-50 border border-slate-200 rounded px-2 py-1.5';
+          div.innerHTML = items || '<div class="text-[10px] text-slate-400 italic">No options defined</div>';
+          return div;
+        }
+        case 'upload':
+          div.className = 'border border-dashed border-slate-300 rounded text-center py-2 text-[10px] text-slate-400 bg-slate-50';
+          div.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="inline-block mr-1 align-middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' + (f.multiple ? 'Upload files...' : 'Upload file...');
+          return div;
+        case 'country':
+        case 'language':
+        case 'product':
+          div.innerHTML = '<input type="text" ' + base + ' placeholder="🔍 Search ' + f.type + '..." disabled>';
+          return div.firstChild;
+        default:
+          // text + fallback
+          div.innerHTML = '<input type="text" ' + base + ph + dv + '>';
+          return div.firstChild;
+      }
+    }
+
+    // ── Field meta string for breakdown row ──
+    function _rjFieldMeta(f) {
+      const parts = [f.type];
+      if (f.fieldName) parts.push(f.fieldName);
+      if (f.type === 'select' || f.type === 'radio' || f.type === 'checkbox' || f.type === 'checklist') {
+        if (f.options && f.options.length) parts.push(f.options.length + ' options');
+      } else if (f.type === 'text' || f.type === 'textarea') {
+        if (f.maxLen && f.maxLen > 0) parts.push('max ' + f.maxLen);
+        else if (f.minLen && f.minLen > 0) parts.push('min ' + f.minLen);
+      } else if (f.type === 'upload' && f.multiple) {
+        parts.push('multi-file');
+      }
+      return parts.join(' · ');
+    }
+
+    // ── SVG icon per field type (inline 14px slate) ──
+    function _rjFieldIcon(type) {
+      const stroke = 'stroke="currentColor" stroke-width="2" fill="none"';
+      switch (type) {
+        case 'label':     return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>';
+        case 'text':      return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
+        case 'textarea':  return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="14" y2="18"/></svg>';
+        case 'number':    return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>';
+        case 'email':     return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+        case 'boolean':   return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3"/></svg>';
+        case 'date':      return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+        case 'daterange': return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>';
+        case 'select':    return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="6 9 12 15 18 9"/></svg>';
+        case 'radio':     return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
+        case 'checkbox':  return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+        case 'checklist': return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><polyline points="9 11 12 14 22 4"/><line x1="3" y1="6" x2="3" y2="6.01"/><line x1="3" y1="12" x2="3" y2="12.01"/><line x1="3" y1="18" x2="3" y2="18.01"/></svg>';
+        case 'upload':    return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+        case 'country':   return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>';
+        case 'language':  return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M4 7h16M9 4v3M14 4v3"/><path d="M5 21l4-10 4 10M6 18h6M16 11l2 5 2-5M14 21l4-10 4 10"/></svg>';
+        case 'product':   return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><path d="M6 11l1.5-7h9L18 11M4 11h16l-1 9H5z"/></svg>';
+        default:          return '<svg width="14" height="14" viewBox="0 0 24 24" ' + stroke + '><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      }
+    }
+
+    // ── Reload as template ──
+    // Smart behavior: if session has data → confirm; else → load + reset selection
+    // Uses existing _templateMode mechanism so fields auto-apply when user picks a service
+    function reloadImportedAsTemplate() {
+      if (!_rjData) return;
+
+      const sessionHasFields = fields.length > 0;
+      const sessionHasDesc = (document.getElementById('desc-input').value || '').trim().length > 0;
+      const sessionHasSel = !!(sel && sel.n);
+
+      if (sessionHasFields || sessionHasDesc || sessionHasSel) {
+        const bits = [];
+        if (sessionHasSel) bits.push('selected service "' + sel.n + '"');
+        if (sessionHasFields) bits.push(fields.length + ' field(s)');
+        if (sessionHasDesc) bits.push('service description');
+        const msg = 'Replace your current work?\n\nThis will discard: ' + bits.join(', ') + '.\n\nYou\'ll need to pick a service to apply the imported template.';
+        if (!confirm(msg)) return;
+      }
+
+      // Snapshot data before closing modal (close clears _rjData)
+      const importedFields = _rjData.parsedFields.map(f => JSON.parse(JSON.stringify(f)));
+      const importedDesc = (_rjData.raw.form && _rjData.raw.form.description) || '';
+      const importedSvcName = (_rjData.raw.form && _rjData.raw.form.name) || 'Imported template';
+
+      // Reuse existing _templateMode mechanism — fields will be loaded by pS() when user picks
+      // No source catalog/category since the imported JSON doesn't store them — leave blank so
+      // no service gets greyed out as "source" in the picker
+      _templateMode = {
+        sourceLabel: importedSvcName,
+        sourceCatalog: '',
+        sourceCategory: '',
+        sourceService: '',  // empty → no service gets blocked as "source"
+        fields: importedFields,
+        description: importedDesc
+      };
+
+      // Reset designer state — fields will be loaded after user picks service via pS()
+      sel = { s: '', g: '', n: '' };
+      fields = []; _fid = 1; activeId = null; previewState = {};
+      sq = '';
+      const si = document.getElementById('search-input');
+      if (si) si.value = '';
+      const di = document.getElementById('desc-input');
+      if (di) di.value = '';
+      const dp = document.getElementById('desc-path');
+      if (dp) dp.style.display = 'none';
+
+      // Close modal + show banner on Step 1 + go to Service tab Step 1
+      closeReviewJSONVerify();
+      if (typeof renderTemplateBanner === 'function') renderTemplateBanner();
+      if (typeof goStep === 'function') goStep(1);
+      switchTab('service');
+
+      if (typeof renderCols === 'function') renderCols();
+      if (typeof dLock === 'function') dLock();
+      if (typeof checkWords === 'function') checkWords();
+      if (typeof sv === 'function') sv();
+      if (typeof renderFieldList === 'function') renderFieldList();
+      if (typeof renderPreview === 'function') renderPreview();
+
+      toast('🎯 Template loaded (' + importedFields.length + ' fields) — pick a service to apply');
     }
 
     window.onload = function() {
