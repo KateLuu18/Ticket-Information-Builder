@@ -1400,193 +1400,697 @@
     function _buildExportHTML(entries) {
       if (!entries || !entries.length) return '';
 
+      const H2 = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const slug = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase().slice(0,60);
+
       const now = new Date();
-      const dateStr = now.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', timeZone: 'Asia/Ho_Chi_Minh' });
-      const timeStr = now.toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' });
+      const dateStr = now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Asia/Ho_Chi_Minh'});
+      const timeStr = now.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Ho_Chi_Minh'});
 
-      // Helper: render badge html for PDF
-      function badge(text, color) {
-        const colors = {
-          req:    'background:#FEF2F2;color:#991B1B',
-          cond:   'background:#F5F3FF;color:#6D28D9',
-          branch: 'background:#EEF2FF;color:#3730A3',
-          type:   'background:#F0F9FF;color:#0369A1',
-          half:   'background:#F0FDF4;color:#166534',
-        };
-        return `<span style="display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:600;margin-right:3px;${colors[color]||colors.type}">${text}</span>`;
-      }
+      // ── SheetJS CDN (injected inline — self-contained export) ──
+      const SHEETJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 
-      // Flatten all fields from an entry into printable rows (handles branches)
-      function flattenFieldsForPDF(entry) {
-        // Build ID → label lookup for visRule source display
-        const idToLabel = {};
-        function scanFields(fArr) {
-          (fArr||[]).forEach(f => {
-            idToLabel[f.id] = f.label || f.fieldName || ('field_'+f.id);
-            if (f.branchFields) Object.values(f.branchFields).forEach(arr => scanFields(arr));
+      // ── Build ID→label+fieldName map for conditional rules ──
+      function buildIdMap(fields) {
+        const m = {};
+        function scan(arr) {
+          (arr||[]).forEach(f => {
+            // Store under both number and string key to handle visRule.source type mismatch
+            const entry = { label: f.label||f.fieldName||('field_'+f.id), fieldName: f.fieldName||'' };
+            m[f.id] = entry;
+            m[String(f.id)] = entry;
+            if (f.branchFields) Object.values(f.branchFields).forEach(a => scan(a));
           });
         }
-        scanFields(entry.fields);
+        scan(fields);
+        return m;
+      }
 
-        const rows = [];
-        let seq = 1;
-        function addField(f, depth, parentLabel, parentOpt) {
-          const tInfo = TI(f.type);
-          const labelText = f.type === 'label'
-            ? (f.content || '(Label / Rich text)')
-            : (f.label || '(chưa đặt tên)');
-          const seqLabel = depth > 0 ? '' : String(seq++);
-          const indent = depth > 0;
-          let badges = '';
-          if (f.type !== 'label') badges += badge(tInfo.nm, 'type');
-          if (f.required) badges += badge('Required', 'req');
-          if (f.visRule && f.visRule.source) badges += badge('Conditional', 'cond');
-          if (f.type === 'branch' && !(f.visRule && f.visRule.source)) badges += badge('Conditional', 'cond');
-          if (f.halfWidth) badges += badge('½ width', 'half');
+      // ── Render a single field — matches Preview pane exactly (inline styles) ──
+      function renderField(f, idMap, depth, parentBranchId, parentOptIdx) {
+        const isSub = depth > 0;
+        const fn = f.fieldName || ('f_'+f.id);
 
-          let condNote = '';
-          if (f.visRule && f.visRule.source) {
-            const srcLabel = idToLabel[f.visRule.source] || String(f.visRule.source);
-            condNote = `Hiện khi <b>${H(srcLabel)}</b> = "<b>${H(f.visRule.values||'')}</b>"`;
-          } else if (depth > 0 && parentLabel && parentOpt !== undefined) {
-            condNote = `Hiện khi <b>${H(parentLabel)}</b> = "<b>${H(parentOpt)}</b>"`;
+        // Conditional visibility
+        let visAttr = '';
+        const _hasValidRule = f.visRule && f.visRule.source && String(f.visRule.source).trim() !== '' && f.visRule.values && String(f.visRule.values).trim() !== '';
+        if (_hasValidRule) {
+          const srcFn = (idMap[f.visRule.source]||{}).fieldName || ('f_'+f.visRule.source);
+          visAttr = ` data-cond-source="${H2(srcFn)}" data-cond-op="${H2(f.visRule.op||'equals')}" data-cond-val="${H2(f.visRule.values||'')}"`;
+        }
+        const wrapHide = (f.visible===false) ? 'display:none;' : _hasValidRule ? 'display:none;' : '';
+        const wrapId = 'fw-'+f.id;
+
+        // ── Style tokens (matching Tailwind classes from Preview) ──
+        const S = {
+          input: 'width:100%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:10px;font-size:12px;color:#1E293B;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color .15s',
+          inputFocus: "this.style.borderColor='#155DFC'",
+          inputBlur: "this.style.borderColor='#E2E8F0';validateField(this)",
+          label: 'display:block;font-size:12px;font-weight:700;color:#334155',
+          hint: 'font-size:10px;color:#94A3B8;line-height:1.5',
+          req: 'color:#EF4444;margin-left:2px;font-weight:700',
+          radioLabel: 'display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer',
+          radioText: 'font-size:12px;font-weight:600;color:#475569',
+          radioInput: 'width:14px;height:14px;accent-color:#155DFC;cursor:pointer',
+          checkLabel: 'display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer',
+          checkInput: 'width:14px;height:14px;accent-color:#155DFC;border-radius:3px;cursor:pointer',
+          clWrap: 'background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px',
+          clLabel: 'display:flex;align-items:flex-start;gap:10px;cursor:pointer',
+          clCheck: 'width:16px;height:16px;accent-color:#155DFC;border-radius:4px;cursor:pointer;margin-top:2px',
+          clText: 'font-size:12px;font-weight:500;color:#334155;line-height:1.5',
+          upload: 'border:2px dashed #E2E8F0;border-radius:12px;padding:16px;text-align:center;background:rgba(248,250,252,0.5)',
+          select: 'width:100%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:10px;font-size:12px;font-weight:600;color:#334155;outline:none;cursor:pointer;font-family:inherit;box-sizing:border-box',
+          branchSub: 'display:none;margin-top:8px;padding:12px;background:#F8FAFC;border-left:4px solid #155DFC;border-radius:0 12px 12px 0',
+          branchSubTitle: 'font-size:9px;font-weight:800;color:#155DFC;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px',
+        };
+
+        const reqStar = (f.required && f.type!=='label') ? '<span style="'+S.req+'">*</span>' : '';
+        const displayLabel = f.type==='label' ? '' : H2(f.label||'(ch\u01b0a \u0111\u1eb7t t\u00ean)');
+        const hintHtml = f.hint ? '<p style="'+S.hint+'">'+H2(f.hint)+'</p>' : '';
+
+        let inputHtml = '';
+        const dataAttrs = 'id="inp-'+f.id+'" name="'+fn+'" data-fid="'+f.id+'" data-label="'+H2(f.label||f.fieldName||'')+'" data-required="'+(f.required?'1':'0')+'"';
+
+        switch(f.type) {
+          case 'label': {
+            const ls = (f.inlineStyles||[]).map(function(si){return si.key+':'+si.value}).join(';');
+            const content = f.content||'<span style="color:#94A3B8;font-style:italic">N\u1ed9i dung label...</span>';
+            inputHtml = '<div style="padding:14px;border-radius:12px;font-size:12px;color:#334155;line-height:1.5;border:1px solid rgba(226,232,240,0.6);background:rgba(248,250,252,0.7);'+ls+'">'+content+'</div>';
+            break;
           }
-
-          let optStr = '';
-          if (['select','radio','checkbox','checklist','branch'].includes(f.type) && f.options && f.options.length) {
-            const bullet = f.type === 'radio' ? '○' : f.type === 'checkbox' || f.type === 'checklist' ? '☐' : f.type === 'branch' ? '◆' : '▸';
-            const hasBranch = f.type === 'branch' && f.branchFields;
-            optStr = '<div style="margin:2px 0">' + f.options.map((o,i) => {
-              const v = (f.optionValues && f.optionValues[i] && f.optionValues[i] !== o) ? ` <span style="color:#9CA3AF;font-size:9px">= ${H(f.optionValues[i])}</span>` : '';
-              const subCount = hasBranch && f.branchFields[i] && f.branchFields[i].length ? ` <span style="color:#3730A3;font-size:9px;font-weight:600">(+${f.branchFields[i].length} sub-fields)</span>` : '';
-              return '<div style="padding:1px 0;display:flex;align-items:baseline;gap:5px"><span style="color:#9CA3AF;font-size:9px;flex-shrink:0">' + bullet + '</span><span>' + H(o) + v + subCount + '</span></div>';
-            }).join('') + '</div>';
+          case 'text': case 'email':
+            inputHtml = '<input type="'+(f.type)+'" '+dataAttrs+' placeholder="'+H2(f.placeholder||'Nh\u1eadp n\u1ed9i dung...')+'" value="'+H2(f.defaultValue||'')+'" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" oninput="updateProgress()" style="'+S.input+'">';
+            break;
+          case 'textarea':
+            inputHtml = '<textarea '+dataAttrs+' placeholder="'+H2(f.placeholder||'Nh\u1eadp n\u1ed9i dung...')+'" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" oninput="updateProgress()" style="'+S.input+';min-height:70px;resize:vertical">'+H2(f.defaultValue||'')+'</textarea>';
+            break;
+          case 'number':
+            inputHtml = '<input type="number" '+dataAttrs+' placeholder="VD: 100" value="'+H2(f.defaultValue||'')+'" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" oninput="updateProgress()" style="'+S.input+'">';
+            break;
+          case 'date':
+            inputHtml = '<input type="date" '+dataAttrs+' onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" onchange="updateProgress()" style="'+S.input+';cursor:pointer">';
+            break;
+          case 'daterange':
+            inputHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input type="date" id="inp-'+f.id+'-from" name="'+fn+'_from" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" onchange="updateProgress()" style="'+S.input+';cursor:pointer"><input type="date" id="inp-'+f.id+'-to" name="'+fn+'_to" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" onchange="updateProgress()" style="'+S.input+';cursor:pointer"></div>';
+            break;
+          case 'boolean':
+            inputHtml = '<label class="pv-toggle" style="position:relative;display:inline-flex;align-items:center;cursor:pointer;margin-top:4px"><input type="checkbox" id="inp-'+f.id+'" name="'+fn+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" '+(f.defaultValue==='true'?'checked':'')+' onchange="updateProgress()" style="position:absolute;opacity:0;width:0;height:0" class="pv-toggle-inp"><span class="pv-toggle-track"></span><span style="margin-left:8px;font-size:12px;font-weight:600;color:#475569">Active</span></label>';
+            break;
+          case 'select': {
+            const opts = (f.options||[]).map(function(o,i){return '<option value="'+H2((f.optionValues&&f.optionValues[i])||o)+'">'+H2(o)+'</option>'}).join('');
+            inputHtml = '<select '+dataAttrs+' onchange="updateProgress();evaluateConditions()" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" style="'+S.select+'"><option value="">'+H2(f.placeholder||'-- Ch\u1ecdn --')+'</option>'+opts+'</select>';
+            break;
           }
+          case 'radio': {
+            const opts = (f.options||[]).map(function(o,i){
+              const val = (f.optionValues&&f.optionValues[i])||o;
+              return '<label style="'+S.radioLabel+'"><input type="radio" name="'+fn+'" value="'+H2(val)+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" onchange="onRadioChange(this);updateProgress();evaluateConditions()" style="'+S.radioInput+'"><span style="'+S.radioText+'">'+H2(o)+'</span></label>';
+            }).join('');
+            inputHtml = '<div id="inp-'+f.id+'">'+opts+'</div>';
+            break;
+          }
+          case 'checkbox': {
+            const opts = (f.options||[]).map(function(o,i){
+              const val = (f.optionValues&&f.optionValues[i])||o;
+              return '<label style="'+S.checkLabel+'"><input type="checkbox" name="'+fn+'" value="'+H2(val)+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" onchange="updateProgress()" style="'+S.checkInput+'"><span style="'+S.radioText+'">'+H2(o)+'</span></label>';
+            }).join('');
+            inputHtml = '<div id="inp-'+f.id+'">'+opts+'</div>';
+            break;
+          }
+          case 'checklist': {
+            const opts = (f.options||[]).map(function(o){
+              return '<label style="'+S.clLabel+'"><input type="checkbox" name="'+fn+'" value="'+H2(o)+'" onchange="updateProgress()" style="'+S.clCheck+'"><span style="'+S.clText+'">'+H2(o)+'</span></label>';
+            }).join('');
+            inputHtml = '<div style="'+S.clWrap+';display:flex;flex-direction:column;gap:8px" id="inp-'+f.id+'">'+opts+'</div>';
+            break;
+          }
+          case 'branch': {
+            const radioOpts = (f.options||[]).map(function(o,i){
+              const val = (f.optionValues&&f.optionValues[i])||o;
+              const subFields = (f.branchFields&&f.branchFields[i])||[];
+              let subHtml = '';
+              if (subFields.length) {
+                const subInner = subFields.map(function(sf){return renderField(sf, idMap, depth+1, f.id, i)}).join('');
+                subHtml = '<div id="branch-sub-'+f.id+'-'+i+'" style="'+S.branchSub+'"><div style="'+S.branchSubTitle+'">\u21b3 M\u1edf r\u1ed9ng: "'+H2(o)+'"</div><div style="display:flex;flex-direction:column;gap:14px">'+subInner+'</div></div>';
+              }
+              return '<label style="'+S.radioLabel+'"><input type="radio" name="'+fn+'" value="'+H2(val)+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" onchange="onBranchChange(this,\''+f.id+'\','+i+','+(f.options||[]).length+');updateProgress()" style="'+S.radioInput+'"><span style="'+S.radioText+'">'+H2(o)+'</span></label>'+subHtml;
+            }).join('');
+            inputHtml = '<div style="display:flex;flex-direction:column;gap:4px" id="inp-'+f.id+'">'+radioOpts+'</div>';
+            break;
+          }
+          case 'upload':
+            inputHtml = '<div style="'+S.upload+'" onclick="document.getElementById(\'file-'+f.id+'\').click()"><input type="file" id="file-'+f.id+'" name="'+fn+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" '+(f.multiple?'multiple':'')+' '+(f.acceptTypes?'accept="'+H2(f.acceptTypes)+'"':'')+' onchange="onFileChange(this)" style="display:none"><span style="font-size:18px;display:block">\ud83d\udcce</span><div style="font-size:10px;color:#64748B;font-weight:700;margin-top:4px">K\u00e9o th\u1ea3 file \u0111\u1ec3 upload</div>'+(f.acceptTypes?'<p style="font-size:9px;color:#94A3B8;margin-top:2px">Ch\u1ec9: '+H2(f.acceptTypes)+'</p>':'')+'<div id="file-name-'+f.id+'" style="margin-top:6px;font-size:11px;color:#155DFC"></div></div>';
+            break;
+          case 'country':
+            inputHtml = '<select '+dataAttrs+' onchange="updateProgress()" style="'+S.select+'"><option value="">-- Ch\u1ecdn qu\u1ed1c gia --</option><option value="VN">Vietnam (VN)</option><option value="SG">Singapore (SG)</option><option value="TH">Thailand (TH)</option><option value="MY">Malaysia (MY)</option><option value="PH">Philippines (PH)</option><option value="ID">Indonesia (ID)</option></select>';
+            break;
+          case 'language':
+            inputHtml = '<select '+dataAttrs+' onchange="updateProgress()" style="'+S.select+'"><option value="">-- Ch\u1ecdn ng\u00f4n ng\u1eef --</option><option value="vi">Ti\u1ebfng Vi\u1ec7t</option><option value="en">English</option><option value="zh">Chinese</option><option value="th">Thai</option><option value="id">Indonesian</option></select>';
+            break;
+          case 'product':
+            inputHtml = '<select '+dataAttrs+' onchange="updateProgress()" style="'+S.select+'"><option value="">-- Ch\u1ecdn Game Product --</option><option>Gunny</option><option>V\u00f5 L\u00e2m Truy\u1ec1n K\u1ef3 Mobile</option><option>\u0110\u1ed9t K\u00edch</option><option>Fifa Online</option></select>';
+            break;
+          default:
+            inputHtml = '<input type="text" '+dataAttrs+' placeholder="'+H2(f.placeholder||'Nh\u1eadp n\u1ed9i dung...')+'" value="'+H2(f.defaultValue||'')+'" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" oninput="updateProgress()" style="'+S.input+'">';
+        }
 
-          rows.push({ seqLabel, indent, labelText, fieldName: f.fieldName||'', badges, hint: f.hint||'', condNote, optStr, type: f.type });
+        // Label field has no label row
+        const isLabel = f.type === 'label';
+        const labelRow = isLabel ? '' : '<label for="inp-'+f.id+'" style="'+S.label+'">'+displayLabel+reqStar+'</label>'+hintHtml;
+        const errorEl = (!isLabel) ? '<div id="err-'+f.id+'" style="display:none;font-size:11px;color:#EF4444;margin-top:4px;align-items:center;gap:4px"><span>\u26a0</span><span id="err-msg-'+f.id+'">Tr\u01b0\u1eddng n\u00e0y b\u1eaft bu\u1ed9c</span></div>' : '';
 
-          // Branch sub-fields
-          if (f.type === 'branch' && f.branchFields) {
-            f.options.forEach((opt, optIdx) => {
-              const sfs = f.branchFields[optIdx] || [];
-              sfs.forEach(sf => addField(sf, depth+1, f.label||'', opt));
-            });
+        return '<div id="'+wrapId+'" style="'+wrapHide+'" data-fid="'+f.id+'"'+visAttr+'><div style="display:flex;flex-direction:column;gap:6px">'+labelRow+'<div>'+inputHtml+'</div>'+errorEl+'</div></div>';
+      }
+
+      // ── Build per-service form section ──
+      function buildServiceForm(entry, idx) {
+        const idMap = buildIdMap(entry.fields||[]);
+        const breadcrumb = [entry.catalog, entry.category].filter(Boolean).join(' › ');
+
+        // Group fields greedy 2-by-2 (same as preview pane)
+        const _pvRows = [];
+        let _pi = 0;
+        const _flds = entry.fields||[];
+        while (_pi < _flds.length) {
+          const _pf = _flds[_pi];
+          if (_pf.halfWidth && _pi + 1 < _flds.length && _flds[_pi+1].halfWidth) {
+            _pvRows.push([_pf, _flds[_pi+1]]);
+            _pi += 2;
+          } else {
+            _pvRows.push([_pf]);
+            _pi++;
           }
         }
-        (entry.fields||[]).forEach(f => addField(f, 0));
-        return rows;
-      }
-
-      // Build per-service section HTML
-      function buildServiceSection(entry, idx) {
-        const rows = flattenFieldsForPDF(entry);
-        const breadcrumb = [entry.catalog, entry.category].filter(Boolean).join(' › ');
-        let html = `
-          <div class="service-block" style="${idx > 0 ? 'page-break-before:always;padding-top:2rem;' : ''}">
-            <div style="border-bottom:2px solid #155DFC;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end">
-              <div>
-                ${breadcrumb ? `<div style="font-size:10px;color:#888;letter-spacing:.3px;margin-bottom:3px">${H(breadcrumb)}</div>` : ''}
-                <div style="font-size:17px;font-weight:600;color:#111">${H(entry.service||'Service')}</div>
-              </div>
-              <div style="font-size:10px;color:#999">Service ${idx+1} / ${entries.length}</div>
-            </div>
-            ${entry.description ? `<div style="font-size:11px;color:#555;line-height:1.6;padding:8px 12px;background:#f8f9fa;border-left:3px solid #155DFC;margin-bottom:14px;border-radius:0 4px 4px 0">${H(entry.description)}</div>` : ''}
-            <div style="font-size:10px;font-weight:600;color:#155DFC;letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px">${rows.length} fields</div>
-            <table style="width:100%;border-collapse:collapse;font-size:11px">
-              <thead>
-                <tr style="background:#EFF6FF">
-                  <th style="padding:7px 8px;border:0.5px solid #BFDBFE;color:#155DFC;font-weight:600;width:28px;text-align:center">#</th>
-                  <th style="padding:7px 8px;border:0.5px solid #BFDBFE;color:#155DFC;font-weight:600;width:160px">Label</th>
-                  <th style="padding:7px 8px;border:0.5px solid #BFDBFE;color:#155DFC;font-weight:600;width:130px">Field name</th>
-                  <th style="padding:7px 8px;border:0.5px solid #BFDBFE;color:#155DFC;font-weight:600">Thuộc tính</th>
-                  <th style="padding:7px 8px;border:0.5px solid #BFDBFE;color:#155DFC;font-weight:600">Hint / Options / Điều kiện</th>
-                </tr>
-              </thead>
-              <tbody>`;
-        rows.forEach((r, ri) => {
-          const bg = ri % 2 === 0 ? '#fff' : '#fafafa';
-          const indent = r.indent ? 'padding-left:22px;color:#555' : '';
-          const prefix = r.indent ? '<span style="color:#9CA3AF;margin-right:4px">↳</span>' : '';
-          let extra = [];
-          if (r.hint) extra.push('<div style="color:#6B7280;font-size:10px;line-height:1.5;padding:2px 0">💬 ' + H(r.hint) + '</div>');
-          if (r.optStr) extra.push('<div style="border-left:2px solid #BFDBFE;padding-left:8px;margin:3px 0">' + r.optStr + '</div>');
-          if (r.condNote) extra.push('<div style="color:#7C3AED;font-size:10px;font-style:italic;background:#F5F3FF;padding:3px 8px;border-radius:4px;margin-top:3px">👁 ' + r.condNote + '</div>');
-          html += `<tr style="background:${bg}">
-            <td style="padding:6px 8px;border:0.5px solid #E5E7EB;text-align:center;color:#9CA3AF;font-size:10px">${r.seqLabel}</td>
-            <td style="padding:6px 8px;border:0.5px solid #E5E7EB;font-weight:${r.indent?'400':'500'};${indent}">${prefix}${r.type === 'label' ? r.labelText : H(r.labelText)}</td>
-            <td style="padding:6px 8px;border:0.5px solid #E5E7EB;font-family:monospace;font-size:10px;color:#6B7280">${H(r.fieldName)}</td>
-            <td style="padding:6px 8px;border:0.5px solid #E5E7EB">${r.badges}</td>
-            <td style="padding:6px 8px;border:0.5px solid #E5E7EB;color:#4B5563;line-height:1.6">${extra.join('')}</td>
-          </tr>`;
+        const fieldsHtml = _pvRows.map(row => {
+          const isHalf = row.length === 2;
+          const inner = row.map(f => renderField(f, idMap, 0)).join('');
+          return isHalf
+            ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${inner}</div>`
+            : inner;
+        }).join('');
+        const svcSlug = slug(entry.service||'service');
+        // Embed full field spec as hidden JSON for Excel export
+        const specJson = JSON.stringify({
+          catalog: entry.catalog||'', category: entry.category||'',
+          service: entry.service||'', description: entry.description||'',
+          fields: entry.fields||[]
         });
-        html += `</tbody></table></div>`;
-        return html;
+        return `
+        <script type="application/json" id="spec-${idx}">${specJson.replace(/<\\/g,'\\u003c')}<\/sc` + `ript>
+        <div class="svc-section" id="svc-${idx}" data-slug="${svcSlug}" style="${idx>0?'margin-top:32px;padding-top:32px;border-top:1px solid #E5E7EB':''}">
+          <div style="border-bottom:1px solid #F1F5F9;padding-bottom:16px;margin-bottom:16px">
+            <div style="display:inline-block;font-size:12px;font-weight:700;color:#155DFC;background:rgba(21,93,252,0.1);border:1px solid rgba(21,93,252,0.3);padding:2px 8px;border-radius:6px;margin-bottom:8px">${H2(entry.catalog||'Nexus')}</div>
+            <h2 style="font-size:16px;font-weight:800;color:#1E293B;line-height:1.3">${H2(entry.service||'Service')}</h2>
+            ${entry.description?'<p style="font-size:11px;color:#64748B;font-style:italic;line-height:1.5;margin-top:6px;background:#F8FAFC;padding:10px;border-radius:8px;border:1px solid #F1F5F9">"'+H2(entry.description)+'"</p>':''}
+          </div>
+          <form id="form-${idx}" novalidate style="display:flex;flex-direction:column;gap:16px">
+            ${fieldsHtml}
+          </form>
+        </div>`;
       }
 
-      const servicesHTML = entries.map((e, i) => buildServiceSection(e, i)).join('\n');
-      const totalFields = entries.reduce((s, e) => s + (e.fields||[]).length, 0);
+      const servicesHtml = entries.map((e,i) => buildServiceForm(e,i)).join('\n');
+      const totalFields = entries.reduce((s,e)=>(s+(e.fields||[]).length),0);
+
+      // ── Inline JS for the exported HTML (self-contained) ──
+      const formScript = `
+    let _xlsxLoaded = false;
+    function loadXlsx(cb) {
+      if (typeof XLSX !== 'undefined') { cb(); return; }
+      if (_xlsxLoaded) { setTimeout(()=>loadXlsx(cb),100); return; }
+      _xlsxLoaded = true;
+      var s = document.createElement('script');
+      s.src = '${SHEETJS_CDN}';
+      s.onload = cb;
+      s.onerror = function(){ alert('Không tải được SheetJS — cần kết nối internet để Export Excel lần đầu.'); };
+      document.head.appendChild(s);
+    }
+
+    function validateField(el) {
+      var fid = el.dataset.fid;
+      if (!fid) return true;
+      var req = el.dataset.required === '1';
+      if (!req) return true;
+      var val = el.type === 'checkbox' ? el.checked : el.value;
+      var ok = val && String(val).trim() !== '';
+      var errEl = document.getElementById('err-'+fid);
+      var inputEl = document.getElementById('inp-'+fid) || el;
+      if (errEl) errEl.style.display = ok ? 'none' : 'flex';
+      if (inputEl && inputEl.style !== undefined) {
+        inputEl.style.borderColor = ok ? '#D1D5DB' : '#EF4444';
+        if (!ok) inputEl.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.12)';
+        else inputEl.style.boxShadow = 'none';
+      }
+      return ok;
+    }
+
+    function onRadioChange(el) {
+      var fid = el.dataset.fid;
+      var errEl = document.getElementById('err-'+fid);
+      if (errEl) errEl.style.display = 'none';
+    }
+
+    function onBranchChange(el, branchId, optIdx, totalOpts) {
+      for (var i = 0; i < totalOpts; i++) {
+        var sub = document.getElementById('branch-sub-'+branchId+'-'+i);
+        if (sub) sub.style.display = (i === optIdx) ? 'block' : 'none';
+      }
+      var errEl = document.getElementById('err-'+branchId);
+      if (errEl) errEl.style.display = 'none';
+      evaluateConditions();
+    }
+
+    function onFileChange(el) {
+      var fid = el.dataset.fid;
+      var nameEl = document.getElementById('file-name-'+fid);
+      if (nameEl && el.files && el.files.length) {
+        nameEl.textContent = Array.from(el.files).map(f=>f.name).join(', ');
+      }
+      updateProgress();
+    }
+
+    function evaluateConditions() {
+      document.querySelectorAll('[data-cond-source]').forEach(function(wrap) {
+        var srcName = wrap.dataset.condSource;
+        var op = wrap.dataset.condOp || 'equals';
+        var condVal = wrap.dataset.condVal || '';
+        var srcEl = document.querySelector('[name="'+srcName+'"]');
+        if (!srcEl) return;
+        var srcVal = '';
+        if (srcEl.type === 'radio' || srcEl.type === 'checkbox') {
+          var checked = document.querySelector('[name="'+srcName+'"]:checked');
+          srcVal = checked ? checked.value : '';
+        } else {
+          srcVal = srcEl.value || '';
+        }
+        var match = op === 'not_equals' ? (srcVal !== condVal) : (srcVal === condVal);
+        wrap.style.display = match ? 'block' : 'none';
+      });
+    }
+
+    function updateProgress() {
+      evaluateConditions();
+      var total = 0, filled = 0;
+      document.querySelectorAll('[data-required="1"]').forEach(function(el) {
+        var wrap = document.getElementById('fw-' + el.dataset.fid);
+        if (wrap && wrap.style.display === 'none') return;
+        total++;
+        if (el.type === 'radio' || el.type === 'checkbox') {
+          if (document.querySelector('[name="'+el.name+'"]:checked')) filled++;
+        } else if (el.value && el.value.trim()) filled++;
+      });
+      var pct = total ? Math.round(filled/total*100) : 0;
+      var bar = document.getElementById('prog-bar');
+      if (bar) { bar.style.width = pct + '%'; bar.title = pct + '% complete'; }
+      var cnt = document.getElementById('field-count');
+      if (cnt) cnt.textContent = filled + ' / ' + total + ' required filled';
+    }
+
+    function validateAll() {
+      var errors = [];
+      document.querySelectorAll('[data-required="1"][data-fid]').forEach(function(el) {
+        var fid = el.dataset.fid;
+        var wrap = document.getElementById('fw-'+fid);
+        if (wrap && wrap.style.display === 'none') return;
+        var ok = validateField(el);
+        if (!ok) {
+          var labelEl = document.querySelector('[for="inp-'+fid+'"]');
+          var lbl = (el.dataset.label) || (labelEl ? labelEl.textContent : fid);
+          if (!errors.find(function(e){return e.fid===fid;})) errors.push({fid:fid, label:lbl});
+        }
+      });
+      return errors;
+    }
+
+    function onValidate() {
+      var errs = validateAll();
+      var banner = document.getElementById('val-banner');
+      var bannerMsg = document.getElementById('val-banner-msg');
+      if (errs.length === 0) {
+        banner.style.background = '#F0FDF4';
+        banner.style.borderColor = '#86EFAC';
+        bannerMsg.style.color = '#15803D';
+        bannerMsg.innerHTML = '&#10003; Form hợp lệ — tất cả trường bắt buộc đã điền';
+        banner.style.display = 'flex';
+        setTimeout(function(){ banner.style.display='none'; }, 4000);
+      } else {
+        banner.style.background = '#FEF2F2';
+        banner.style.borderColor = '#FCA5A5';
+        bannerMsg.style.color = '#B91C1C';
+        bannerMsg.innerHTML = '&#9888; ' + errs.length + ' trường bắt buộc chưa điền: ' + errs.map(function(e){return '<b>'+e.label+'</b>';}).join(', ');
+        banner.style.display = 'flex';
+        var firstEl = document.getElementById('inp-'+errs[0].fid) || document.getElementById('fw-'+errs[0].fid);
+        if (firstEl) firstEl.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+    }
+
+    function onReset() {
+      if (!confirm('Reset toàn bộ form? Tất cả dữ liệu đã nhập sẽ bị xoá.')) return;
+      document.querySelectorAll('input:not([type=radio]):not([type=checkbox]), textarea, select').forEach(function(el){
+        if (el.type==='file') return;
+        el.value = '';
+        el.style.borderColor = '#D1D5DB';
+        el.style.boxShadow = 'none';
+      });
+      document.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(function(el){el.checked=false;});
+      document.querySelectorAll('[id^="err-"]').forEach(function(el){el.style.display='none';});
+      document.querySelectorAll('[id^="branch-sub-"]').forEach(function(el){el.style.display='none';});
+      document.querySelectorAll('[id^="file-name-"]').forEach(function(el){el.textContent='';});
+      document.getElementById('val-banner').style.display='none';
+      evaluateConditions();
+      updateProgress();
+    }
+
+    // ── Read embedded spec JSON ──
+    function _readSpecData() {
+      var specs = [];
+      var i = 0;
+      while (true) {
+        var el = document.getElementById('spec-' + i);
+        if (!el) break;
+        try { specs.push(JSON.parse(el.textContent)); } catch(e) {}
+        i++;
+      }
+      return specs;
+    }
+
+    // ── Build validation string per field type ──
+    function _buildValidation(f) {
+      var parts = [];
+      if (f.type === 'number') {
+        if (f.minVal !== '' && f.minVal !== undefined && f.minVal !== null) parts.push('min: ' + f.minVal);
+        if (f.maxVal !== '' && f.maxVal !== undefined && f.maxVal !== null) parts.push('max: ' + f.maxVal);
+      }
+      if (f.type === 'text' || f.type === 'textarea' || f.type === 'email') {
+        if (f.minLen) parts.push('minLen: ' + f.minLen);
+        if (f.maxLen && f.maxLen !== 255) parts.push('maxLen: ' + f.maxLen);
+        if (f.pattern) parts.push('pattern: ' + f.pattern);
+      }
+      if (f.type === 'upload') {
+        if (f.acceptTypes) parts.push('accept: ' + f.acceptTypes);
+      }
+      return parts.join(', ');
+    }
+
+    // ── Build options string: "Label:Value | Label:Value" or "Label | Label" ──
+    function _buildOptions(f) {
+      if (!f.options || !f.options.length) return '';
+      var hasValues = f.optionValues && Object.keys(f.optionValues).length > 0;
+      return f.options.map(function(o, i) {
+        var v = hasValues ? (f.optionValues[i] || o) : null;
+        return (v && v !== o) ? o + ':' + v : o;
+      }).join(' | ');
+    }
+
+    // ── Build conditional rule string ──
+    function _buildConditional(f, idToName) {
+      if (!f.visRule || !f.visRule.source || String(f.visRule.source).trim() === '') return '';
+      if (!f.visRule.values || String(f.visRule.values).trim() === '') return '';
+      var srcName = idToName[f.visRule.source] || ('field_' + f.visRule.source);
+      var op = f.visRule.op === 'not_equals' ? '!=' : '=';
+      return srcName + ' ' + op + ' "' + (f.visRule.values||'') + '"';
+    }
+
+    // ── Build one field row (17 cols) ──
+    function _buildFieldRow(num, f, idToName, parentField, parentOption, halfWidth, pairWith) {
+      // For label type: convert HTML to readable plain text for Excel
+      var labelVal;
+      if (f.type === 'label') {
+        var raw = f.content || '';
+        // Convert links: <a href="url">text</a> → text (url)
+        var readable = raw.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, function(m,url,txt){ return txt+' ('+url+')'; });
+        // Convert bold: <b>text</b> or <strong>text</strong> → **text**
+        readable = readable.replace(/<(b|strong)>(.*?)<\/(b|strong)>/gi, '**$2**');
+        // Convert italic: <i>text</i> or <em>text</em> → _text_
+        readable = readable.replace(/<(i|em)>(.*?)<\/(i|em)>/gi, '_$2_');
+        // Convert <br> / <br/> to newline
+        readable = readable.replace(/<br\s*\/?>/gi, '\n');
+        // Convert <li> to bullet
+        readable = readable.replace(/<li[^>]*>/gi, '• ').replace(/<\/li>/gi, '\n');
+        // Strip remaining tags
+        readable = readable.replace(/<[^>]*>/g, '').replace(/[ \t]+/g, ' ').trim();
+        // Clean up multiple newlines
+        readable = readable.replace(/\n{3,}/g, '\n\n');
+        labelVal = readable ? '[Label] ' + readable : '(Label / Rich text)';
+      } else {
+        labelVal = f.label || '';
+      }
+      return [
+        num,
+        f.fieldName || '',
+        labelVal,
+        f.type || '',
+        f.required ? 'Yes' : 'No',
+        f.visible === false ? 'Hidden' : 'Yes',
+        f.editable === false ? 'Read-only' : 'Yes',
+        f.searchable ? 'Yes' : 'No',
+        f.multiple ? 'Yes' : 'No',
+        f.hint || '',
+        f.placeholder || '',
+        f.defaultValue || '',
+        _buildOptions(f),
+        _buildValidation(f),
+        _buildConditional(f, idToName),
+        parentField || '',
+        parentOption || '',
+        halfWidth ? '1/2' : '',
+        pairWith || ''
+      ];
+    }
+
+    // ── Build ID → fieldName map (recursive for branch sub-fields) ──
+    function _buildIdMap(fields) {
+      var m = {};
+      (fields || []).forEach(function(f) {
+        if (f && f.id != null) m[f.id] = f.fieldName || ('field_' + f.id);
+        if (f.branchFields) {
+          Object.values(f.branchFields).forEach(function(arr) {
+            (arr || []).forEach(function(sf) {
+              if (sf && sf.id != null) m[sf.id] = sf.fieldName || ('field_' + sf.id);
+            });
+          });
+        }
+      });
+      return m;
+    }
+
+    // ── Build detail sheet for one service ──
+    function _buildDetailSheet(entry) {
+      var idToName = _buildIdMap(entry.fields || []);
+      var now = new Date();
+      var dateStr = now.toLocaleDateString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Asia/Ho_Chi_Minh'});
+      var timeStr = now.toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Ho_Chi_Minh'});
+      var totalFields = (entry.fields||[]).length;
+
+      var aoa = [
+        [entry.service || ''],
+        ['Catalog: ' + (entry.catalog||'') + '   |   Category: ' + (entry.category||'') + '   |   Total fields: ' + totalFields],
+        ['Description: ' + (entry.description || '(no description)')],
+        ['Exported: ' + dateStr + ' ' + timeStr + '   |   Tool: Nexus Ticket Information Builder'],
+        [],
+        ['#','field_name','label','type','required','visible','editable','searchable','multiple','hint','placeholder','default_value','options','validation','conditional_rule','parent_field','parent_option','half_width','pair_with']
+      ];
+
+      // Pre-compute half-width pairs (greedy 2-by-2)
+      var hwPairs = {};
+      var flds = entry.fields || [];
+      var pi = 0;
+      while (pi < flds.length) {
+        if (flds[pi].halfWidth && pi + 1 < flds.length && flds[pi+1].halfWidth) {
+          hwPairs[flds[pi].id] = flds[pi+1].label || flds[pi+1].fieldName || '';
+          hwPairs[flds[pi+1].id] = flds[pi].label || flds[pi].fieldName || '';
+          pi += 2;
+        } else {
+          pi++;
+        }
+      }
+
+      var rowNum = 1;
+      flds.forEach(function(f) {
+        var pw = hwPairs[f.id] || '';
+        aoa.push(_buildFieldRow(rowNum++, f, idToName, '', '', f.halfWidth, pw));
+        // Flatten branch sub-fields
+        if (f.type === 'branch' && f.branchFields) {
+          Object.entries(f.branchFields).forEach(function(entry2) {
+            var optIdx = entry2[0];
+            var subFields = entry2[1];
+            var optLabel = (f.options && f.options[parseInt(optIdx)]) || optIdx;
+            (subFields || []).forEach(function(sf) {
+              aoa.push(_buildFieldRow(rowNum++, sf, idToName, f.fieldName || ('field_'+f.id), optLabel, sf.halfWidth, ''));
+            });
+          });
+        }
+      });
+
+      var ws = XLSX.utils.aoa_to_sheet(aoa);
+      // Column widths
+      ws['!cols'] = [
+        {wch:4},  // #
+        {wch:22}, // field_name
+        {wch:28}, // label
+        {wch:12}, // type
+        {wch:9},  // required
+        {wch:8},  // visible
+        {wch:10}, // editable
+        {wch:11}, // searchable
+        {wch:9},  // multiple
+        {wch:30}, // hint
+        {wch:24}, // placeholder
+        {wch:16}, // default_value
+        {wch:36}, // options
+        {wch:20}, // validation
+        {wch:36}, // conditional_rule
+        {wch:18}, // parent_field
+        {wch:18}, // parent_option
+        {wch:10}, // half_width
+        {wch:24}  // pair_with
+      ];
+      // Freeze top 6 rows + col A
+      ws['!freeze'] = {xSplit:1, ySplit:6};
+      return ws;
+    }
+
+    // ── Build summary sheet ──
+    function _buildSummarySheet(specs) {
+      var now = new Date();
+      var dateStr = now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Asia/Ho_Chi_Minh'});
+      var aoa = [
+        ['Nexus Ticket Information Builder — Form Spec Export'],
+        ['Exported: ' + dateStr + '   |   Total services: ' + specs.length],
+        [],
+        ['#','Catalog','Category','Service','Description','Total fields','Sheet']
+      ];
+      specs.forEach(function(e, i) {
+        var sheetName = _buildSheetName(i+1, e.service);
+        aoa.push([i+1, e.catalog||'', e.category||'', e.service||'', e.description||'', (e.fields||[]).length, sheetName]);
+      });
+      var ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = [{wch:4},{wch:16},{wch:20},{wch:32},{wch:40},{wch:13},{wch:24}];
+      ws['!freeze'] = {xSplit:0, ySplit:4};
+      return ws;
+    }
+
+    // ── Sheet name: "01_Service Name" (max 31 chars) ──
+    function _buildSheetName(num, name) {
+      var n = String(num).padStart(2,'0');
+      var cleaned = String(name||'').replace(/[\\\\\\/\\?\\*\\[\\]:'\"]/g,'').trim();
+      return (n + '_' + cleaned).slice(0, 31);
+    }
+
+    // ── Filename: nexus-spec-{CATALOG}-{N}svc-{YYYYMMDD}.xlsx ──
+    function _buildFilename(specs) {
+      var now = new Date();
+      var pad = function(n){return String(n).padStart(2,'0');};
+      var d = now.getFullYear()+''+pad(now.getMonth()+1)+''+pad(now.getDate());
+      var catalogs = specs.map(function(e){return e.catalog||'';}).filter(function(v,i,a){return a.indexOf(v)===i;});
+      var cat = catalogs.length===1 ? '-'+catalogs[0].toLowerCase().replace(/[^a-z0-9]/g,'-') : '-multi';
+      return 'nexus-spec'+cat+'-'+specs.length+'svc-'+d+'.xlsx';
+    }
+
+    function onExportExcel() {
+      loadXlsx(function() {
+        var specs = _readSpecData();
+        if (!specs.length) { alert('Không tìm thấy spec data. Vui lòng export lại từ TIB tool.'); return; }
+        try {
+          var wb = XLSX.utils.book_new();
+          if (specs.length > 1) {
+            XLSX.utils.book_append_sheet(wb, _buildSummarySheet(specs), 'Tổng quan');
+          }
+          specs.forEach(function(e, i) {
+            var sheetName = _buildSheetName(i+1, e.service);
+            XLSX.utils.book_append_sheet(wb, _buildDetailSheet(e), sheetName);
+          });
+          var filename = _buildFilename(specs);
+          XLSX.writeFile(wb, filename);
+        } catch(err) {
+          alert('Lỗi khi xuất Excel: ' + (err.message||err));
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('input,select,textarea').forEach(function(el){
+        el.addEventListener('change', function(){ evaluateConditions(); updateProgress(); });
+      });
+      evaluateConditions();
+      updateProgress();
+    });
+`;
 
       const htmlContent = `<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Nexus TIB — ${dateStr}</title>
-<base target="_blank">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${entries.length===1 ? H2(entries[0].service||'Form') : 'Nexus Forms'} — Test Form</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; background: #fff; color: #111; padding: 32px 40px; max-width: 900px; margin: 0 auto; }
-  @media print {
-    body { padding: 16px 20px; max-width: none; }
-    .no-print { display: none !important; }
-    @page { margin: 15mm 12mm; size: A4; }
-  }
-  .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #155DFC; padding-bottom: 14px; margin-bottom: 20px; }
-  .doc-title { font-size: 20px; font-weight: 600; color: #155DFC; }
-  .doc-sub { font-size: 12px; color: #6B7280; margin-top: 3px; }
-  .doc-meta { font-size: 10px; color: #9CA3AF; text-align: right; line-height: 2; }
-  .summary-bar { display: flex; gap: 24px; background: #F8FAFF; border: 0.5px solid #BFDBFE; border-radius: 6px; padding: 10px 16px; margin-bottom: 20px; font-size: 11px; }
-  .summary-bar span { color: #374151; }
-  .summary-bar b { color: #155DFC; }
-  .print-btn { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; padding: 8px 18px; background: #155DFC; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
-  .print-btn:hover { background: #0f4ecf; }
-  .doc-footer { margin-top: 24px; padding-top: 10px; border-top: 0.5px solid #E5E7EB; display: flex; justify-content: space-between; font-size: 9px; color: #9CA3AF; }
-  .service-block table td { vertical-align: top; line-height: 1.6; }
-  .service-block table td ul { margin: 4px 0; padding-left: 18px; list-style: disc; }
-  .service-block table td ol { margin: 4px 0; padding-left: 18px; list-style: decimal; }
-  .service-block table td li { line-height: 1.6; }
-  .service-block table td a { color: #155DFC; text-decoration: underline; }
-  .service-block table td b, .service-block table td strong { font-weight: 600; }
-  .service-block table td p { margin: 0 0 4px; }
-  .service-block table td br + b, .service-block table td br + strong { line-height: 1.6; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;background:#F8FAFC;color:#111;min-height:100vh;display:flex;flex-direction:column}
+input,select,textarea{font-family:inherit}
+input[type=text]:focus,input[type=number]:focus,input[type=email]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:#155DFC!important;box-shadow:0 0 0 3px rgba(21,93,252,.12)!important;outline:none}
+.topbar{background:#fff;border-bottom:0.5px solid #E5E7EB;padding:11px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:10}
+.topbar-brand{font-size:15px;font-weight:600;color:#155DFC;letter-spacing:-.3px}
+.topbar-sep{width:1px;height:18px;background:#E5E7EB;margin:0 12px}
+.topbar-bc{font-size:12px;color:#6B7280}
+.topbar-bc b{color:#1F2937;font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.topbar-meta{font-size:11px;color:#9CA3AF}
+.prog-wrap{height:3px;background:#E5E7EB;flex-shrink:0}
+.prog-fill{height:100%;background:#155DFC;border-radius:2px;transition:width .3s;width:0}
+.body{flex:1;padding:24px;padding-bottom:90px;overflow-y:auto}
+.form-card{background:#fff;border:0.5px solid #E5E7EB;border-radius:10px;max-width:640px;margin:0 auto;padding:24px 28px}
+.footer{position:sticky;bottom:0;background:#fff;border-top:0.5px solid #E5E7EB;padding:11px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.footer-left{display:flex;align-items:center;gap:10px}
+.footer-right{display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid #D1D5DB;background:#fff;color:#374151;font-family:inherit;transition:background .15s}
+.btn:hover{background:#F9FAFB}
+.btn-primary{background:#155DFC;color:#fff;border-color:#155DFC}
+.btn-primary:hover{background:#1248d1}
+.btn-green{background:#F0FDF4;color:#15803D;border-color:#86EFAC}
+.btn-green:hover{background:#DCFCE7}
+.btn-ghost{border-color:transparent;color:#9CA3AF}
+.btn-ghost:hover{background:#F9FAFB;border-color:#E5E7EB;color:#6B7280}
+.fc{font-size:11px;color:#6B7280}
+.val-banner{display:none;padding:10px 16px;font-size:12px;align-items:flex-start;gap:8px;border:0.5px solid;border-radius:8px;margin:0 auto 16px;max-width:640px;line-height:1.5}
+.pv-toggle-track{width:36px;height:20px;background:#CBD5E1;border-radius:10px;position:relative;display:inline-block;transition:background .2s}
+.pv-toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;border:1px solid #CBD5E1;transition:transform .2s}
+.pv-toggle-inp:checked+.pv-toggle-track{background:#155DFC}
+.pv-toggle-inp:checked+.pv-toggle-track::after{transform:translateX(16px);border-color:#155DFC}
+@media print{.topbar,.footer,.prog-wrap,.no-print{display:none!important}.body{padding:0}.form-card{border:none;padding:0;max-width:none}}
 </style>
 </head>
 <body>
-  <button class="print-btn no-print" onclick="window.print()">🖨 In / Lưu PDF</button>
-
-  <div class="doc-header">
-    <div>
-      <div class="doc-title">Nexus Ticket Form Spec</div>
-      <div class="doc-sub">Tài liệu thiết kế ticket form — chuẩn bị bởi Service Owner</div>
-    </div>
-    <div class="doc-meta">
-      Xuất: ${dateStr} ${timeStr}<br>
-      Trạng thái: Draft
-    </div>
+<div class="topbar no-print">
+  <div style="display:flex;align-items:center">
+    <span class="topbar-brand">Nexus</span>
+    <span class="topbar-sep"></span>
+    <span class="topbar-bc">${entries.length===1 ? (()=>{const bc=[entries[0].catalog,entries[0].category].filter(Boolean).join(' \u203a ');return (bc?H2(bc)+' \u203a ':'')+'\u003cb\u003e'+H2(entries[0].service||'Service')+'\u003c/b\u003e';})() : '\u003cb\u003e'+entries.length+' services\u003c/b\u003e'}</span>
   </div>
-
-  <div class="summary-bar">
-    <span><b>${entries.length}</b> service</span>
-    <span><b>${totalFields}</b> fields tổng</span>
-    <span><b>${[...new Set(entries.map(e=>e.catalog))].length}</b> catalog</span>
+  <div class="topbar-right">
+    <span class="topbar-meta">Xuất ${dateStr} ${timeStr}</span>
+    <button class="btn btn-ghost no-print" onclick="window.print()" title="In / Lưu PDF">🖨</button>
   </div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:8px 14px;background:#FAFAFA;border:0.5px solid #E5E7EB;border-radius:6px;font-size:10px;align-items:center"><span style="font-weight:600;color:#6B7280;margin-right:4px">Chú thích:</span><span style="background:#F0F9FF;color:#0369A1;padding:1px 7px;border-radius:4px;font-weight:600">Type</span><span style="color:#9CA3AF">=</span><span style="color:#555">Loại field</span><span style="color:#ddd">│</span><span style="background:#FEF2F2;color:#991B1B;padding:1px 7px;border-radius:4px;font-weight:600">Required</span><span style="color:#9CA3AF">=</span><span style="color:#555">Bắt buộc điền</span><span style="color:#ddd">│</span><span style="background:#F5F3FF;color:#6D28D9;padding:1px 7px;border-radius:4px;font-weight:600">Conditional</span><span style="color:#9CA3AF">=</span><span style="color:#555">Ẩn/hiện theo điều kiện</span><span style="color:#ddd">│</span><span style="color:#9CA3AF">↳</span><span style="color:#555">= Câu hỏi con (hiện theo lựa chọn)</span></div>
-
-  ${servicesHTML}
-
-  <div class="doc-footer">
-    <span>Nexus Ticket Information Builder · GPP Team · VNG Games</span>
-    <span>Xuất ${dateStr} ${timeStr}</span>
+</div>
+<div class="prog-wrap no-print"><div class="prog-fill" id="prog-bar"></div></div>
+<div class="body">
+  <div class="val-banner" id="val-banner"><span id="val-banner-msg"></span></div>
+  <div class="form-card">
+    ${servicesHtml}
   </div>
+</div>
+<div class="footer no-print">
+  <div class="footer-left">
+    <button class="btn btn-ghost" onclick="onReset()">↺ Reset</button>
+    <span class="fc" id="field-count">0 required filled</span>
+  </div>
+  <div class="footer-right">
+    <button class="btn btn-green" onclick="onExportExcel()">⬇ Export Excel</button>
+    <button class="btn btn-primary" onclick="onValidate()">✓ Validate form</button>
+  </div>
+</div>
+<scr\u0069pt>
+${formScript}
+</scr\u0069pt>
 </body>
 </html>`;
 
@@ -1666,7 +2170,7 @@
       const fieldName = f.fieldName || ('field_' + f.id);
       // Build visibility_rule using confirmed Nexus format: {source_field, operator, values:[]}
       let visRule = null;
-      if (f.visRule && f.visRule.source && idToName) {
+      if (f.visRule && f.visRule.source && String(f.visRule.source).trim() !== '' && f.visRule.values && String(f.visRule.values).trim() !== '' && idToName) {
         const srcName = idToName[f.visRule.source] || ('field_' + f.visRule.source);
         visRule = {
           source_field: srcName,
@@ -1805,34 +2309,90 @@
       fields = []; _fid = 1;
 
       if (presetId === 'test_all_types_1') {
-        fields.push({ id: fuid(), type: 'label', content: '<b>Hướng dẫn:</b> Điền đầy đủ thông tin bên dưới. Tải file template <a href="https://drive.google.com/..." target="_blank">tại đây</a>.', fieldName: 'label_intro', hint: '', required: false, visible: true, editable: true, inlineStyles: [{key:'background',value:'#eff6ff'},{key:'border-left',value:'3px solid #155DFC'}], isFieldNameManual: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'text', label: 'Tên Game Studio', hint: 'Tên chính thức của Game Studio', placeholder: 'VD: VNG Game Studio 1', fieldName: 'ten_game_studio', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'number', label: 'Transaction ID', hint: 'Mã giao dịch dạng số', placeholder: 'VD: 1234567890', fieldName: 'transaction_id', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'email', label: 'Email liên hệ kỹ thuật', hint: 'Email nhân sự phụ trách tích hợp', placeholder: 'dev@vng.com.vn', fieldName: 'email_ky_thuat', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'boolean', label: 'Đã test trên môi trường UAT?', hint: 'Xác nhận đã kiểm tra trước Production', fieldName: 'da_test_uat', required: true, defaultValue: 'false', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'date', label: 'Ngày dự kiến go-live', hint: 'Ngày mong muốn lên Production', fieldName: 'ngay_go_live', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'daterange', label: 'Thời gian bảo trì dự kiến', hint: 'Khoảng thời gian đóng cổng để deploy', fieldName: 'thoi_gian_bao_tri', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'select', label: 'Môi trường tích hợp', hint: 'Chọn môi trường cần tích hợp', fieldName: 'moi_truong', required: true, multiple: false, visible: true, editable: true, options: ['Development', 'Staging / UAT', 'Production'], optionValues: {0:'dev',1:'staging',2:'production'}, branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'radio', label: 'Loại thanh toán', hint: 'Phương thức thanh toán cần tích hợp', fieldName: 'loai_thanh_toan', required: true, visible: true, editable: true, options: ['VNGGames Card', 'ATM / Internet Banking', 'Ví điện tử (MoMo, ZaloPay)', 'Thẻ tín dụng quốc tế'], optionValues: {}, branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'checkbox', label: 'Platform hỗ trợ', hint: 'Chọn tất cả platform cần tích hợp', fieldName: 'platform', required: true, multiple: true, visible: true, editable: true, options: ['iOS (App Store)', 'Android (Google Play)', 'PC / Web', 'Console'], optionValues: {}, branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'upload', label: 'File đặc tả kỹ thuật', hint: 'Upload PDF/Word mô tả yêu cầu tích hợp', fieldName: 'file_spec', required: true, multiple: false, acceptTypes: '.pdf,.doc,.docx', uploadMode: 'online', uploadLink: '', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
+        // ══ Template 1: "Payment Integration Request" ══
+        // Demo: label+link, halfWidth pair, select, conditional, branch+sub-fields, upload, checklist, textarea
+        fields.push({ id: fuid(), type: 'label', content: '<b>Hướng dẫn:</b> Điền đầy đủ thông tin tích hợp thanh toán.<br>Tải file spec template <a href="https://drive.google.com/file/payment-spec" target="_blank">tại đây</a>, điền xong đính kèm bên dưới.', fieldName: 'label_huong_dan', hint: '', required: false, visible: true, editable: true, inlineStyles: [{key:'background',value:'#eff6ff'},{key:'border-left',value:'3px solid #155DFC'}], isFieldNameManual: true, options: [], branchFields: {}, halfWidth: false });
+
+        // halfWidth pair — side by side
+        fields.push({ id: fuid(), type: 'text', label: 'Tên Game Studio', hint: 'Tên chính thức của Game Studio', placeholder: 'VD: VNG Game Studio 1', fieldName: 'ten_game_studio', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+        fields.push({ id: fuid(), type: 'email', label: 'Email kỹ thuật', hint: 'Email nhân sự phụ trách tích hợp', placeholder: 'dev@vng.com.vn', fieldName: 'email_ky_thuat', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+
+        // Select — source cho conditional
+        const envId = fuid();
+        fields.push({ id: envId, type: 'select', label: 'Môi trường tích hợp', hint: 'Chọn môi trường deploy', fieldName: 'moi_truong', required: true, multiple: false, visible: true, editable: true, options: ['Development', 'Staging / UAT', 'Production'], optionValues: {0:'dev',1:'staging',2:'production'}, branchFields: {}, halfWidth: false });
+
+        // Conditional — chỉ hiện khi chọn Production
+        fields.push({ id: fuid(), type: 'textarea', label: 'Kế hoạch rollback', hint: 'Bắt buộc khi deploy Production — mô tả cách revert nếu có lỗi', placeholder: 'Mô tả kế hoạch rollback...', fieldName: 'ke_hoach_rollback', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: envId, op: 'equals', values: 'Production' } });
+
+        // Branch — sub-fields khác nhau tùy loại tích hợp
+        const branchId = fuid();
+        const iapSubId = fuid();
+        const webshopSubId1 = fuid();
+        const webshopSubId2 = fuid();
+        fields.push({ id: branchId, type: 'branch', label: 'Loại tích hợp', hint: 'Chọn phương thức tích hợp thanh toán', fieldName: 'loai_tich_hop', required: true, visible: true, editable: true,
+          options: ['In-App Purchase (IAP)', 'Webshop ngoài game'],
+          optionValues: {0:'iap', 1:'webshop'},
+          branchFields: {
+            0: [{ id: iapSubId, type: 'text', label: 'Bundle ID (iOS) / Package Name (Android)', hint: 'Identifier của app trên store', placeholder: 'com.vnggames.example', fieldName: 'bundle_id', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: null }],
+            1: [
+              { id: webshopSubId1, type: 'text', label: 'URL Webshop hiện tại', hint: 'Link trang web shop', placeholder: 'https://shop.vnggames.com/...', fieldName: 'webshop_url', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: null },
+              { id: webshopSubId2, type: 'select', label: 'Platform Webshop', hint: '', fieldName: 'webshop_platform', required: false, visible: true, editable: true, multiple: false, options: ['Mobile Web', 'Desktop Web', 'Cả hai'], optionValues: {}, branchFields: {}, halfWidth: false, visRule: null }
+            ]
+          }, halfWidth: false, visRule: null });
+
+        // Radio + Checkbox
+        fields.push({ id: fuid(), type: 'radio', label: 'Loại thanh toán', hint: 'Phương thức thanh toán chính', fieldName: 'loai_thanh_toan', required: true, visible: true, editable: true, options: ['VNGGames Card', 'ATM / Internet Banking', 'Ví điện tử (MoMo, ZaloPay)', 'Thẻ quốc tế'], optionValues: {}, branchFields: {}, halfWidth: false });
+        fields.push({ id: fuid(), type: 'checkbox', label: 'Platform hỗ trợ', hint: 'Chọn tất cả platform cần tích hợp', fieldName: 'platform', required: true, multiple: true, visible: true, editable: true, options: ['iOS (App Store)', 'Android (Google Play)', 'PC / Web'], optionValues: {}, branchFields: {}, halfWidth: false });
+
+        // halfWidth pair — Boolean + Date
+        fields.push({ id: fuid(), type: 'boolean', label: 'Đã test UAT?', hint: 'Xác nhận đã kiểm tra trước Production', fieldName: 'da_test_uat', required: true, defaultValue: 'false', visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+        fields.push({ id: fuid(), type: 'date', label: 'Ngày go-live', hint: 'Ngày mong muốn lên Production', fieldName: 'ngay_go_live', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+
+        // Upload + Checklist
+        fields.push({ id: fuid(), type: 'upload', label: 'File đặc tả kỹ thuật', hint: 'Upload spec đã điền từ template', fieldName: 'file_spec', required: true, multiple: false, acceptTypes: '.pdf,.doc,.docx,.xlsx', uploadMode: 'online', uploadLink: '', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
+        fields.push({ id: fuid(), type: 'checklist', label: 'Xác nhận trước khi gửi', hint: '', fieldName: 'checklist_xac_nhan', required: false, visible: true, editable: true, options: ['Đã đọc tài liệu hướng dẫn tích hợp', 'Đã kiểm tra thông tin kỹ thuật chính xác', 'Đã thông báo team vận hành về kế hoạch'], branchFields: {}, halfWidth: false });
+
         fields.push({ id: fuid(), type: 'textarea', label: 'Ghi chú thêm', hint: 'Thông tin bổ sung hoặc yêu cầu đặc biệt', placeholder: 'Nhập ghi chú nếu có...', fieldName: 'ghi_chu', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
+
       } else if (presetId === 'test_all_types_2') {
-        fields.push({ id: fuid(), type: 'label', content: '⚠️ <b>Lưu ý:</b> Mô tả chi tiết sự cố giúp rút ngắn thời gian xử lý.', fieldName: 'label_luu_y', hint: '', required: false, visible: true, editable: true, inlineStyles: [{key:'border-left',value:'3px solid #f59e0b'},{key:'background',value:'#fffbeb'}], isFieldNameManual: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'text', label: 'ZingID / VGA UID bị ảnh hưởng', hint: 'UID của tài khoản gặp sự cố', placeholder: 'VD: 123456789', fieldName: 'zing_id', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'product', label: 'Game bị ảnh hưởng', hint: 'Game liên quan đến sự cố Passport', fieldName: 'game_lien_quan', required: true, multiple: false, productFamily: 'Game', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
+        // ══ Template 2: "Passport — Báo cáo sự cố tài khoản" ══
+        // Demo: label+warning, product, 2 selects as conditional sources, nhiều conditional targets, daterange, upload
+
+        fields.push({ id: fuid(), type: 'label', content: '⚠️ <b>Lưu ý:</b> Mô tả chi tiết sự cố giúp rút ngắn thời gian xử lý.<br>Xem <a href="https://support.vnggames.com/faq" target="_blank">FAQ</a> trước khi gửi — có thể sự cố đã có hướng giải quyết.', fieldName: 'label_luu_y', hint: '', required: false, visible: true, editable: true, inlineStyles: [{key:'border-left',value:'3px solid #f59e0b'},{key:'background',value:'#fffbeb'}], isFieldNameManual: true, options: [], branchFields: {}, halfWidth: false });
+
+        // halfWidth pair — UID + Game
+        fields.push({ id: fuid(), type: 'text', label: 'ZingID / VGA UID', hint: 'UID tài khoản gặp sự cố', placeholder: 'VD: 123456789', fieldName: 'zing_id', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+        fields.push({ id: fuid(), type: 'product', label: 'Game bị ảnh hưởng', hint: 'Game liên quan sự cố', fieldName: 'game_lien_quan', required: true, multiple: false, productFamily: 'Game', visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+
+        // Select 1 — Loại sự cố (source cho conditional "Mô tả chi tiết khi chọn Khác")
         const loaiSuCoId = fuid();
         fields.push({ id: loaiSuCoId, type: 'select', label: 'Loại sự cố', hint: 'Phân loại sự cố Passport', fieldName: 'loai_su_co', required: true, multiple: false, visible: true, editable: true, options: ['Không đăng nhập được', 'Mất liên kết tài khoản', 'Lỗi OTP / xác thực', 'Tài khoản bị khóa nhầm', 'Khác'], optionValues: {0:'login_fail',1:'unlink',2:'otp_error',3:'wrong_ban',4:'other'}, branchFields: {}, halfWidth: false });
+
+        // Select 2 — Kênh login (source cho 5 conditional fields bên dưới)
         const kenhLoginId = fuid();
         fields.push({ id: kenhLoginId, type: 'select', label: 'Kênh đăng nhập gặp sự cố', hint: 'Chọn kênh login bị lỗi', fieldName: 'kenh_login', required: true, multiple: false, visible: true, editable: true, options: ['Zing Account', 'Facebook', 'Google', 'Apple ID'], optionValues: {0:'zing',1:'fb',2:'gg',3:'apple'}, branchFields: {}, halfWidth: false });
+
+        // Conditional: chỉ hiện khi chọn Zing Account
         fields.push({ id: fuid(), type: 'text', label: 'Số điện thoại đăng ký Zing', hint: 'SĐT liên kết với tài khoản', fieldName: 'zing_sdt', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Zing Account' } });
         fields.push({ id: fuid(), type: 'email', label: 'Email Zing Account', hint: 'Email đăng ký tài khoản Zing', fieldName: 'zing_email', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Zing Account' } });
+
+        // Conditional: chỉ hiện khi chọn Facebook
         fields.push({ id: fuid(), type: 'text', label: 'Facebook UID / Link profile', hint: 'Link hoặc UID số Facebook', fieldName: 'fb_uid', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Facebook' } });
+
+        // Conditional: chỉ hiện khi chọn Google
         fields.push({ id: fuid(), type: 'email', label: 'Gmail liên kết', hint: 'Địa chỉ Gmail dùng để đăng nhập', fieldName: 'gmail_lien_ket', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Google' } });
+
+        // Conditional: chỉ hiện khi chọn Apple ID (2 fields)
         fields.push({ id: fuid(), type: 'text', label: 'Apple ID (email)', hint: 'Email Apple ID đã dùng', fieldName: 'apple_id', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Apple ID' } });
         fields.push({ id: fuid(), type: 'boolean', label: 'Đã dùng "Ẩn email" của Apple?', hint: 'Apple Hide My Email feature', fieldName: 'apple_hide_email', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: kenhLoginId, op: 'equals', values: 'Apple ID' } });
-        fields.push({ id: fuid(), type: 'date', label: 'Thời điểm phát sinh sự cố', hint: 'Ngày xảy ra lỗi', fieldName: 'ngay_su_co', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
-        fields.push({ id: fuid(), type: 'textarea', label: 'Mô tả chi tiết lỗi (khi chọn "Khác")', hint: 'Chỉ hiển thị khi chọn loại sự cố là Khác', placeholder: 'Mô tả chi tiết...', fieldName: 'mo_ta_khac', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: loaiSuCoId, op: 'equals', values: 'Khác' } });
+
+        // halfWidth pair — Date + Daterange
+        fields.push({ id: fuid(), type: 'date', label: 'Ngày phát sinh sự cố', hint: 'Ngày xảy ra lỗi', fieldName: 'ngay_su_co', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: true });
+        fields.push({ id: fuid(), type: 'number', label: 'Số lần xảy ra lỗi', hint: 'Ước tính số lần lặp lại', fieldName: 'so_lan_loi', required: false, visible: true, editable: true, options: [], branchFields: {}, halfWidth: true, minVal: 1, maxVal: 999 });
+
+        // Conditional: chỉ hiện khi Loại sự cố = Khác
+        fields.push({ id: fuid(), type: 'textarea', label: 'Mô tả chi tiết (khi chọn "Khác")', hint: 'Chỉ hiển thị khi loại sự cố là Khác', placeholder: 'Mô tả chi tiết sự cố...', fieldName: 'mo_ta_khac', required: true, visible: true, editable: true, options: [], branchFields: {}, halfWidth: false, visRule: { source: loaiSuCoId, op: 'equals', values: 'Khác' } });
+
         fields.push({ id: fuid(), type: 'upload', label: 'Screenshot / Video lỗi', hint: 'Đính kèm bằng chứng để xử lý nhanh hơn', fieldName: 'evidence', required: false, multiple: true, acceptTypes: 'image/*,video/*', uploadMode: 'online', uploadLink: '', visible: true, editable: true, options: [], branchFields: {}, halfWidth: false });
       } else {
         toast('⚠️ Template không hợp lệ');
@@ -1844,7 +2404,7 @@
       renderFieldList();
       renderPreview();
       sv();
-      const templateName = presetId === 'test_all_types_1' ? 'All field types' : 'Conditional fields demo';
+      const templateName = presetId === 'test_all_types_1' ? 'Payment Integration Request' : 'Passport — Incident Report';
       toast('✅ Applied example "' + templateName + '" — ' + fields.length + ' fields');
     }
 
@@ -2213,12 +2773,21 @@
     }
     function rtShowLinkModal() {
       const ed = document.getElementById('ew-rt-editor');
+      // Capture selected text BEFORE losing focus
+      let selText = '';
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0 && ed && ed.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+        selText = sel.toString().trim();
+      }
       if (ed) ed.focus();
       _rtSaveSel();
       const modal = document.getElementById('ew-rt-link-modal');
       if (modal) modal.classList.add('rt-open');
       setTimeout(() => {
         const urlInp = document.getElementById('ew-rt-link-url');
+        const textInp = document.getElementById('ew-rt-link-text');
+        // Pre-fill link text with selected text if any, else keep default
+        if (textInp) textInp.value = selText || 'tại đây';
         if (urlInp) urlInp.focus();
       }, 30);
     }
@@ -2360,7 +2929,12 @@
           } else {
             valueInputHtml = `<input type="text" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:outline-none" value="${H(vr.values || '')}" placeholder="Giá trị..." oninput="onCondValuesInput(this.value)">`;
           }
-          conditionCard = `<div class="border border-slate-200 rounded-xl p-4 mt-3 bg-white space-y-3.5"><div class="grid grid-cols-12 gap-2 items-center"><span class="col-span-3 text-xs text-slate-400 font-semibold">When</span><div class="col-span-9"><select class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondSourceChange(this.value)"><option value="">-- Chọn câu hỏi nguồn --</option>${others.map(f => `<option value="${f.id}" ${String(vr.source) === String(f.id) ? 'selected' : ''}>${H(f.label || f.type).toUpperCase()}</option>`).join('')}</select></div></div><div class="grid grid-cols-12 gap-2 items-center"><span class="col-span-3 text-xs text-slate-400 font-semibold">...</span><div class="col-span-9"><select class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondOpChange(this.value)"><option value="equals" ${!vr.op || vr.op === 'equals' ? 'selected' : ''}>is</option><option value="not_equals" ${vr.op === 'not_equals' ? 'selected' : ''}>is not</option></select></div></div><div class="grid grid-cols-12 gap-2 items-center"><span class="col-span-3 text-xs text-slate-400 font-semibold">the value</span><div class="col-span-9">${valueInputHtml}</div></div></div>`;
+          const _srcMissing = !vr.source || String(vr.source).trim() === '' || vr.source === 'null';
+          const _valMissing = !vr.values || String(vr.values).trim() === '';
+          const _condWarnHtml = (_srcMissing || _valMissing)
+            ? `<div id="ew-cond-warn" class="mt-3 flex items-start gap-2 text-xs text-red-600 font-semibold bg-red-50 border border-red-100 rounded-lg px-3 py-2.5"><span class="shrink-0 mt-0.5">⚠</span><span>${_srcMissing ? 'Vui lòng chọn câu hỏi nguồn.' : 'Vui lòng chọn hoặc nhập giá trị điều kiện.'}</span></div>`
+            : '<div id="ew-cond-warn" class="hidden"></div>';
+          conditionCard = `<div class="border border-slate-200 rounded-xl p-4 mt-3 bg-white space-y-3.5"><div class="grid grid-cols-12 gap-2 items-center"><span class="col-span-3 text-xs text-slate-400 font-semibold">When</span><div class="col-span-9"><select class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondSourceChange(this.value)"><option value="">-- Chọn câu hỏi nguồn --</option>${others.map(f => `<option value="${f.id}" ${String(vr.source) === String(f.id) ? 'selected' : ''}>${H(f.label || f.type).toUpperCase()}</option>`).join('')}</select></div></div><div class="grid grid-cols-12 gap-2 items-center"><span class="col-span-3 text-xs text-slate-400 font-semibold">...</span><div class="col-span-9"><select class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondOpChange(this.value)"><option value="equals" ${!vr.op || vr.op === 'equals' ? 'selected' : ''}>is</option><option value="not_equals" ${vr.op === 'not_equals' ? 'selected' : ''}>is not</option></select></div></div><div class="grid grid-cols-12 gap-2 items-center"><span class="col-span-3 text-xs text-slate-400 font-semibold">the value</span><div class="col-span-9">${valueInputHtml}</div></div>${_condWarnHtml}</div>`;
         } else {
           conditionCard = `<div class="p-3 bg-amber-50 border border-amber-100 rounded-lg text-xs text-amber-700 font-semibold mt-3">⚠️ Cần ít nhất một câu hỏi khác để thiết lập điều kiện.</div>`;
         }
@@ -2375,10 +2949,10 @@
       }
       return h;
     }
-    function ewToggleCondition(on) { EW.visRule = on ? { source: '', op: 'equals', values: '' } : null; renderEWBody(); }
-    function onCondSourceChange(v) { if (!EW.visRule) EW.visRule = {}; EW.visRule.source = v; EW.visRule.values = ''; renderEWBody(); }
+    function ewToggleCondition(on) { EW.visRule = on ? { source: null, op: 'equals', values: '' } : null; renderEWBody(); checkEWNextBtn(); }
+    function onCondSourceChange(v) { if (!EW.visRule) EW.visRule = {}; EW.visRule.source = v; EW.visRule.values = ''; renderEWBody(); checkEWNextBtn(); }
     function onCondOpChange(v) { if (!EW.visRule) EW.visRule = {}; EW.visRule.op = v; }
-    function onCondValuesInput(v) { if (!EW.visRule) EW.visRule = {}; EW.visRule.values = v; }
+    function onCondValuesInput(v) { if (!EW.visRule) EW.visRule = {}; EW.visRule.values = v; checkEWNextBtn(); }
 
     function checkEWNextBtn() {
       const tabs = getTabsForType(EW.type);
@@ -2396,6 +2970,17 @@
         ok = EW.options && EW.options.length > 0 && EW.options.some(o => o.trim() !== '');
         const w = document.getElementById('ew-opts-warn');
         if (w) w.classList.toggle('hidden', ok);
+      }
+      if (tn === 'Advanced') {
+        // Block save if conditional is ON but source or values are missing
+        if (EW.visRule !== null) {
+          const srcOk = EW.visRule.source && String(EW.visRule.source).trim() !== '' && EW.visRule.source !== 'null';
+          const valOk = EW.visRule.values && String(EW.visRule.values).trim() !== '';
+          ok = srcOk && valOk;
+        }
+        // Update warning visibility
+        const warn = document.getElementById('ew-cond-warn');
+        if (warn) warn.classList.toggle('hidden', ok || EW.visRule === null);
       }
       btn.disabled = !ok;
     }
@@ -3343,7 +3928,7 @@
         setTimeout(() => {
           try {
             const blob = _buildJSONBlob(entry);
-            _triggerDownload(blob, _slug(entry.service||'service', 60) + '__IMPORT.json');
+            _triggerDownload(blob, _slug(entry.service||'service', 60) + '.json');
           } catch (err) { toast('\u274c L\u1ed7i xu\u1ea5t JSON: ' + (err.message || err)); }
         }, i * 400);
       });
@@ -3400,20 +3985,20 @@
       try {
         const zip = new JSZip();
         if (isMulti) {
-          // Multi-service: subfolder per service for JSON + 1 combined HTML
+          // Multi-service: each service gets its own <slug>.html + <slug>.json pair
           entries.forEach(entry => {
-            const folder = _slug(entry.service||'service', 60);
+            const svcSlug = _slug(entry.service||'service', 60);
             try {
-              zip.file(folder + '/import.json', _buildJSONBlob(entry));
+              zip.file(svcSlug + '.json', _buildJSONBlob(entry));
+              zip.file(svcSlug + '.html', _buildDesignHTMLBlob([entry]));
             } catch (e) {}
           });
-          // Combined design HTML at root (chứa all services)
-          zip.file('design-all-' + entries.length + 'svc.html', _buildDesignHTMLBlob(entries));
         } else {
-          // Single service: flat structure
+          // Single service: named files <service-slug>.html + <service-slug>.json
           const entry = entries[0];
-          zip.file('design.html', _buildDesignHTMLBlob([entry]));
-          zip.file('import.json', _buildJSONBlob(entry));
+          const svcSlug = _slug(entry.service||'service', 60);
+          zip.file(svcSlug + '.html', _buildDesignHTMLBlob([entry]));
+          zip.file(svcSlug + '.json', _buildJSONBlob(entry));
         }
         // README explains pair + print instructions
         const readme = '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n'
@@ -3423,24 +4008,25 @@
           + 'Số service: ' + entries.length + '\n\n'
           + 'NỘI DUNG GÓI\n'
           + '────────────\n'
-          + '🎨 design.html      → Mở bằng browser để XEM design form (như PDF)\n'
-          + '⚙️  import.json     → Gửi PIC services để import vào Nexus admin\n\n'
+          + '🗂  <service-slug>.html  → Form tương tác — điền thử, validate, export Excel\n'
+          + '⚙️  <service-slug>.json  → Gửi PIC services để import vào Nexus admin\n\n'
           + 'CÁCH SỬ DỤNG\n'
           + '────────────\n'
-          + '1. XEM DESIGN\n'
-          + '   Double-click file design.html → mở bằng browser bất kỳ\n'
-          + '   (Chrome, Safari, Firefox, Edge... đều OK)\n\n'
-          + '2. LƯU PDF (nếu cần)\n'
-          + '   Mở design.html → bấm Cmd+P (Mac) / Ctrl+P (Windows)\n'
-          + '   → chọn destination "Save as PDF" → Save\n\n'
-          + '3. IMPORT VÀO NEXUS\n'
-          + '   PIC services nhận import.json → upload vào Nexus admin\n\n'
+          + '1. TEST FORM\n'
+          + '   Double-click <service-slug>.html → mở bằng browser (Chrome/Edge/Safari)\n'
+          + '   Điền thử, bấm Validate để kiểm tra logic, conditional fields...\n\n'
+          + '2. EXPORT EXCEL (backup)\n'
+          + '   Trong form → bấm "Export Excel" → tải .xlsx với tất cả fields\n\n'
+          + '3. LƯU PDF (nếu cần)\n'
+          + '   Mở .html → Cmd+P (Mac) / Ctrl+P (Windows) → Save as PDF\n\n'
+          + '4. IMPORT VÀO NEXUS\n'
+          + '   PIC services nhận <service-slug>.json → upload vào Nexus admin\n\n'
           + 'LƯU Ý\n'
           + '─────\n'
           + '• HTML đọc được trên MỌI máy có browser — không cần cài thêm gì\n'
           + '• HTML self-contained — không phụ thuộc internet\n'
           + '• JSON dùng để IMPORT, KHÔNG đọc trực tiếp\n'
-          + '• 2 file là 1 cặp — cùng mô tả 1 service\n';
+          + '• .html + .json cùng tên = 1 cặp — cùng mô tả 1 service\n';
         zip.file('README.txt', readme);
 
         zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
@@ -3878,7 +4464,7 @@
         EW = JSON.parse(JSON.stringify(newField(r.type)));
         EW_isNew = true;
         EW_tabIdx = 0;
-        if (FTA.cond === 'yes') EW.visRule = { source: '', op: 'equals', values: '' };
+        if (FTA.cond === 'yes') EW.visRule = { source: null, op: 'equals', values: '' };
         if (FTA.detail === 'label-link') {
           EW.content = '📥 Download the template file <a href="https://drive.google.com/..." target="_blank">here</a>, fill it in, then upload it back using the field below.';
         }
