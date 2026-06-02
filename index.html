@@ -367,38 +367,38 @@
           </button>
         </div>
       </div>
-      <div class="relative px-8 pt-5">
-        <input class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-nexus focus:ring-2 focus:ring-nexus/10 shadow-xs transition" id="search-input" type="text" placeholder="Quick search Service..." oninput="onSearch(this.value)">
-        <span class="absolute left-11 top-8 text-slate-400 text-base">🔍</span>
+      <div class="relative px-8 pt-5 pb-4">
+        <input class="w-full bg-white border border-slate-200 text-slate-800 rounded-lg py-2.5 pl-9 pr-4 text-sm font-medium focus:outline-none focus:border-nexus focus:ring-2 focus:ring-nexus/10 transition" id="search-input" type="text" placeholder="Quick search Service..." oninput="onSearch(this.value)">
+        <svg class="absolute left-11 top-1/2 -translate-y-0 text-slate-400 pointer-events-none" style="top:calc(50% + 2px)" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </div>
 
-      <div class="border-b border-slate-200 px-8 mt-4">
-        <div class="flex gap-8">
-          <button class="pb-3 text-sm font-semibold border-b-2 border-nexus text-nexus transition" id="tab-svc" onclick="switchTab('service')" data-lang-key="tab_service">Service</button>
-          <button class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition" id="tab-int" onclick="switchTab('internal')" data-lang-key="tab_internal">Internal Service</button>
+      <div class="border-b border-slate-200 px-8">
+        <div class="flex">
+          <button class="tab-btn-active mr-7 pb-3 text-sm font-semibold text-nexus relative transition" id="tab-svc" onclick="switchTab('service')" data-lang-key="tab_service">Service<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-nexus rounded-none"></span></button>
+          <button class="tab-btn-inactive pb-3 text-sm text-slate-400 hover:text-slate-600 relative transition" id="tab-int" onclick="switchTab('internal')" data-lang-key="tab_internal">Internal Service</button>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #e2e8f0;min-height:420px;background:#fff;">
-        <div style="display:flex;flex-direction:column;height:420px;border-right:1px solid #f1f5f9;">
-          <div style="padding:8px 12px;border-bottom:1px solid #f1f5f9;background:#f8fafc;">
-            <span style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Catalog</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #e2e8f0;min-height:420px;background:#fff;">
+        <div style="display:flex;flex-direction:column;height:420px;border-right:0.5px solid #e8ecf0;">
+          <div style="padding:8px 14px;border-bottom:0.5px solid #e8ecf0;background:#f8fafc;">
+            <span style="font-size:11px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Catalog</span>
           </div>
-          <div class="custom-scrollbar" style="flex:1;overflow-y:auto;padding:4px;" id="col-catalog"></div>
+          <div class="custom-scrollbar" style="flex:1;overflow-y:auto;padding:6px;" id="col-catalog"></div>
         </div>
-        <div style="display:flex;flex-direction:column;height:420px;border-right:1px solid #f1f5f9;">
-          <div style="padding:8px 12px;border-bottom:1px solid #f1f5f9;background:#f8fafc;">
-            <span style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Category</span>
+        <div style="display:flex;flex-direction:column;height:420px;border-right:0.5px solid #e8ecf0;">
+          <div style="padding:8px 14px;border-bottom:0.5px solid #e8ecf0;background:#f8fafc;">
+            <span style="font-size:11px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Category</span>
           </div>
-          <div class="custom-scrollbar" style="flex:1;overflow-y:auto;padding:4px;" id="col-category">
+          <div class="custom-scrollbar" style="flex:1;overflow-y:auto;padding:6px;" id="col-category">
             <div style="padding:24px;text-align:center;font-size:12px;color:#9ca3af;">Vui lòng chọn Catalog...</div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;height:420px;">
-          <div style="padding:8px 12px;border-bottom:1px solid #f1f5f9;background:#f8fafc;">
-            <span style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Service</span>
+          <div style="padding:8px 14px;border-bottom:0.5px solid #e8ecf0;background:#f8fafc;">
+            <span style="font-size:11px;font-weight:500;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Service</span>
           </div>
-          <div class="custom-scrollbar" style="flex:1;overflow-y:auto;padding:4px;" id="col-service">
+          <div class="custom-scrollbar" style="flex:1;overflow-y:auto;padding:6px;" id="col-service">
             <div style="padding:24px;text-align:center;font-size:12px;color:#9ca3af;">Vui lòng chọn Category...</div>
           </div>
         </div>
@@ -1159,11 +1159,15 @@
       const tabS = document.getElementById('tab-svc');
       const tabI = document.getElementById('tab-int');
       if (t === 'service') {
-        tabS.className = 'pb-3 text-sm font-semibold border-b-2 border-nexus text-nexus transition';
-        tabI.className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+        tabS.className = 'tab-btn-active mr-7 pb-3 text-sm font-semibold text-nexus relative transition';
+        tabS.innerHTML = (tabS.getAttribute('data-lang-key') === 'tab_service' ? 'Service' : tabS.textContent.replace(/\s*$/, '').trim()) + '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-nexus rounded-none"></span>';
+        tabI.className = 'tab-btn-inactive pb-3 text-sm text-slate-400 hover:text-slate-600 relative transition';
+        tabI.innerHTML = tabI.getAttribute('data-lang-key') === 'tab_internal' ? 'Internal Service' : tabI.textContent.trim();
       } else {
-        tabI.className = 'pb-3 text-sm font-semibold border-b-2 border-nexus text-nexus transition';
-        tabS.className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+        tabI.className = 'tab-btn-active pb-3 text-sm font-semibold text-nexus relative transition';
+        tabI.innerHTML = (tabI.getAttribute('data-lang-key') === 'tab_internal' ? 'Internal Service' : tabI.textContent.replace(/\s*$/, '').trim()) + '<span class="absolute bottom-0 left-0 right-0 h-0.5 bg-nexus rounded-none"></span>';
+        tabS.className = 'tab-btn-inactive mr-7 pb-3 text-sm text-slate-400 hover:text-slate-600 relative transition';
+        tabS.innerHTML = tabS.getAttribute('data-lang-key') === 'tab_service' ? 'Service' : tabS.textContent.trim();
       }
       requestAnimationFrame(function() { renderCols(); });
       dLock();
@@ -1416,7 +1420,7 @@
         function scan(arr) {
           (arr||[]).forEach(f => {
             // Store under both number and string key to handle visRule.source type mismatch
-            const entry = { label: f.label||f.fieldName||('field_'+f.id), fieldName: f.fieldName||'' };
+            const entry = { label: f.label||f.fieldName||('field_'+f.id), fieldName: f.fieldName||'', options: f.options||[], optionValues: f.optionValues||{} };
             m[f.id] = entry;
             m[String(f.id)] = entry;
             if (f.branchFields) Object.values(f.branchFields).forEach(a => scan(a));
@@ -1435,8 +1439,17 @@
         let visAttr = '';
         const _hasValidRule = f.visRule && f.visRule.source && String(f.visRule.source).trim() !== '' && f.visRule.values && String(f.visRule.values).trim() !== '';
         if (_hasValidRule) {
-          const srcFn = (idMap[f.visRule.source]||{}).fieldName || ('f_'+f.visRule.source);
-          visAttr = ` data-cond-source="${H2(srcFn)}" data-cond-op="${H2(f.visRule.op||'equals')}" data-cond-val="${H2(f.visRule.values||'')}"`;
+          const srcEntry = idMap[f.visRule.source] || {};
+          const srcFn = srcEntry.fieldName || ('f_'+f.visRule.source);
+          // Translate condition value: display label → optionValue (if source has optionValues)
+          let condVal = f.visRule.values || '';
+          if (srcEntry.options && srcEntry.options.length && srcEntry.optionValues) {
+            const optIdx = srcEntry.options.findIndex(function(o){ return String(o).trim().toLowerCase() === String(condVal).trim().toLowerCase(); });
+            if (optIdx >= 0 && srcEntry.optionValues[optIdx] != null && String(srcEntry.optionValues[optIdx]) !== '') {
+              condVal = String(srcEntry.optionValues[optIdx]);
+            }
+          }
+          visAttr = ` data-cond-source="${H2(srcFn)}" data-cond-op="${H2(f.visRule.op||'equals')}" data-cond-val="${H2(condVal)}"`;
         }
         const wrapHide = (f.visible===false) ? 'display:none;' : _hasValidRule ? 'display:none;' : '';
         const wrapId = 'fw-'+f.id;
@@ -1596,7 +1609,7 @@
           fields: entry.fields||[]
         });
         return `
-        <script type="application/json" id="spec-${idx}">${specJson.replace(/<\\/g,'\\u003c')}<\/sc` + `ript>
+        <script type="application/json" id="spec-${idx}">${specJson.replace(/</g,'\\u003c')}<\/sc` + `ript>
         <div class="svc-section" id="svc-${idx}" data-slug="${svcSlug}" style="${idx>0?'margin-top:32px;padding-top:32px;border-top:1px solid #E5E7EB':''}">
           <div style="border-bottom:1px solid #F1F5F9;padding-bottom:16px;margin-bottom:16px">
             <div style="display:inline-block;font-size:12px;font-weight:700;color:#155DFC;background:rgba(21,93,252,0.1);border:1px solid rgba(21,93,252,0.3);padding:2px 8px;border-radius:6px;margin-bottom:8px">${H2(entry.catalog||'Nexus')}</div>
@@ -1677,13 +1690,27 @@
         var srcEl = document.querySelector('[name="'+srcName+'"]');
         if (!srcEl) return;
         var srcVal = '';
+        var srcText = '';
         if (srcEl.type === 'radio' || srcEl.type === 'checkbox') {
           var checked = document.querySelector('[name="'+srcName+'"]:checked');
-          srcVal = checked ? checked.value : '';
+          if (checked) {
+            srcVal = checked.value || '';
+            var nextSpan = checked.nextElementSibling;
+            if (nextSpan && nextSpan.tagName === 'SPAN') srcText = (nextSpan.textContent || '').trim();
+          }
+        } else if (srcEl.tagName === 'SELECT') {
+          srcVal = srcEl.value || '';
+          if (srcEl.selectedIndex >= 0 && srcEl.options[srcEl.selectedIndex]) {
+            srcText = (srcEl.options[srcEl.selectedIndex].text || '').trim();
+          }
         } else {
           srcVal = srcEl.value || '';
         }
-        var match = op === 'not_equals' ? (srcVal !== condVal) : (srcVal === condVal);
+        var cv = String(condVal).trim().toLowerCase();
+        var sv = String(srcVal).trim().toLowerCase();
+        var st = String(srcText).trim().toLowerCase();
+        var isEqual = (sv !== '' && sv === cv) || (st !== '' && st === cv);
+        var match = op === 'not_equals' ? !isEqual : isEqual;
         wrap.style.display = match ? 'block' : 'none';
       });
     }
@@ -1818,19 +1845,19 @@
       if (f.type === 'label') {
         var raw = f.content || '';
         // Convert links: <a href="url">text</a> → text (url)
-        var readable = raw.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, function(m,url,txt){ return txt+' ('+url+')'; });
+        var readable = raw.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\\/a>/gi, function(m,url,txt){ return txt+' ('+url+')'; });
         // Convert bold: <b>text</b> or <strong>text</strong> → **text**
-        readable = readable.replace(/<(b|strong)>(.*?)<\/(b|strong)>/gi, '**$2**');
+        readable = readable.replace(/<(b|strong)>(.*?)<\\/(b|strong)>/gi, '**$2**');
         // Convert italic: <i>text</i> or <em>text</em> → _text_
-        readable = readable.replace(/<(i|em)>(.*?)<\/(i|em)>/gi, '_$2_');
+        readable = readable.replace(/<(i|em)>(.*?)<\\/(i|em)>/gi, '_$2_');
         // Convert <br> / <br/> to newline
-        readable = readable.replace(/<br\s*\/?>/gi, '\n');
+        readable = readable.replace(/<br\\s*\\/?>/gi, '\\n');
         // Convert <li> to bullet
-        readable = readable.replace(/<li[^>]*>/gi, '• ').replace(/<\/li>/gi, '\n');
+        readable = readable.replace(/<li[^>]*>/gi, '• ').replace(/<\\/li>/gi, '\\n');
         // Strip remaining tags
         readable = readable.replace(/<[^>]*>/g, '').replace(/[ \t]+/g, ' ').trim();
         // Clean up multiple newlines
-        readable = readable.replace(/\n{3,}/g, '\n\n');
+        readable = readable.replace(/\\n{3,}/g, '\\n\\n');
         labelVal = readable ? '[Label] ' + readable : '(Label / Rich text)';
       } else {
         labelVal = f.label || '';
@@ -1945,8 +1972,8 @@
         {wch:10}, // half_width
         {wch:24}  // pair_with
       ];
-      // Freeze top 6 rows + col A
-      ws['!freeze'] = {xSplit:1, ySplit:6};
+      // Freeze top rows + col A (SheetJS Pro only — no-op in free tier)
+      // ws['!freeze'] = {xSplit:1, ySplit:6};
       return ws;
     }
 
@@ -1966,15 +1993,15 @@
       });
       var ws = XLSX.utils.aoa_to_sheet(aoa);
       ws['!cols'] = [{wch:4},{wch:16},{wch:20},{wch:32},{wch:40},{wch:13},{wch:24}];
-      ws['!freeze'] = {xSplit:0, ySplit:4};
       return ws;
     }
 
     // ── Sheet name: "01_Service Name" (max 31 chars) ──
     function _buildSheetName(num, name) {
       var n = String(num).padStart(2,'0');
-      var cleaned = String(name||'').replace(/[\\\\\\/\\?\\*\\[\\]:'\"]/g,'').trim();
-      return (n + '_' + cleaned).slice(0, 31);
+      var s = String(name||'');
+      ['\\\\','/','?','*','[',']',':',"'",'"'].forEach(function(c){ s = s.split(c).join(''); });
+      return (n + '_' + s.trim()).slice(0, 31);
     }
 
     // ── Filename: nexus-spec-{CATALOG}-{N}svc-{YYYYMMDD}.xlsx ──
@@ -2068,24 +2095,19 @@ input[type=text]:focus,input[type=number]:focus,input[type=email]:focus,input[ty
   </div>
   <div class="topbar-right">
     <span class="topbar-meta">Xuất ${dateStr} ${timeStr}</span>
-    <button class="btn btn-ghost no-print" onclick="window.print()" title="In / Lưu PDF">🖨</button>
   </div>
 </div>
-<div class="prog-wrap no-print"><div class="prog-fill" id="prog-bar"></div></div>
 <div class="body">
-  <div class="val-banner" id="val-banner"><span id="val-banner-msg"></span></div>
   <div class="form-card">
     ${servicesHtml}
   </div>
 </div>
 <div class="footer no-print">
   <div class="footer-left">
-    <button class="btn btn-ghost" onclick="onReset()">↺ Reset</button>
-    <span class="fc" id="field-count">0 required filled</span>
+    <span class="fc">Form spec preview — read-only</span>
   </div>
   <div class="footer-right">
     <button class="btn btn-green" onclick="onExportExcel()">⬇ Export Excel</button>
-    <button class="btn btn-primary" onclick="onValidate()">✓ Validate form</button>
   </div>
 </div>
 <scr\u0069pt>
@@ -2923,7 +2945,7 @@ ${formScript}
           const srcField = others.find(x => String(x.id) === String(vr.source));
           let valueInputHtml = '';
           if (srcField && ['select', 'radio', 'checkbox', 'checklist', 'branch'].includes(srcField.type)) {
-            valueInputHtml = `<select class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondValuesInput(this.value)"><option value="">-- Chọn đáp án --</option>${srcField.options.map(opt => `<option value="${H(opt.trim())}" ${vr.values === opt.trim() ? 'selected' : ''}>${H(opt)}</option>`).join('')}</select>`;
+            valueInputHtml = `<select class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondValuesInput(this.value)"><option value="">-- Chọn đáp án --</option>${srcField.options.map((opt, i) => { const val = (srcField.optionValues && srcField.optionValues[i] != null && srcField.optionValues[i] !== '') ? srcField.optionValues[i] : opt; return `<option value="${H(String(val).trim())}" ${String(vr.values||'').toLowerCase() === String(val).trim().toLowerCase() ? 'selected' : ''}>${H(opt)}</option>`; }).join('')}</select>`;
           } else if (srcField && srcField.type === 'boolean') {
             valueInputHtml = `<select class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-700 focus:outline-none cursor-pointer" onchange="onCondValuesInput(this.value)"><option value="">-- Chọn --</option><option value="true" ${vr.values === 'true' ? 'selected' : ''}>Có / Yes</option><option value="false" ${vr.values === 'false' ? 'selected' : ''}>Không / No</option></select>`;
           } else {
@@ -3481,8 +3503,8 @@ ${formScript}
           const srcField = allFieldsFlat.find(x => String(x.id) === String(f.visRule.source));
           if (!srcField) return;
           const currentVal = String(previewState[srcField.fieldName] || '').trim().toLowerCase();
-          const ruleVals = String(f.visRule.values || '').split(',').map(v => v.trim().toLowerCase());
-          const isMatch = ruleVals.includes(currentVal);
+          const ruleVal = String(f.visRule.values || '').trim().toLowerCase();
+          const isMatch = currentVal === ruleVal;
           const shouldShow = f.visRule.op === 'not_equals' ? !isMatch : isMatch;
           if (shouldShow) { el.classList.remove('hidden'); el.classList.add('fade-item-enter'); }
           else { el.classList.add('hidden'); /* M5 fix: keep previewState value — don't reset */ }
@@ -4008,23 +4030,18 @@ ${formScript}
           + 'Số service: ' + entries.length + '\n\n'
           + 'NỘI DUNG GÓI\n'
           + '────────────\n'
-          + '🗂  <service-slug>.html  → Form tương tác — điền thử, validate, export Excel\n'
           + '⚙️  <service-slug>.json  → Gửi PIC services để import vào Nexus admin\n\n'
           + 'CÁCH SỬ DỤNG\n'
           + '────────────\n'
-          + '1. TEST FORM\n'
+          + '1. XEM FORM SPEC\n'
           + '   Double-click <service-slug>.html → mở bằng browser (Chrome/Edge/Safari)\n'
-          + '   Điền thử, bấm Validate để kiểm tra logic, conditional fields...\n\n'
+          + '   Xem preview form spec, kiểm tra fields, conditional logic...\n\n'
           + '2. EXPORT EXCEL (backup)\n'
           + '   Trong form → bấm "Export Excel" → tải .xlsx với tất cả fields\n\n'
-          + '3. LƯU PDF (nếu cần)\n'
-          + '   Mở .html → Cmd+P (Mac) / Ctrl+P (Windows) → Save as PDF\n\n'
-          + '4. IMPORT VÀO NEXUS\n'
+          + '3. IMPORT VÀO NEXUS\n'
           + '   PIC services nhận <service-slug>.json → upload vào Nexus admin\n\n'
           + 'LƯU Ý\n'
           + '─────\n'
-          + '• HTML đọc được trên MỌI máy có browser — không cần cài thêm gì\n'
-          + '• HTML self-contained — không phụ thuộc internet\n'
           + '• JSON dùng để IMPORT, KHÔNG đọc trực tiếp\n'
           + '• .html + .json cùng tên = 1 cặp — cùng mô tả 1 service\n';
         zip.file('README.txt', readme);
@@ -4050,9 +4067,6 @@ ${formScript}
       if (format === 'json') {
         _dlJSON(entries);
         toast('\u2705 \u0110ang t\u1ea3i ' + entries.length + ' file JSON' + (label ? ' \u2014 ' + label : ''));
-      } else if (format === 'html') {
-        _dlPrintHTML(entries);
-        toast('\u2705 M\u1edf print dialog \u2014 ch\u1ecdn "Save as PDF" \u0111\u1ec3 l\u01b0u', 4000);
       } else {
         // 'both' → ZIP bundle (HTML + JSON + README)
         _dlZipBundle(entries);
@@ -4069,8 +4083,7 @@ ${formScript}
       pop.innerHTML = '<div style="font-size:11px;font-weight:600;color:#94a3b8;padding:6px 10px 4px">Ch\u1ecdn \u0111\u1ecbnh d\u1ea1ng xu\u1ea5t</div>'
         + _popItem('both', '#EFF6FF', '#155DFC', 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4', 'B\u1ed9 \u0111\u1ea7y \u0111\u1ee7 (ZIP)', 'JSON + design HTML + README', true)
         + '<div style="height:0.5px;background:#f1f5f9;margin:2px 10px"></div>'
-        + _popItem('json', '#FFF7ED', '#BA7517', 'M17 8l4 4-4 4M7 8l-4 4 4 4M14 4l-4 16', 'Ch\u1ec9 JSON', 'G\u1eedi PIC services import Nexus', false)
-        + _popItem('html', '#E1F5EE', '#0F6E56', 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z', 'In ra PDF', 'M\u1edf dialog Save as PDF c\u1ee7a browser', false);
+        + _popItem('json', '#FFF7ED', '#BA7517', 'M17 8l4 4-4 4M7 8l-4 4 4 4M14 4l-4 16', 'Ch\u1ec9 JSON', 'G\u1eedi PIC services import Nexus', false);
       document.body.appendChild(pop);
       // Position above button
       const rect = btnEl.getBoundingClientRect();
