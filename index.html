@@ -467,7 +467,7 @@
         </div>
 
         <div class="relative">
-          <button class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg transition" onclick="toggleTemplateMenu(event)" title="Apply an example field template">
+          <button id="btn-examples-top" class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-50" onclick="toggleTemplateMenu(event)" title="Chọn service trước để dùng example">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
             <span>Examples</span>
           </button>
@@ -645,7 +645,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                     Add first field
                   </button>
-                  <button onclick="toggleTemplateMenu(event)" class="bg-white hover:bg-slate-50 text-nexus text-xs font-bold px-4 py-2.5 rounded-lg border border-nexus-border transition flex items-center gap-1.5">
+                  <button id="btn-examples-empty" onclick="toggleTemplateMenu(event)" class="bg-white hover:bg-slate-50 text-nexus text-xs font-bold px-4 py-2.5 rounded-lg border border-nexus-border transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white" title="Chọn service trước để dùng example">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                     Try an example
                   </button>
@@ -1474,6 +1474,19 @@
       const el = document.getElementById('desc-box');
       if (sel.n) el.classList.remove('opacity-40', 'pointer-events-none');
       else el.classList.add('opacity-40', 'pointer-events-none');
+      // Disable Example buttons: must be on Step 2 (Design form) with service selected
+      const exTop = document.getElementById('btn-examples-top');
+      const exEmpty = document.getElementById('btn-examples-empty');
+      const blockExample = !sel.n || _currentStep !== 2;
+      const blockReason = !sel.n ? 'Chọn service trước để dùng example' : (_currentStep !== 2 ? 'Sang Step 2 (Design form) để dùng example' : 'Apply an example field template');
+      if (exTop) {
+        exTop.disabled = blockExample;
+        exTop.title = blockReason;
+      }
+      if (exEmpty) {
+        exEmpty.disabled = blockExample;
+        exEmpty.title = blockReason;
+      }
       v1();
     }
 
@@ -1500,11 +1513,13 @@
       if (u1) u1.style.backgroundColor = isValid ? '#155DFC' : 'transparent';
     }
 
+    let _currentStep = 1;
     function goStep(n, force) {
       if (n === 2 && !force && document.getElementById('next-btn').disabled) {
         toast('⚠️ Vui lòng chọn dịch vụ và điền mô tả trước!');
         return;
       }
+      _currentStep = n;
       document.getElementById('page1').style.display = n === 1 ? 'block' : 'none';
       document.getElementById('page2').style.display = n === 2 ? 'block' : 'none';
 
@@ -1561,6 +1576,7 @@
         renderPreview();
       }
       if (n === 2) { saveCurrentService(); hideCancelBanner(); }
+      if (typeof dLock === 'function') dLock();
       sv();
     }
 
@@ -2451,6 +2467,14 @@ ${formScript}
     // ────────────────────────────────────────────────
     function toggleTemplateMenu(e) {
       if (e) e.stopPropagation();
+      if (!sel.n) {
+        toast('⚠️ Chọn service trước khi áp dụng example');
+        return;
+      }
+      if (_currentStep !== 2) {
+        toast('⚠️ Sang Step 2 (Design form) để dùng example');
+        return;
+      }
       const menu = document.getElementById('template-menu');
       if (!menu) return;
       const isOpen = !menu.classList.contains('hidden');
