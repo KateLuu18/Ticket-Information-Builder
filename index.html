@@ -1840,10 +1840,10 @@
           '<input id="' + id + '" value="' + H(val) + '" oninput="_idOnInput()" onfocus="this.style.color=\'#1A2236\';this.style.fontStyle=\'normal\'" ' +
           'style="width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;' + (dim ? 'color:#AEB7C4;font-style:italic' : 'color:#1A2236') + '"></div>';
       };
-      return inp('ed-svc', 'Service name', _idEdit.service, _origin.service) +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' +
+      return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' +
         inp('ed-cat', 'Catalog', _idEdit.catalog, _origin.catalog) +
         inp('ed-ctg', 'Category', _idEdit.category, _origin.category) + '</div>' +
+        inp('ed-svc', 'Service name', _idEdit.service, _origin.service) +
         '<div style="font-size:11px;color:#94a3b8;font-style:italic;margin-top:6px">Giá trị hiện tại hiển thị mờ; bấm/gõ để sửa.</div>';
     }
     function _idChanges() {
@@ -1877,7 +1877,7 @@
         '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><span style="width:27px;height:27px;border-radius:7px;background:#EAF1FE;color:#155DFC;display:flex;align-items:center;justify-content:center">' + pen + '</span>' +
         '<span style="font-size:13px;font-weight:700;color:#1e3a8a">Thay đổi so với service gốc</span>' +
         '<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#155DFC;background:#EAF1FE;padding:2px 7px;border-radius:999px">' + rows.length + ' thay đổi</span></div>' +
-        '<p style="font-size:11px;color:#64748b;margin:0 0 10px 36px">Sẽ ghi vào bản HTML &amp; Excel để PIC cập nhật. JSON giữ nguyên.</p>' +
+        '<div style="margin-bottom:10px"></div>' +
         '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' +
         '<th style="text-align:left;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;padding:5px 10px;border-bottom:1px solid #EDF1F7">Mục</th>' +
         '<th style="text-align:left;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;padding:5px 10px;border-bottom:1px solid #EDF1F7">Hiện tại (gốc)</th>' +
