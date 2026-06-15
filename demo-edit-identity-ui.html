@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Giao diện "Sửa định danh service" trên tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --nexus:#155DFC; --ink:#1A2236; --slate:#64748B; --line:#E2E8F0; }
+  *{ box-sizing:border-box; }
+  body{ font-family:'Inter',sans-serif; background:#F1F5F9; color:var(--ink); margin:0; padding:26px; }
+  .wrap{ max-width:920px; margin:0 auto; }
+  h1{ font-size:22px; font-weight:800; color:#1e3a8a; margin:0 0 4px; letter-spacing:-.3px; }
+  .sub{ color:var(--slate); font-size:13.5px; margin-bottom:18px; }
+  .hint{ font-size:12px; color:#64748B; background:#FEFCE8; border:1px solid #FDE68A; border-radius:9px; padding:8px 12px; margin-bottom:16px; }
+
+  /* tool surface */
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px 24px; box-shadow:0 6px 24px rgba(16,40,90,.06); }
+  .topline{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+  .path{ font-size:25px; font-weight:700; color:#1e293b; letter-spacing:-.5px; line-height:1.2; }
+  .crumb{ font-size:12.5px; color:var(--slate); margin-top:5px; }
+  .crumb s{ color:#cbd5e1; }
+  .crumb .moved{ color:#0f4ecf; font-weight:600; }
+  .editbtn{ flex-shrink:0; font-size:12.5px; font-weight:700; color:var(--nexus); background:#EFF6FF; border:1.5px solid #BFDBFE; padding:8px 14px; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:all .15s; }
+  .editbtn:hover{ background:#DBEAFE; }
+  .editbtn.on{ background:var(--nexus); color:#fff; border-color:var(--nexus); }
+
+  /* edit identity panel */
+  .panel{ overflow:hidden; max-height:0; transition:max-height .3s ease; }
+  .panel.open{ max-height:520px; }
+  .panel-in{ margin-top:16px; border:1.5px solid #E3EBF6; border-radius:13px; padding:16px 18px; background:#FAFCFF; }
+  .panel-h{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#64748B; margin-bottom:13px; display:flex; align-items:center; gap:8px; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .fld label{ display:block; font-size:11.5px; font-weight:600; color:#475569; margin-bottom:5px; }
+  .fld input{ width:100%; border:1.5px solid var(--line); border-radius:9px; padding:9px 11px; font-size:13.5px; font-family:inherit; color:var(--ink); transition:border .15s; }
+  .fld input:focus{ outline:none; border-color:#93C5FD; box-shadow:0 0 0 3px rgba(21,93,252,.08); }
+  .fld.changed input{ border-color:#86A8F0; background:#F5F8FF; }
+  .fld.full{ grid-column:1 / -1; }
+  .chgmark{ font-size:10.5px; font-weight:700; color:#0f4ecf; margin-left:6px; }
+  .panel-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+  .panel-foot .resetlnk{ font-size:12px; color:#94A3B8; cursor:pointer; text-decoration:underline; }
+  .donebtn{ background:var(--nexus); color:#fff; border:none; border-radius:9px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; }
+  .sugnote{ font-size:11px; color:#94A3B8; font-style:italic; margin-top:9px; }
+
+  /* description */
+  .sect{ margin-top:20px; }
+  .desc-lbl{ font-size:12.5px; font-weight:700; color:#334155; margin-bottom:7px; }
+  .desc-input{ width:100%; border:1.5px solid var(--line); border-radius:11px; padding:11px 13px; font-size:13.5px; font-family:inherit; min-height:58px; resize:vertical; }
+  .desc-input:focus{ outline:none; border-color:#93C5FD; box-shadow:0 0 0 3px rgba(21,93,252,.08); }
+  .ref{ background:#F8FAFC; border:1px dashed #D6DEEA; border-radius:10px; padding:10px 13px; font-size:12px; color:#5b6b85; margin-top:9px; line-height:1.5; }
+  .ref b{ color:#475569; font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:.5px; display:block; margin-bottom:3px; }
+
+  /* change note */
+  .chg{ margin-top:20px; background:#FCFDFF; border:1px solid #E3EBF6; border-left:4px solid var(--nexus); border-radius:12px; padding:15px 18px; }
+  .chg-head{ display:flex; align-items:center; gap:10px; margin-bottom:3px; }
+  .chg-ic{ width:30px; height:30px; border-radius:8px; background:#EAF1FE; color:var(--nexus); display:flex; align-items:center; justify-content:center; }
+  .chg-title{ font-size:14px; font-weight:700; color:#1e3a8a; }
+  .chg-tag{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--nexus); background:#EAF1FE; padding:2px 8px; border-radius:999px; }
+  .chg-note{ font-size:12px; color:var(--slate); margin:0 0 12px 40px; }
+  table.chg-tbl{ width:100%; border-collapse:collapse; font-size:13px; }
+  .chg-tbl th{ text-align:left; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; padding:7px 12px; border-bottom:1px solid #EDF1F7; }
+  .chg-tbl td{ padding:9px 12px; border-bottom:1px solid #F2F5FA; vertical-align:top; }
+  .chg-tbl tr:last-child td{ border-bottom:none; }
+  .chg-field{ font-weight:600; color:#334155; white-space:nowrap; }
+  .old{ color:#94A3B8; text-decoration:line-through; text-decoration-color:#CBD5E1; }
+  .new{ color:#0f4ecf; font-weight:600; }
+  .nochg{ margin-top:20px; display:flex; align-items:center; gap:9px; background:#F6FBF7; border:1px solid #D5EAD9; border-radius:11px; padding:12px 15px; font-size:12.5px; color:#15803D; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Giao diện "Sửa định danh service" trên tool — Demo</h1>
+  <p class="sub">Bản mô phỏng vùng Step 2. Bấm <b>✎ Sửa định danh</b> để mở panel, gõ thử Catalog / Category / Service — path & change note cập nhật trực tiếp.</p>
+  <div class="hint">💡 Trong bản thật, 3 ô này dùng lại đúng dropdown gợi ý của màn "tạo service mới" (gõ là xổ list catalog/category/service có sẵn + cho nhập mới). Demo này để input thường cho gọn.</div>
+
+  <div class="card">
+    <div class="topline">
+      <div>
+        <div class="path" id="path"></div>
+        <div class="crumb" id="crumb"></div>
+      </div>
+      <button class="editbtn" id="editbtn" onclick="toggle()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        <span id="editbtn-lbl">Sửa định danh</span>
+      </button>
+    </div>
+
+    <div class="panel" id="panel">
+      <div class="panel-in">
+        <div class="panel-h">✎ Sửa định danh service (Catalog / Category / Service)</div>
+        <div class="grid3">
+          <div class="fld" id="fld-catalog"><label>Catalog</label><input id="in-catalog" oninput="upd()"></div>
+          <div class="fld" id="fld-category"><label>Category</label><input id="in-category" oninput="upd()"></div>
+          <div class="fld full" id="fld-service"><label>Service name</label><input id="in-service" oninput="upd()"></div>
+        </div>
+        <div class="sugnote">Để trống → giữ giá trị gốc. Mỗi ô đổi khác gốc sẽ được tô viền xanh & ghi vào change note.</div>
+        <div class="panel-foot">
+          <span class="resetlnk" onclick="reset()">↺ Khôi phục giá trị gốc</span>
+          <button class="donebtn" onclick="toggle()">Xong</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="desc-lbl">Service description</div>
+      <textarea class="desc-input" id="in-desc" placeholder="Nhập mô tả… (để trống nếu dùng theo bản chính thức)" oninput="upd()"></textarea>
+      <div class="ref"><b>Mô tả chính thức (SLA) — chỉ tham chiếu, không tự điền</b><span id="ref"></span></div>
+    </div>
+
+    <div id="note"></div>
+  </div>
+</div>
+
+<script>
+  const ORIG = { catalog:'PAYMENT', category:'Tích hợp', service:'Integrate VNGGames Webshop',
+                 sla:"Integrate the VNGGames Webshop for the game's in-app purchase flow." };
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function val(id){ return document.getElementById(id).value.trim(); }
+  function cur(){
+    return {
+      catalog: val('in-catalog') || ORIG.catalog,
+      category: val('in-category') || ORIG.category,
+      service: val('in-service') || ORIG.service,
+      desc: val('in-desc'),
+    };
+  }
+  function toggle(){
+    const p=document.getElementById('panel'), b=document.getElementById('editbtn');
+    const open=p.classList.toggle('open'); b.classList.toggle('on',open);
+    document.getElementById('editbtn-lbl').textContent = open?'Đóng':'Sửa định danh';
+  }
+  function reset(){ ['in-catalog','in-category','in-service'].forEach(i=>document.getElementById(i).value=''); upd(); }
+  function upd(){
+    const c=cur();
+    document.getElementById('path').textContent = c.service;
+    document.getElementById('crumb').innerHTML =
+      (c.catalog===ORIG.catalog? c.catalog : `<s>${esc(ORIG.catalog)}</s> <span class="moved">→ ${esc(c.catalog)}</span>`) + ' › ' +
+      (c.category===ORIG.category? c.category : `<s>${esc(ORIG.category)}</s> <span class="moved">→ ${esc(c.category)}</span>`);
+    document.getElementById('ref').textContent = ORIG.sla;
+    // highlight changed fields
+    document.getElementById('fld-catalog').classList.toggle('changed', c.catalog!==ORIG.catalog);
+    document.getElementById('fld-category').classList.toggle('changed', c.category!==ORIG.category);
+    document.getElementById('fld-service').classList.toggle('changed', c.service!==ORIG.service);
+    // change note
+    const rows=[];
+    if(c.catalog!==ORIG.catalog) rows.push(['Catalog',ORIG.catalog,c.catalog]);
+    if(c.category!==ORIG.category) rows.push(['Category',ORIG.category,c.category]);
+    if(c.service!==ORIG.service) rows.push(['Tên service',ORIG.service,c.service]);
+    if(c.desc && c.desc!==ORIG.sla) rows.push(['Mô tả',ORIG.sla,c.desc]);
+    const n=document.getElementById('note');
+    if(!rows.length){ n.innerHTML='<div class="nochg">✓ Chưa có thay đổi — service giữ nguyên định danh & mô tả gốc.</div>'; return; }
+    const pencil='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    n.innerHTML='<div class="chg"><div class="chg-head"><span class="chg-ic">'+pencil+'</span><span class="chg-title">Thay đổi so với service gốc</span><span class="chg-tag">'+rows.length+' thay đổi</span></div>'+
+      '<p class="chg-note">Sẽ ghi vào bản HTML & Excel để PIC cập nhật. JSON giữ nguyên.</p>'+
+      '<table class="chg-tbl"><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead><tbody>'+
+      rows.map(r=>'<tr><td class="chg-field">'+r[0]+'</td><td class="old">'+esc(r[1])+'</td><td class="new">'+esc(r[2])+'</td></tr>').join('')+
+      '</tbody></table></div>';
+  }
+  upd();
+</script>
+</body>
+</html>
