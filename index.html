@@ -1760,6 +1760,7 @@
       const nextBtn = document.getElementById('next-btn');
       const isValid = (sel.n && v.trim() && w <= 100);
       nextBtn.disabled = !isValid;
+      nextBtn.title = isValid ? '' : (!sel.n ? 'Chọn service trước' : (!v.trim() ? 'Nhập Service description' : (w > 100 ? 'Mô tả vượt quá 100 từ — vui lòng rút gọn' : '')));
       if (isValid) nextBtn.className = 'flex items-center gap-2 bg-nexus hover:bg-nexus-hover text-white font-bold px-5 py-3 rounded-xl transition shadow-premium';
       else nextBtn.className = 'flex items-center gap-2 bg-slate-100 text-slate-400 font-bold px-5 py-3 rounded-xl transition';
       const u1 = document.getElementById('step-1-underline');
@@ -2014,7 +2015,15 @@
       const d = dEl ? dEl.value.trim() : '';
       const w = d ? d.split(/\s+/).filter(Boolean).length : 0;
       const btn = document.getElementById('cs-next-btn');
-      btn.disabled = !(c && g && n && d && w <= 100);
+      const ok = c && g && n && d && w <= 100;
+      btn.disabled = !ok;
+      if (ok) { btn.title = ''; }
+      else {
+        const miss = [];
+        if (!c) miss.push('Catalog'); if (!g) miss.push('Category'); if (!n) miss.push('Service');
+        if (!d) miss.push('Mô tả dịch vụ'); else if (w > 100) miss.push('Mô tả ≤ 100 từ');
+        btn.title = 'Cần: ' + miss.join(', ');
+      }
     }
     function onCsDescInput() {
       const dEl = document.getElementById('cs-desc');
@@ -2026,9 +2035,27 @@
       }
       validateCustomForm();
     }
-    // Enter on a custom-service input → commit the typed value (new or existing) and advance to the next field
+    // Keyboard for the custom-service comboboxes: ↑/↓ move highlight, Enter picks highlighted (or commits typed), Esc closes.
     function onCsKey(e, fieldId) {
-      if (e.key === 'Enter') { e.preventDefault(); _csUseCustom(fieldId); }
+      const sug = document.getElementById(fieldId + '-suggest');
+      const open = sug && sug.classList.contains('open');
+      const items = open ? Array.from(sug.querySelectorAll('.cs-suggest-item')) : [];
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        if (!items.length) return;
+        e.preventDefault();
+        let idx = items.findIndex(el => el.classList.contains('active'));
+        items.forEach(el => el.classList.remove('active'));
+        idx = e.key === 'ArrowDown' ? (idx + 1) % items.length : (idx <= 0 ? items.length - 1 : idx - 1);
+        items[idx].classList.add('active');
+        items[idx].scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const active = items.find(el => el.classList.contains('active'));
+        if (active) active.click();          // pick the highlighted existing item
+        else _csUseCustom(fieldId);          // otherwise commit the typed value (new or as-is)
+      } else if (e.key === 'Escape') {
+        if (open) { e.preventDefault(); _closeSuggest(fieldId + '-suggest'); }
+      }
     }
 
     // ── Custom service combobox: Catalog + Category suggestions ──
