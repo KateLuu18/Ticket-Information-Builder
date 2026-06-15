@@ -58,9 +58,9 @@
     .s0-search-box .s0-clear { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: #E2E8F0; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 12px; color: #64748B; font-family: inherit; }
     /* v13 two-column: illustration + cards */
     .s0-row { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 2vw, 36px); flex: 1; min-height: 0; }
-    .s0-illo-wrap { width: 800px; flex-shrink: 0; min-width: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .s0-illo-wrap { flex: 1 1 0; min-width: 0; max-width: 800px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .s0-illo-wrap img { width: 100%; max-width: 790px; height: auto; max-height: calc(100vh - 240px); object-fit: contain; display: block; image-rendering: -webkit-optimize-contrast; }
-    .s0-cards { flex: 0 0 470px; max-width: 470px; display: flex; flex-direction: column; gap: clamp(8px, 1.2vh, 16px); }
+    .s0-cards { flex: 1 1 360px; min-width: 0; max-width: 470px; display: flex; flex-direction: column; gap: clamp(8px, 1.2vh, 16px); }
     .s0-card { border: 1.5px solid #E2E8F0; border-radius: 18px; padding: clamp(14px, 2vh, 22px) clamp(16px, 1.5vw, 24px); cursor: pointer; transition: all 0.22s; background: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
     .s0-card:hover { box-shadow: 0 12px 32px rgba(30,58,138,0.08); transform: translateY(-2px); }
     .s0-card.cd-blue { border: 2px solid #93B4F0; background: linear-gradient(180deg,#FBFCFF 0%,#FFFFFF 42%); box-shadow: 0 4px 16px rgba(59,109,198,0.06); }
