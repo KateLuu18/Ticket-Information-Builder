@@ -107,7 +107,9 @@
       .s0-title { font-size: 26px; }
     }
     /* ── Responsive: tablet & mobile ── */
-    @media (max-width: 900px) {
+    /* Stack the picker/description (and designer split) below 1024px so 3-column
+       pickers stay roomy inside embedded/narrow frames instead of being squeezed. */
+    @media (max-width: 1024px) {
       .s2-split { grid-template-columns: 1fr !important; min-height: auto !important; }
       .s1-main { flex-direction: column !important; padding: 12px 16px 18px !important; }
       #desc-box { flex: 1 1 auto !important; }
