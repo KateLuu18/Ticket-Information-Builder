@@ -1944,12 +1944,14 @@
       if (path === 'existing') {
         document.getElementById('header-actions').style.display = '';
         _isCustomService = false;
+        resetWorkingState();
         document.getElementById('page0').style.display = 'none';
         document.getElementById('page-custom').style.display = 'none';
         document.getElementById('step-bar').style.display = '';
         goStep(1);
       } else if (path === 'custom') {
         _isCustomService = true;
+        resetWorkingState();
         document.getElementById('page0').style.display = 'none';
         document.getElementById('page-custom').style.display = 'block';
         document.getElementById('step-bar').style.display = '';
@@ -1963,6 +1965,23 @@
       var pc = document.getElementById('page-cover'); if (pc) pc.style.display = 'none';
       var sh = document.getElementById('shell'); if (sh) sh.style.display = '';
       goToStep0();
+    }
+
+    // Clear all in-progress designer + identity state so the two flows (existing / custom) never bleed into each other.
+    function resetWorkingState() {
+      fields = []; _fid = 1; activeId = null; previewState = {};
+      sel = { s: '', g: '', n: '' };
+      _origin = null; _idEdit = null; _editingId = false;
+      const di = document.getElementById('desc-input');
+      if (di) { di.value = ''; di.readOnly = false; di.style.background = ''; }
+      const dp = document.getElementById('desc-path'); if (dp) { dp.style.display = 'none'; dp.innerHTML = ''; }
+      // Reset the custom-service form inputs too
+      ['cs-catalog', 'cs-category', 'cs-service', 'cs-desc'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      const wc = document.getElementById('cs-wcount'); if (wc) { wc.textContent = '0 / 100 words'; wc.className = 'text-xs font-semibold text-slate-400'; }
+      const csn = document.getElementById('cs-next-btn'); if (csn) csn.disabled = true;
+      if (typeof _idRender === 'function') _idRender();
+      if (typeof renderCols === 'function') renderCols();
+      if (typeof checkWords === 'function') checkWords();
     }
 
     function goToStep0() {
@@ -5532,6 +5551,7 @@ ${formScript}
       }
       // Restore state from entry
       sel = { s: entry.catalog, g: entry.category, n: entry.service };
+      _isCustomService = !!entry.isCustom;
       fields = JSON.parse(JSON.stringify(entry.fields));
       _fid = Math.max(0, ..._collectAllFieldIds(fields)) + 1;
       activeId = fields.length ? fields[0].id : null;
@@ -5546,6 +5566,8 @@ ${formScript}
       }
       const db = document.getElementById('desc-box');
       if (db) db.classList.remove('opacity-40', 'pointer-events-none');
+      // Re-establish identity-edit state (_origin/_idEdit) for THIS entry so the change note isn't stale
+      if (typeof _idInit === 'function') _idInit();
       checkWords();
       v1();
       goStep(2, true);
@@ -5655,7 +5677,8 @@ ${formScript}
         if (li) li.textContent = CURR_LANG.toUpperCase();
         translateUI();
         switchTab(tab);
-        if (sel.n) pS(sel.n);
+        // Custom services aren't in RAW_* — don't run the existing-service picker machinery on them
+        if (sel.n && !_isCustomService) pS(sel.n);
         if (d.desc !== undefined) {
           const di = document.getElementById('desc-input');
           if (di) { di.value = d.desc; checkWords(); }
