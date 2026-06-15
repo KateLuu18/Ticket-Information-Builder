@@ -1836,15 +1836,34 @@
     function _idInputsHTML() {
       const inp = (id, label, val, ov) => {
         const dim = (val === ov);
+        // Show the original as a greyed placeholder so the old value is never lost,
+        // even if the user clears the field (empty = keep original).
         return '<div style="margin-bottom:9px"><label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">' + label + '</label>' +
-          '<input id="' + id + '" value="' + H(val) + '" oninput="_idOnInput()" onfocus="this.style.color=\'#1A2236\';this.style.fontStyle=\'normal\'" ' +
+          '<input id="' + id + '" value="' + H(val) + '" placeholder="' + H(ov) + '" oninput="_idOnInput()" onfocus="this.style.color=\'#1A2236\';this.style.fontStyle=\'normal\'" ' +
           'style="width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;' + (dim ? 'color:#AEB7C4;font-style:italic' : 'color:#1A2236') + '"></div>';
       };
+      const restoreBtn = '<button onclick="_idRestore()" title="Đưa Catalog / Category / Service (và mô tả) về đúng giá trị gốc" ' +
+        'onmouseover="this.style.background=\'#FEF3C7\'" onmouseout="this.style.background=\'#FFFBEB\'" ' +
+        'style="flex-shrink:0;font-size:11px;font-weight:700;color:#B45309;background:#FFFBEB;border:1.5px solid #FDE68A;padding:5px 10px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s">↺ Khôi phục gốc</button>';
       return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' +
         inp('ed-cat', 'Catalog', _idEdit.catalog, _origin.catalog) +
         inp('ed-ctg', 'Category', _idEdit.category, _origin.category) + '</div>' +
         inp('ed-svc', 'Service name', _idEdit.service, _origin.service) +
-        '<div style="font-size:11px;color:#94a3b8;font-style:italic;margin-top:6px">Giá trị hiện tại hiển thị mờ; bấm/gõ để sửa.</div>';
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px">' +
+        '<span style="font-size:11px;color:#94a3b8;font-style:italic">Để trống = giữ nguyên giá trị gốc (hiển thị mờ).</span>' +
+        restoreBtn + '</div>';
+    }
+    function _idRestore() {
+      if (!_origin) return;
+      _idEdit.service = _origin.service;
+      _idEdit.catalog = _origin.catalog;
+      _idEdit.category = _origin.category;
+      const di = document.getElementById('desc-input');
+      if (di && _origin.sla) di.value = _origin.sla;   // bring back the official description too
+      _idRender();
+      if (typeof checkWords === 'function') checkWords();
+      sv();
+      if (typeof toast === 'function') toast('↺ Đã khôi phục về giá trị gốc');
     }
     function _idChanges() {
       if (!_origin) return [];
