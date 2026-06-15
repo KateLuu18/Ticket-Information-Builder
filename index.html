@@ -824,7 +824,7 @@
       <div class="s1-main" style="display:flex;gap:22px;align-items:stretch;padding:18px 32px 22px;">
       <div class="s1-left" style="flex:3;min-width:0;display:flex;flex-direction:column;">
       <div class="relative pb-4">
-        <input class="w-full bg-white border border-slate-200 text-slate-700 rounded-xl py-3.5 pl-12 pr-4 text-[15px] font-medium focus:outline-none focus:border-nexus focus:ring-2 focus:ring-nexus/10 transition placeholder:text-slate-400 placeholder:font-normal" id="search-input" type="text" placeholder="Quick search Service" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)">
+        <input class="w-full bg-white border border-slate-200 text-slate-700 rounded-xl py-3.5 pl-12 pr-4 text-[15px] font-medium focus:outline-none focus:border-nexus focus:ring-2 focus:ring-nexus/10 transition placeholder:text-slate-400 placeholder:font-normal" id="search-input" type="text" placeholder="Quick search Service" autocomplete="off" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)">
         <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </div>
       <div class="border-b border-slate-200">
@@ -870,7 +870,7 @@
           </label>
           <div class="text-xs font-semibold text-slate-400" id="wcount">0 / 100 words</div>
         </div>
-        <textarea class="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-sm font-medium focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 text-slate-800 transition placeholder:italic placeholder:text-slate-400 placeholder:font-normal" id="desc-input" placeholder="Mô tả mục đích, đầu vào và đầu ra của dịch vụ. VD: Tiếp nhận yêu cầu cấp quyền truy cập hệ thống Nexus, GS cung cấp thông tin nhân sự, kết quả là tài khoản được tạo trong 1-2 ngày làm việc." oninput="checkWords()" style="flex:1;min-height:150px;resize:none;"></textarea>
+        <textarea class="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-sm font-medium focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 text-slate-800 transition placeholder:italic placeholder:text-slate-400 placeholder:font-normal" id="desc-input" placeholder="Mô tả mục đích, đầu vào và đầu ra của dịch vụ. VD: Tiếp nhận yêu cầu cấp quyền truy cập hệ thống Nexus, GS cung cấp thông tin nhân sự, kết quả là tài khoản được tạo trong 1-2 ngày làm việc." autocomplete="off" oninput="checkWords()" style="flex:1;min-height:150px;resize:none;"></textarea>
         <div id="wcount-warn" style="display:none" class="text-xs font-semibold text-red-500 mt-1.5">⚠ Mô tả vượt quá 100 từ — vui lòng rút gọn để tiếp tục.</div>
         <div id="ed-ref" style="display:none;background:#fff;border:1px dashed #D6DEEA;border-radius:10px;padding:9px 12px;font-size:11.5px;color:#5b6b85;line-height:1.5;margin-top:9px"></div>
         <div id="ed-note" style="display:none"></div>
@@ -1839,7 +1839,7 @@
         // Show the original as a greyed placeholder so the old value is never lost,
         // even if the user clears the field (empty = keep original).
         return '<div style="margin-bottom:9px"><label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">' + label + '</label>' +
-          '<input id="' + id + '" value="' + H(val) + '" placeholder="' + H(ov) + '" oninput="_idOnInput()" onfocus="this.style.color=\'#1A2236\';this.style.fontStyle=\'normal\'" ' +
+          '<input id="' + id + '" value="' + H(val) + '" placeholder="' + H(ov) + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="_idOnInput()" onfocus="this.style.color=\'#1A2236\';this.style.fontStyle=\'normal\'" ' +
           'style="width:100%;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;' + (dim ? 'color:#AEB7C4;font-style:italic' : 'color:#1A2236') + '"></div>';
       };
       const restoreBtn = '<button onclick="_idRestore()" title="Đưa Catalog / Category / Service (và mô tả) về đúng giá trị gốc" ' +
