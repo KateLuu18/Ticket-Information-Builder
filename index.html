@@ -1907,7 +1907,9 @@
         html += '<div class="cs-suggest-sep"></div>';
         html += '<div class="cs-suggest-use" onmousedown="event.preventDefault()" onclick="_csUseCustom(\'' + fieldId + '\')">' + plusSvg + ' Dùng "<b>' + H(rawQ) + '</b>" làm tên mới</div>';
       } else {
-        html += '<div class="cs-suggest-empty">Bắt đầu gõ để tìm hoặc nhập tên mới</div>';
+        html += '<div class="cs-suggest-empty">Chưa có mục nào — nhập tên mới bên dưới</div>';
+        html += '<div class="cs-suggest-sep"></div>';
+        html += '<div class="cs-suggest-new" onmousedown="event.preventDefault()" onclick="_csUseCustom(\'' + fieldId + '\')">' + plusSvg + ' Nhập tên mới...</div>';
       }
 
       el.innerHTML = html;
@@ -1969,6 +1971,8 @@
         catEl.value = '';
       }
       catEl.focus();
+      // Auto-open category suggestions for the chosen catalog (list only + "tạo mới")
+      _renderSuggest('cs-category-suggest', _getCategories(val), catEl.value, '_pickCategory');
       validateCustomForm();
     }
 
