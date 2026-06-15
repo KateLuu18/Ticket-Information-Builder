@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Luồng service có sẵn (từng step)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --nexus:#155DFC; --ink:#1A2236; --slate:#64748B; --line:#E2E8F0; }
+  *{ box-sizing:border-box; }
+  body{ font-family:'Inter',sans-serif; background:#F1F5F9; color:var(--ink); margin:0; padding:24px; }
+  .wrap{ max-width:940px; margin:0 auto; }
+  h1{ font-size:21px; font-weight:800; color:#1e3a8a; margin:0 0 3px; letter-spacing:-.3px; }
+  .sub{ color:var(--slate); font-size:13px; margin-bottom:16px; }
+
+  /* stepper */
+  .stepper{ display:flex; align-items:center; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .stp{ display:flex; align-items:center; gap:8px; }
+  .stp .num{ width:24px; height:24px; border-radius:50%; background:#E2E8F0; color:#94A3B8; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .stp .txt{ font-size:12.5px; font-weight:600; color:#94A3B8; }
+  .stp.active .num{ background:var(--nexus); color:#fff; } .stp.active .txt{ color:var(--nexus); }
+  .stp.done .num{ background:#D1FAE5; color:#047857; } .stp.done .txt{ color:#047857; }
+  .stp-arr{ color:#CBD5E1; font-weight:700; }
+
+  .card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px; box-shadow:0 6px 24px rgba(16,40,90,.06); min-height:340px; }
+  .scene{ display:none; } .scene.on{ display:block; animation:fade .22s; }
+  @keyframes fade{ from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+  .scene-tag{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--nexus); background:#EFF6FF; display:inline-block; padding:3px 10px; border-radius:999px; margin-bottom:12px; }
+
+  /* picker */
+  .picker{ display:grid; grid-template-columns:1fr 1fr 1.4fr; border:1px solid var(--line); border-radius:13px; overflow:hidden; }
+  .col{ border-right:1px solid var(--line); }
+  .col:last-child{ border-right:none; }
+  .col-h{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; padding:9px 13px; background:#F8FAFC; border-bottom:1px solid var(--line); }
+  .it{ padding:9px 13px; font-size:13px; cursor:pointer; border-bottom:1px solid #F4F6F9; display:flex; justify-content:space-between; align-items:center; transition:background .12s; }
+  .it:hover{ background:#F6F9FE; } .it.sel{ background:#EFF6FF; color:var(--nexus); font-weight:600; }
+  .it .chev{ color:#CBD5E1; font-size:12px; }
+  .hintbar{ font-size:12px; color:#64748B; margin-top:13px; }
+
+  /* design area */
+  .topline{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+  .path{ font-size:24px; font-weight:700; color:#1e293b; letter-spacing:-.5px; line-height:1.2; }
+  .crumb{ font-size:12.5px; color:var(--slate); margin-top:5px; }
+  .crumb s{ color:#cbd5e1; } .crumb .mv{ color:#0f4ecf; font-weight:600; }
+  .editbtn{ flex-shrink:0; font-size:12.5px; font-weight:700; color:var(--nexus); background:#EFF6FF; border:1.5px solid #BFDBFE; padding:8px 14px; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:7px; }
+  .editbtn:hover{ background:#DBEAFE; } .editbtn.on{ background:var(--nexus); color:#fff; border-color:var(--nexus); }
+
+  .lockbox{ margin-top:18px; border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:#FBFCFE; }
+  .lockbox .l{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; margin-bottom:5px; display:flex; align-items:center; gap:6px; }
+  .lockbox .body{ font-size:13.5px; color:#334155; line-height:1.5; }
+  .lockpill{ font-size:10px; font-weight:600; color:#94A3B8; border:1px solid #E2E8F0; border-radius:6px; padding:1px 7px; }
+
+  /* edit panel */
+  .panel-in{ margin-top:16px; border:1.5px solid #E3EBF6; border-radius:13px; padding:15px 17px; background:#FAFCFF; }
+  .panel-h{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#64748B; margin-bottom:12px; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .fld label{ display:block; font-size:11.5px; font-weight:600; color:#475569; margin-bottom:5px; }
+  .fld input,.fld textarea{ width:100%; border:1.5px solid var(--line); border-radius:9px; padding:9px 11px; font-size:13.5px; font-family:inherit; }
+  .fld input:focus,.fld textarea:focus{ outline:none; border-color:#93C5FD; box-shadow:0 0 0 3px rgba(21,93,252,.08); }
+  .fld.changed input,.fld.changed textarea{ border-color:#86A8F0; background:#F5F8FF; }
+  .fld.full{ grid-column:1/-1; }
+  .ref{ background:#F4F7FB; border:1px dashed #D6DEEA; border-radius:9px; padding:8px 11px; font-size:11.5px; color:#5b6b85; margin-top:7px; line-height:1.5; }
+  .ref b{ color:#475569; font-weight:700; text-transform:uppercase; font-size:9.5px; letter-spacing:.5px; display:block; margin-bottom:2px; }
+  .sugnote{ font-size:11px; color:#94A3B8; font-style:italic; margin-top:8px; }
+  .panel-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:13px; }
+  .resetlnk{ font-size:12px; color:#94A3B8; cursor:pointer; text-decoration:underline; }
+  .donebtn{ background:var(--nexus); color:#fff; border:none; border-radius:9px; padding:7px 16px; font-size:12.5px; font-weight:700; cursor:pointer; }
+
+  /* change note */
+  .chg{ margin-top:16px; background:#FCFDFF; border:1px solid #E3EBF6; border-left:4px solid var(--nexus); border-radius:12px; padding:14px 17px; }
+  .chg-head{ display:flex; align-items:center; gap:9px; margin-bottom:3px; }
+  .chg-ic{ width:28px; height:28px; border-radius:8px; background:#EAF1FE; color:var(--nexus); display:flex; align-items:center; justify-content:center; }
+  .chg-title{ font-size:13.5px; font-weight:700; color:#1e3a8a; }
+  .chg-tag{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--nexus); background:#EAF1FE; padding:2px 8px; border-radius:999px; }
+  .chg-note{ font-size:11.5px; color:var(--slate); margin:0 0 11px 37px; }
+  table.chg-tbl{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .chg-tbl th{ text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; padding:6px 11px; border-bottom:1px solid #EDF1F7; }
+  .chg-tbl td{ padding:8px 11px; border-bottom:1px solid #F2F5FA; vertical-align:top; }
+  .chg-tbl tr:last-child td{ border-bottom:none; }
+  .chg-field{ font-weight:600; color:#334155; white-space:nowrap; }
+  .old{ color:#94A3B8; text-decoration:line-through; text-decoration-color:#CBD5E1; }
+  .new{ color:#0f4ecf; font-weight:600; }
+  .nochg{ margin-top:16px; display:flex; align-items:center; gap:8px; background:#F6FBF7; border:1px solid #D5EAD9; border-radius:11px; padding:11px 14px; font-size:12px; color:#15803D; font-weight:600; }
+
+  .nav{ display:flex; justify-content:space-between; margin-top:16px; }
+  .nav button{ border-radius:10px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; border:1.5px solid var(--line); background:#fff; color:#475569; }
+  .nav button.primary{ background:var(--nexus); color:#fff; border-color:var(--nexus); }
+  .nav button:disabled{ opacity:.4; cursor:not-allowed; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Luồng "service có sẵn" — Demo từng step</h1>
+  <p class="sub">Đi qua 3 bước: chọn service (như cũ) → màn thiết kế khi vừa chọn (khoá + mô tả đính kèm + nút chỉnh) → chế độ chỉnh sửa.</p>
+
+  <div class="stepper">
+    <div class="stp active" id="s0"><span class="num">1</span><span class="txt">Chọn service</span></div>
+    <span class="stp-arr">›</span>
+    <div class="stp" id="s1"><span class="num">2</span><span class="txt">Vừa chọn xong (khoá)</span></div>
+    <span class="stp-arr">›</span>
+    <div class="stp" id="s2"><span class="num">3</span><span class="txt">Chỉnh sửa thông tin</span></div>
+  </div>
+
+  <div class="card">
+    <!-- SCENE 1: picker -->
+    <div class="scene on" id="sc0">
+      <span class="scene-tag">Step 1 · Giữ nguyên như hiện tại</span>
+      <div class="picker">
+        <div class="col">
+          <div class="col-h">Catalog</div>
+          <div class="it sel">PAYMENT <span class="chev">›</span></div>
+          <div class="it">STORE <span class="chev">›</span></div>
+          <div class="it">DATA <span class="chev">›</span></div>
+        </div>
+        <div class="col">
+          <div class="col-h">Category</div>
+          <div class="it sel">Tích hợp <span class="chev">›</span></div>
+          <div class="it">Hỗ trợ vận hành <span class="chev">›</span></div>
+        </div>
+        <div class="col">
+          <div class="col-h">Service</div>
+          <div class="it" onclick="pick(this,'Integrate VNGGames Webshop')">Integrate VNGGames Webshop</div>
+          <div class="it" onclick="pick(this,'Integrate TPP Webshops')">Integrate TPP Webshops</div>
+          <div class="it" onclick="pick(this,'Integrate IAP in other platform')">Integrate IAP in other platform</div>
+        </div>
+      </div>
+      <div class="hintbar" id="pickhint">Bấm chọn 1 service ở cột phải để tiếp tục.</div>
+    </div>
+
+    <!-- SCENE 2: locked -->
+    <div class="scene" id="sc1">
+      <span class="scene-tag">Step 2 · Vừa chọn xong — mọi thứ khoá, chỉ xem</span>
+      <div class="topline">
+        <div>
+          <div class="path" id="l-path"></div>
+          <div class="crumb" id="l-crumb"></div>
+        </div>
+        <button class="editbtn" onclick="goEdit()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          Chỉnh sửa thông tin
+        </button>
+      </div>
+      <div class="lockbox">
+        <div class="l">🔒 Mô tả chính thức (SLA) — đính kèm theo service <span class="lockpill">read-only</span></div>
+        <div class="body" id="l-desc"></div>
+      </div>
+      <p class="hintbar">Đây là trạng thái mặc định sau khi chọn. Nút <b>“Chỉnh sửa thông tin”</b> chỉ xuất hiện với service có sẵn (vì có bản gốc để đối chiếu). Bấm nút để mở khoá.</p>
+    </div>
+
+    <!-- SCENE 3: edit -->
+    <div class="scene" id="sc2">
+      <span class="scene-tag">Step 3 · Mở khoá — sửa được, thay đổi ghi vào change note</span>
+      <div class="topline">
+        <div>
+          <div class="path" id="e-path"></div>
+          <div class="crumb" id="e-crumb"></div>
+        </div>
+        <button class="editbtn on" onclick="lockBack()">✓ Đang chỉnh sửa</button>
+      </div>
+      <div class="panel-in">
+        <div class="panel-h">✎ Sửa định danh & mô tả</div>
+        <div class="grid3">
+          <div class="fld" id="f-cat"><label>Catalog</label><input id="i-cat" oninput="upd()"></div>
+          <div class="fld" id="f-ctg"><label>Category</label><input id="i-ctg" oninput="upd()"></div>
+          <div class="fld full" id="f-svc"><label>Service name</label><input id="i-svc" oninput="upd()"></div>
+          <div class="fld full" id="f-desc"><label>Service description</label><textarea id="i-desc" rows="2" oninput="upd()" placeholder="Để trống = dùng theo mô tả chính thức"></textarea>
+            <div class="ref"><b>Mô tả chính thức (SLA) — tham chiếu</b><span id="e-ref"></span></div>
+          </div>
+        </div>
+        <div class="sugnote">3 ô định danh dùng dropdown gợi ý như màn “tạo service mới”. Ô đổi khác gốc → tô viền xanh.</div>
+        <div class="panel-foot"><span class="resetlnk" onclick="resetEdit()">↺ Khôi phục giá trị gốc</span><button class="donebtn" onclick="lockBack()">Xong</button></div>
+      </div>
+      <div id="note"></div>
+    </div>
+
+    <div class="nav">
+      <button id="btnBack" onclick="go(-1)" disabled>← Quay lại</button>
+      <button id="btnNext" class="primary" onclick="go(1)" disabled>Tiếp tục →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SLA = {
+    'Integrate VNGGames Webshop':"Integrate the VNGGames Webshop for the game's in-app purchase flow.",
+    'Integrate TPP Webshops':"Integrate third-party payment provider webshops for the product.",
+    'Integrate IAP in other platform':"Integrate In-App Purchase on platforms other than the official stores."
+  };
+  let step=0, picked=null;
+  const ORIG = { catalog:'PAYMENT', category:'Tích hợp', service:null, sla:null };
+
+  function pick(el,name){
+    document.querySelectorAll('#sc0 .col:last-child .it').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel'); picked=name;
+    ORIG.service=name; ORIG.sla=SLA[name];
+    document.getElementById('pickhint').innerHTML='Đã chọn: <b>'+name+'</b>. Bấm “Tiếp tục →”.';
+    document.getElementById('btnNext').disabled=false;
+  }
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function val(id){ return document.getElementById(id).value.trim(); }
+  function cur(){ return {
+    catalog: val('i-cat')||ORIG.catalog, category: val('i-ctg')||ORIG.category,
+    service: val('i-svc')||ORIG.service, desc: val('i-desc') };
+  }
+
+  function go(d){
+    step=Math.max(0,Math.min(2,step+d));
+    if(step===1) fillLocked();
+    if(step===2) initEdit();
+    render();
+  }
+  function goEdit(){ step=2; initEdit(); render(); }
+  function lockBack(){ step=1; fillLocked(); render(); }
+
+  function fillLocked(){
+    document.getElementById('l-path').textContent=ORIG.service;
+    document.getElementById('l-crumb').textContent=ORIG.catalog+' › '+ORIG.category;
+    document.getElementById('l-desc').textContent=ORIG.sla;
+  }
+  function initEdit(){
+    document.getElementById('e-ref').textContent=ORIG.sla;
+    upd();
+  }
+  function resetEdit(){ ['i-cat','i-ctg','i-svc','i-desc'].forEach(i=>document.getElementById(i).value=''); upd(); }
+  function upd(){
+    const c=cur();
+    document.getElementById('e-path').textContent=c.service;
+    document.getElementById('e-crumb').innerHTML=
+      (c.catalog===ORIG.catalog?c.catalog:`<s>${esc(ORIG.catalog)}</s> <span class="mv">→ ${esc(c.catalog)}</span>`)+' › '+
+      (c.category===ORIG.category?c.category:`<s>${esc(ORIG.category)}</s> <span class="mv">→ ${esc(c.category)}</span>`);
+    document.getElementById('f-cat').classList.toggle('changed',c.catalog!==ORIG.catalog);
+    document.getElementById('f-ctg').classList.toggle('changed',c.category!==ORIG.category);
+    document.getElementById('f-svc').classList.toggle('changed',c.service!==ORIG.service);
+    document.getElementById('f-desc').classList.toggle('changed',!!c.desc && c.desc!==ORIG.sla);
+    const rows=[];
+    if(c.catalog!==ORIG.catalog) rows.push(['Catalog',ORIG.catalog,c.catalog]);
+    if(c.category!==ORIG.category) rows.push(['Category',ORIG.category,c.category]);
+    if(c.service!==ORIG.service) rows.push(['Tên service',ORIG.service,c.service]);
+    if(c.desc && c.desc!==ORIG.sla) rows.push(['Mô tả',ORIG.sla,c.desc]);
+    const n=document.getElementById('note');
+    if(!rows.length){ n.innerHTML='<div class="nochg">✓ Chưa có thay đổi — service giữ nguyên định danh & mô tả gốc.</div>'; return; }
+    const pen='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    n.innerHTML='<div class="chg"><div class="chg-head"><span class="chg-ic">'+pen+'</span><span class="chg-title">Thay đổi so với service gốc</span><span class="chg-tag">'+rows.length+' thay đổi</span></div>'+
+      '<p class="chg-note">Sẽ ghi vào bản HTML & Excel để PIC cập nhật. JSON giữ nguyên.</p>'+
+      '<table class="chg-tbl"><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead><tbody>'+
+      rows.map(r=>'<tr><td class="chg-field">'+r[0]+'</td><td class="old">'+esc(r[1])+'</td><td class="new">'+esc(r[2])+'</td></tr>').join('')+'</tbody></table></div>';
+  }
+  function render(){
+    ['sc0','sc1','sc2'].forEach((id,i)=>document.getElementById(id).classList.toggle('on',i===step));
+    ['s0','s1','s2'].forEach((id,i)=>{ const e=document.getElementById(id); e.classList.toggle('active',i===step); e.classList.toggle('done',i<step); });
+    document.getElementById('btnBack').disabled = step===0;
+    const next=document.getElementById('btnNext');
+    next.style.visibility = step===2 ? 'hidden':'visible';
+    next.disabled = step===0 && !picked;
+    next.textContent = step===0?'Tiếp tục →':'Tới chỉnh sửa →';
+  }
+  render();
+</script>
+</body>
+</html>
