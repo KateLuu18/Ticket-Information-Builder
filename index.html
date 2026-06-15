@@ -1844,13 +1844,16 @@
       };
       const restoreBtn = '<button onclick="_idRestore()" title="Đưa Catalog / Category / Service (và mô tả) về đúng giá trị gốc" ' +
         'onmouseover="this.style.background=\'#FEF3C7\'" onmouseout="this.style.background=\'#FFFBEB\'" ' +
-        'style="flex-shrink:0;font-size:11px;font-weight:700;color:#B45309;background:#FFFBEB;border:1.5px solid #FDE68A;padding:5px 10px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s">↺ Khôi phục gốc</button>';
+        'style="flex-shrink:0;font-size:12px;font-weight:700;color:#B45309;background:#FFFBEB;border:1.5px solid #FDE68A;padding:7px 13px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .15s">↺ Khôi phục gốc</button>';
+      const doneBtn = '<button onclick="_idExitEdit()" title="Hoàn tất chỉnh sửa" ' +
+        'onmouseover="this.style.background=\'#1149D6\'" onmouseout="this.style.background=\'#155DFC\'" ' +
+        'style="flex-shrink:0;font-size:12px;font-weight:700;color:#fff;background:#155DFC;border:none;padding:7px 16px;border-radius:9px;cursor:pointer;transition:background .15s">✓ Xong</button>';
       return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' +
         inp('ed-cat', 'Catalog', _idEdit.catalog, _origin.catalog) +
         inp('ed-ctg', 'Category', _idEdit.category, _origin.category) + '</div>' +
         inp('ed-svc', 'Service name', _idEdit.service, _origin.service) +
-        '<div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:6px">' +
-        restoreBtn + '</div>';
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">' +
+        restoreBtn + doneBtn + '</div>';
     }
     function _idRestore() {
       if (!_origin) return;
@@ -1927,8 +1930,7 @@
         panel.style.display = 'none'; ref.style.display = 'none';
         if (di) { di.readOnly = !!_origin.sla; di.style.background = _origin.sla ? '#f1f5f9' : ''; }
       } else {
-        idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>' +
-          '<button onclick="_idExitEdit()" style="margin-top:8px;font-size:12px;font-weight:700;color:#fff;background:#155DFC;border:none;padding:7px 14px;border-radius:9px;cursor:pointer">✓ Xong</button>';
+        idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>';
         panel.style.display = 'block'; panel.innerHTML = _idInputsHTML();
         ref.style.display = _origin.sla ? 'block' : 'none';
         ref.innerHTML = _origin.sla ? (
