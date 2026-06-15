@@ -754,21 +754,21 @@
             <div class="cs-field">
               <div class="cs-label">Catalog <span class="req">*</span> <span class="hint">— tên Team Service cung cấp dịch vụ</span></div>
               <div class="cs-input-wrap" id="cs-catalog-wrap">
-                <input class="cs-input" id="cs-catalog" placeholder="VD: PASSPORT, PAYMENT, MY TEAM..." oninput="onCsCatalogInput()" onfocus="onCsCatalogFocus()" onclick="onCsCatalogFocus()" autocomplete="off">
+                <input class="cs-input" id="cs-catalog" placeholder="VD: PASSPORT, PAYMENT, MY TEAM..." oninput="onCsCatalogInput()" onfocus="onCsCatalogFocus()" onclick="onCsCatalogFocus()" onkeydown="onCsKey(event,'cs-catalog')" autocomplete="off">
                 <div class="cs-suggest" id="cs-catalog-suggest"></div>
               </div>
             </div>
             <div class="cs-field">
               <div class="cs-label">Category <span class="req">*</span> <span class="hint">— nhóm loại dịch vụ</span></div>
               <div class="cs-input-wrap" id="cs-category-wrap">
-                <input class="cs-input" id="cs-category" placeholder="VD: Integration, Operational Support..." oninput="onCsCategoryInput()" onfocus="onCsCategoryFocus()" onclick="onCsCategoryFocus()" autocomplete="off">
+                <input class="cs-input" id="cs-category" placeholder="VD: Integration, Operational Support..." oninput="onCsCategoryInput()" onfocus="onCsCategoryFocus()" onclick="onCsCategoryFocus()" onkeydown="onCsKey(event,'cs-category')" autocomplete="off">
                 <div class="cs-suggest" id="cs-category-suggest"></div>
               </div>
             </div>
             <div class="cs-field" style="margin-bottom:0">
               <div class="cs-label">Service <span class="req">*</span> <span class="hint">— tên cụ thể của request</span></div>
               <div class="cs-input-wrap" id="cs-service-wrap">
-                <input class="cs-input" id="cs-service" placeholder="VD: Setup monitoring dashboard..." oninput="onCsServiceInput()" onfocus="onCsServiceFocus()" onclick="onCsServiceFocus()" autocomplete="off">
+                <input class="cs-input" id="cs-service" placeholder="VD: Setup monitoring dashboard..." oninput="onCsServiceInput()" onfocus="onCsServiceFocus()" onclick="onCsServiceFocus()" onkeydown="onCsKey(event,'cs-service')" autocomplete="off">
                 <div class="cs-suggest" id="cs-service-suggest"></div>
               </div>
             </div>
@@ -2025,6 +2025,10 @@
         el.className = w > 100 ? 'text-xs font-bold text-red-500' : (w > 80 ? 'text-xs font-bold text-amber-500' : 'text-xs font-semibold text-slate-400');
       }
       validateCustomForm();
+    }
+    // Enter on a custom-service input → commit the typed value (new or existing) and advance to the next field
+    function onCsKey(e, fieldId) {
+      if (e.key === 'Enter') { e.preventDefault(); _csUseCustom(fieldId); }
     }
 
     // ── Custom service combobox: Catalog + Category suggestions ──
@@ -4696,7 +4700,8 @@ ${formScript}
           toast('✅ Đã lưu "' + sel.n + '"');
         }
       }
-      if (_isCustomService) { goToStep0(); } else { goStep(1); }
+      // Back → the service-selection step of the SAME flow (custom → custom form, existing → picker), not the new/old chooser
+      goStep(1);
     }
 
     // ── Helpers that were undefined in original code ──
