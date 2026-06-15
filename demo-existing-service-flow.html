@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Luồng service có sẵn (bám layout thật)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --nexus:#155DFC; --ink:#1A2236; --slate:#64748B; --line:#E8ECF0; }
+  *{ box-sizing:border-box; }
+  body{ font-family:'Inter',sans-serif; background:#F8FAFC; color:var(--ink); margin:0; padding:0; }
+  .topnote{ max-width:1280px; margin:0 auto; padding:14px 28px 0; }
+  .topnote h1{ font-size:18px; font-weight:800; color:#1e3a8a; margin:0 0 2px; }
+  .topnote p{ font-size:12.5px; color:var(--slate); margin:0 0 4px; }
+
+  /* step bar */
+  .stepbar{ display:flex; align-items:center; justify-content:center; gap:26px; padding:16px; border-bottom:1px solid var(--line); background:#fff; margin-top:8px; }
+  .sb{ display:flex; align-items:center; gap:9px; }
+  .sb .dot{ width:11px; height:11px; border-radius:50%; }
+  .sb.done .dot{ background:#22C55E; } .sb.active .dot{ background:var(--nexus); } .sb.idle .dot{ background:#CBD5E1; }
+  .sb .lbl{ font-size:14px; font-weight:600; }
+  .sb.done .lbl{ color:#16A34A; } .sb.active .lbl{ color:var(--nexus); } .sb.idle .lbl{ color:#94A3B8; }
+  .sb-line{ width:40px; height:2px; background:#E2E8F0; }
+
+  .page{ max-width:1280px; margin:0 auto; padding:22px 28px 90px; }
+  .search{ position:relative; margin-bottom:14px; }
+  .search input{ width:100%; border:1.5px solid #E2E8F0; border-radius:14px; padding:14px 16px 14px 46px; font-size:15px; font-family:inherit; }
+  .search svg{ position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#94A3B8; }
+  .tabs{ display:flex; gap:28px; border-bottom:1px solid #EEF1F4; margin-bottom:16px; }
+  .tab{ font-size:15px; font-weight:600; color:#94A3B8; padding:0 2px 11px; cursor:pointer; border-bottom:2px solid transparent; }
+  .tab.act{ color:var(--nexus); border-bottom-color:var(--nexus); }
+
+  .layout{ display:grid; grid-template-columns:1fr 420px; gap:22px; align-items:start; }
+  .picker{ display:grid; grid-template-columns:1fr 1fr 1.25fr; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:#fff; min-height:560px; }
+  .col{ border-right:1px solid var(--line); padding:6px; } .col:last-child{ border-right:none; }
+  .col-h{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#94A3B8; padding:14px 14px 12px; }
+  .it{ padding:13px 16px; font-size:14.5px; cursor:pointer; border-radius:11px; display:flex; justify-content:space-between; align-items:center; gap:8px; transition:background .12s; line-height:1.35; }
+  .it:hover{ background:#F6F9FE; } .it.sel{ background:#EFF6FF; color:var(--nexus); font-weight:600; }
+  .it .chev{ color:#CBD5E1; flex-shrink:0; }
+
+  /* right gray panel */
+  .side{ background:#F8FAFC; border:1px solid #EDF0F4; border-radius:18px; padding:26px 26px 24px; min-height:560px; }
+  .bulb{ width:54px; height:54px; border-radius:50%; background:#FFF4D6; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:18px; }
+  .side-empty{ color:#94A3B8; font-size:14px; line-height:1.6; }
+  .stitle{ font-size:28px; font-weight:800; color:var(--ink); line-height:1.18; letter-spacing:-.5px; margin-bottom:6px; }
+  .scrumb{ font-size:12.5px; color:var(--slate); margin-bottom:16px; }
+  .scrumb s{ color:#cbd5e1; } .scrumb .mv{ color:#0f4ecf; font-weight:600; }
+  .editbtn{ font-size:12.5px; font-weight:700; color:var(--nexus); background:#EFF6FF; border:1.5px solid #BFDBFE; padding:8px 14px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:7px; margin-bottom:16px; }
+  .editbtn:hover{ background:#DBEAFE; } .editbtn.on{ background:var(--nexus); color:#fff; border-color:var(--nexus); }
+
+  .dlabel{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .dlabel b{ font-size:14px; font-weight:700; } .dlabel b .req{ color:#EF4444; }
+  .dlabel .wc{ font-size:12.5px; color:#94A3B8; }
+  .ro-desc{ background:#fff; border:1.5px solid #E8ECF0; border-radius:14px; padding:14px 15px; font-size:14px; color:#334155; line-height:1.55; min-height:90px; }
+  .ro-badge{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; border:1px solid #E2E8F0; border-radius:6px; padding:1px 7px; }
+
+  /* edit fields */
+  .efld{ margin-bottom:11px; } .efld:last-of-type{ margin-bottom:0; }
+  .efld label{ display:block; font-size:11.5px; font-weight:600; color:#475569; margin-bottom:5px; }
+  .efld input,.efld textarea{ width:100%; border:1.5px solid #E2E8F0; border-radius:11px; padding:11px 13px; font-size:14px; font-family:inherit; color:var(--ink); }
+  .efld input:focus,.efld textarea:focus{ outline:none; border-color:#93C5FD; box-shadow:0 0 0 3px rgba(21,93,252,.08); }
+  .efld input.prefill,.efld textarea.prefill{ color:#AEB7C4; font-style:italic; }            /* mờ = giá trị hiện tại */
+  .efld.changed input,.efld.changed textarea{ border-color:#86A8F0; background:#F5F8FF; color:var(--ink); font-style:normal; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .ref{ background:#fff; border:1px dashed #D6DEEA; border-radius:10px; padding:9px 12px; font-size:11.5px; color:#5b6b85; margin-top:7px; line-height:1.5; }
+  .ref b{ color:#475569; font-weight:700; text-transform:uppercase; font-size:9.5px; letter-spacing:.5px; display:block; margin-bottom:2px; }
+  .sugnote{ font-size:11px; color:#94A3B8; font-style:italic; margin-top:8px; }
+  .efoot{ display:flex; justify-content:space-between; align-items:center; margin-top:13px; }
+  .resetlnk{ font-size:12px; color:#94A3B8; cursor:pointer; text-decoration:underline; }
+  .donebtn{ background:var(--nexus); color:#fff; border:none; border-radius:9px; padding:8px 18px; font-size:12.5px; font-weight:700; cursor:pointer; }
+
+  /* change note */
+  .chg{ margin-top:16px; background:#FCFDFF; border:1px solid #E3EBF6; border-left:4px solid var(--nexus); border-radius:12px; padding:14px 16px; }
+  .chg-head{ display:flex; align-items:center; gap:9px; margin-bottom:3px; }
+  .chg-ic{ width:27px; height:27px; border-radius:7px; background:#EAF1FE; color:var(--nexus); display:flex; align-items:center; justify-content:center; }
+  .chg-title{ font-size:13px; font-weight:700; color:#1e3a8a; }
+  .chg-tag{ font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--nexus); background:#EAF1FE; padding:2px 7px; border-radius:999px; }
+  .chg-note{ font-size:11px; color:var(--slate); margin:0 0 10px 36px; }
+  table.chg-tbl{ width:100%; border-collapse:collapse; font-size:12px; }
+  .chg-tbl th{ text-align:left; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; padding:5px 9px; border-bottom:1px solid #EDF1F7; }
+  .chg-tbl td{ padding:7px 9px; border-bottom:1px solid #F2F5FA; vertical-align:top; }
+  .chg-tbl tr:last-child td{ border-bottom:none; }
+  .chg-field{ font-weight:600; color:#334155; white-space:nowrap; }
+  .old{ color:#94A3B8; text-decoration:line-through; text-decoration-color:#CBD5E1; }
+  .new{ color:#0f4ecf; font-weight:600; }
+  .nochg{ margin-top:14px; display:flex; align-items:center; gap:8px; background:#F6FBF7; border:1px solid #D5EAD9; border-radius:10px; padding:10px 13px; font-size:11.5px; color:#15803D; font-weight:600; }
+
+  .footer{ position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); padding:14px 28px; display:flex; justify-content:flex-end; }
+  .nextbtn{ background:var(--nexus); color:#fff; border:none; border-radius:11px; padding:12px 30px; font-size:15px; font-weight:700; cursor:pointer; }
+  .nextbtn:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .designscene{ display:none; text-align:center; padding:70px 20px; }
+  .designscene.on{ display:block; }
+  .ds-ic{ font-size:40px; } .ds-h{ font-size:20px; font-weight:800; margin:12px 0 6px; }
+  .ds-p{ color:var(--slate); font-size:13.5px; }
+  .backlink{ margin-top:18px; display:inline-block; font-size:13px; color:var(--nexus); cursor:pointer; font-weight:600; }
+</style>
+</head>
+<body>
+  <div class="topnote">
+    <h1>Demo luồng service có sẵn — bám layout Step 1 thật</h1>
+    <p>Chọn 1 service ở cột SERVICE → panel phải hiện mô tả đính kèm + nút “Chỉnh sửa thông tin”. Bấm nút để sửa (giá trị hiện tại prefill mờ). “Next” mới sang Design form (điền field).</p>
+  </div>
+
+  <div class="stepbar">
+    <div class="sb done"><span class="dot"></span><span class="lbl">Bắt đầu</span></div>
+    <span class="sb-line"></span>
+    <div class="sb active" id="sb-2"><span class="dot"></span><span class="lbl">Choose service</span></div>
+    <span class="sb-line"></span>
+    <div class="sb idle" id="sb-3"><span class="dot"></span><span class="lbl">Design form</span></div>
+  </div>
+
+  <div class="page" id="page-choose">
+    <div class="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="Quick search Service">
+    </div>
+    <div class="tabs"><div class="tab act">Service</div><div class="tab">Internal Service</div></div>
+
+    <div class="layout">
+      <div class="picker">
+        <div class="col">
+          <div class="col-h">Catalog</div>
+          <div class="it">STORE <span class="chev">›</span></div>
+          <div class="it sel">SYSTEM OPERATION <span class="chev">›</span></div>
+          <div class="it">PAYMENT <span class="chev">›</span></div>
+          <div class="it">DATA <span class="chev">›</span></div>
+        </div>
+        <div class="col">
+          <div class="col-h">Category</div>
+          <div class="it sel">Mainsite <span class="chev">›</span></div>
+          <div class="it">Backup Farm <span class="chev">›</span></div>
+          <div class="it">Game Server <span class="chev">›</span></div>
+          <div class="it">Game up patch <span class="chev">›</span></div>
+        </div>
+        <div class="col">
+          <div class="col-h">Service</div>
+          <div class="it" onclick="pick(this,'Incident resolution related to mainsite')">Incident resolution related to mainsite</div>
+          <div class="it" onclick="pick(this,'[CM] [Standard_2] Add/Edit/Delete redirect site/URL')">[CM] [Standard_2] Add/Edit/Delete redirect site/URL</div>
+          <div class="it" onclick="pick(this,'[CM] [Standard_2] Configure SSL for mainsite')">[CM] [Standard_2] Configure SSL for mainsite</div>
+          <div class="it" onclick="pick(this,'[CM] [Standard_2] Create vhost for mainsite')">[CM] [Standard_2] Create vhost for mainsite</div>
+        </div>
+      </div>
+
+      <div class="side" id="side">
+        <div class="bulb">💡</div>
+        <div class="side-empty">Chọn một service ở danh sách bên trái để xem mô tả và bắt đầu thiết kế form.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page designscene" id="page-design">
+    <div class="ds-ic">🧩</div>
+    <div class="ds-h">Design form — điền / kéo thả field</div>
+    <div class="ds-p">Bước thêm field nằm ở ĐÂY, <b>sau</b> khi đã chọn (và tuỳ chọn chỉnh sửa) thông tin service.</div>
+    <span class="backlink" onclick="backChoose()">← Quay lại Choose service</span>
+  </div>
+
+  <div class="footer" id="footer">
+    <button class="nextbtn" id="nextbtn" disabled onclick="goDesign()">Next →</button>
+  </div>
+
+<script>
+  const SLA = {
+    'Incident resolution related to mainsite':'Support troubleshooting problems of mainsite',
+    '[CM] [Standard_2] Add/Edit/Delete redirect site/URL':'Add/Edit/Delete redirect site/URL according to requirements of the product',
+    '[CM] [Standard_2] Configure SSL for mainsite':'Create/extend SSL for mainsite',
+    '[CM] [Standard_2] Create vhost for mainsite':'Create vhost for mainsite according to requirements of the product'
+  };
+  let ORIG=null, editing=false;
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function pick(el,name){
+    document.querySelectorAll('.col:last-child .it').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel');
+    ORIG={ catalog:'SYSTEM OPERATION', category:'Mainsite', service:name, sla:SLA[name] };
+    editing=false;
+    document.getElementById('nextbtn').disabled=false;
+    renderSide();
+  }
+  function renderSide(){
+    const s=document.getElementById('side');
+    if(!editing){
+      s.innerHTML=
+        '<div class="bulb">💡</div>'+
+        '<div class="stitle">'+esc(ORIG.service)+'</div>'+
+        '<div class="scrumb">'+esc(ORIG.catalog)+' › '+esc(ORIG.category)+'</div>'+
+        '<button class="editbtn" onclick="enterEdit()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Chỉnh sửa thông tin</button>'+
+        '<div class="dlabel"><b>Service description <span class="req">*</span></b><span class="ro-badge">🔒 mô tả chính thức</span></div>'+
+        '<div class="ro-desc">'+esc(ORIG.sla)+'</div>';
+    } else {
+      s.innerHTML=
+        '<div class="bulb">💡</div>'+
+        '<button class="editbtn on" onclick="exitEdit()">✓ Đang chỉnh sửa — bấm để xong</button>'+
+        '<div class="efld changed-host" id="f-svc"><label>Service name</label><input id="i-svc" class="prefill" value="'+esc(ORIG.service)+'" oninput="touch(this);upd()" onfocus="touch(this)"></div>'+
+        '<div class="row2">'+
+          '<div class="efld" id="f-cat"><label>Catalog</label><input id="i-cat" class="prefill" value="'+esc(ORIG.catalog)+'" oninput="touch(this);upd()" onfocus="touch(this)"></div>'+
+          '<div class="efld" id="f-ctg"><label>Category</label><input id="i-ctg" class="prefill" value="'+esc(ORIG.category)+'" oninput="touch(this);upd()" onfocus="touch(this)"></div>'+
+        '</div>'+
+        '<div class="efld" id="f-desc" style="margin-top:11px"><div class="dlabel"><label style="margin:0">Service description <span class="req">*</span></label><span class="wc" id="wc">0 / 100 words</span></div>'+
+          '<textarea id="i-desc" class="prefill" rows="3" oninput="touch(this);upd()" onfocus="touch(this)">'+esc(ORIG.sla)+'</textarea>'+
+          '<div class="ref"><b>Mô tả chính thức (SLA) — tham chiếu</b>'+esc(ORIG.sla)+'</div></div>'+
+        '<div class="sugnote">Giá trị hiện tại hiển thị mờ; bấm/gõ để sửa. 3 ô định danh bản thật dùng dropdown gợi ý.</div>'+
+        '<div class="efoot"><span class="resetlnk" onclick="resetEdit()">↺ Khôi phục giá trị gốc</span><button class="donebtn" onclick="exitEdit()">Xong</button></div>'+
+        '<div id="note"></div>';
+      upd();
+    }
+  }
+  function enterEdit(){ editing=true; renderSide(); }
+  function exitEdit(){ editing=false; renderSide(); }
+  function touch(el){ el.classList.remove('prefill'); }
+  function resetEdit(){
+    document.getElementById('i-svc').value=ORIG.service;
+    document.getElementById('i-cat').value=ORIG.catalog;
+    document.getElementById('i-ctg').value=ORIG.category;
+    document.getElementById('i-desc').value=ORIG.sla;
+    ['i-svc','i-cat','i-ctg','i-desc'].forEach(id=>document.getElementById(id).classList.add('prefill'));
+    ['f-svc','f-cat','f-ctg','f-desc'].forEach(id=>document.getElementById(id).classList.remove('changed'));
+    upd();
+  }
+  function v(id){ return document.getElementById(id).value.trim(); }
+  function upd(){
+    const c={catalog:v('i-cat'),category:v('i-ctg'),service:v('i-svc'),desc:v('i-desc')};
+    const wc=(c.desc.match(/\S+/g)||[]).length;
+    document.getElementById('wc').textContent=wc+' / 100 words';
+    document.getElementById('f-svc').classList.toggle('changed',c.service!==ORIG.service);
+    document.getElementById('f-cat').classList.toggle('changed',c.catalog!==ORIG.catalog);
+    document.getElementById('f-ctg').classList.toggle('changed',c.category!==ORIG.category);
+    document.getElementById('f-desc').classList.toggle('changed',c.desc!==ORIG.sla);
+    const rows=[];
+    if(c.catalog!==ORIG.catalog) rows.push(['Catalog',ORIG.catalog,c.catalog]);
+    if(c.category!==ORIG.category) rows.push(['Category',ORIG.category,c.category]);
+    if(c.service!==ORIG.service) rows.push(['Tên service',ORIG.service,c.service]);
+    if(c.desc && c.desc!==ORIG.sla) rows.push(['Mô tả',ORIG.sla,c.desc]);
+    const n=document.getElementById('note');
+    if(!rows.length){ n.innerHTML='<div class="nochg">✓ Chưa có thay đổi — giữ nguyên service gốc.</div>'; return; }
+    const pen='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    n.innerHTML='<div class="chg"><div class="chg-head"><span class="chg-ic">'+pen+'</span><span class="chg-title">Thay đổi so với service gốc</span><span class="chg-tag">'+rows.length+' thay đổi</span></div>'+
+      '<p class="chg-note">Ghi vào bản HTML & Excel để PIC cập nhật. JSON giữ nguyên.</p>'+
+      '<table class="chg-tbl"><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead><tbody>'+
+      rows.map(r=>'<tr><td class="chg-field">'+r[0]+'</td><td class="old">'+esc(r[1])+'</td><td class="new">'+esc(r[2])+'</td></tr>').join('')+'</tbody></table></div>';
+  }
+  function goDesign(){
+    document.getElementById('page-choose').style.display='none';
+    document.getElementById('page-design').classList.add('on');
+    document.getElementById('sb-2').className='sb done';
+    document.getElementById('sb-3').className='sb active';
+    document.getElementById('footer').style.display='none';
+  }
+  function backChoose(){
+    document.getElementById('page-choose').style.display='block';
+    document.getElementById('page-design').classList.remove('on');
+    document.getElementById('sb-2').className='sb active';
+    document.getElementById('sb-3').className='sb idle';
+    document.getElementById('footer').style.display='flex';
+  }
+</script>
+</body>
+</html>

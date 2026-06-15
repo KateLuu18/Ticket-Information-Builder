@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo — Tạo service thay thế (3 options)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --nexus:#155DFC; --nexus-light:#EFF6FF; --nexus-border:#BFDBFE; --amber:#B45309; --green:#047857; --slate:#64748B; }
+  *{ box-sizing:border-box; }
+  body{ font-family:'Inter',sans-serif; background:#F8FAFC; color:#1A2236; margin:0; padding:28px; }
+  .wrap{ max-width:1080px; margin:0 auto; }
+  h1{ font-size:24px; font-weight:800; color:#1e3a8a; margin:0 0 4px; letter-spacing:-0.3px; }
+  .sub{ color:var(--slate); font-size:14px; margin-bottom:22px; }
+  .tabs{ display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .tab{ border:1.5px solid #E2E8F0; background:#fff; border-radius:12px; padding:10px 16px; font-size:13.5px; font-weight:600; cursor:pointer; transition:all .18s; color:#475569; }
+  .tab:hover{ border-color:var(--nexus-border); }
+  .tab.active{ background:var(--nexus); border-color:var(--nexus); color:#fff; box-shadow:0 4px 14px rgba(21,93,252,.25); }
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fade .25s; }
+  @keyframes fade{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .card{ background:#fff; border:1.5px solid #E2E8F0; border-radius:18px; padding:22px 24px; margin-bottom:16px; }
+  .card-h{ font-size:17px; font-weight:700; margin:0 0 6px; display:flex; align-items:center; gap:10px; }
+  .pill{ font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; }
+  .pill-blue{ background:var(--nexus-light); color:var(--nexus); }
+  .pill-amber{ background:#FEF3C7; color:var(--amber); }
+  .pill-slate{ background:#F1F5F9; color:var(--slate); }
+  .card-d{ color:var(--slate); font-size:13.5px; line-height:1.6; margin:0 0 16px; }
+  .flow{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .step{ background:#F8FAFC; border:1px solid #E8ECF0; border-radius:10px; padding:8px 13px; font-size:12.5px; font-weight:600; color:#334155; }
+  .arr{ color:#94A3B8; font-weight:800; }
+  .demoarea{ border:1.5px dashed #CBD5E1; border-radius:14px; padding:18px; background:#FCFDFF; }
+  .lbl{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; margin-bottom:6px; }
+  .svc-list{ display:flex; flex-direction:column; gap:8px; max-width:520px; }
+  .svc{ display:flex; align-items:center; justify-content:space-between; gap:12px; border:1.5px solid #E2E8F0; border-radius:12px; padding:11px 14px; background:#fff; }
+  .svc-name{ font-weight:600; font-size:14px; }
+  .svc-meta{ font-size:11.5px; color:var(--slate); }
+  .btn{ border:none; border-radius:10px; padding:8px 14px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+  .btn-primary{ background:var(--nexus); color:#fff; }
+  .btn-primary:hover{ background:#0f4ecf; }
+  .btn-ghost{ background:#fff; border:1.5px solid var(--nexus-border); color:var(--nexus); }
+  .btn-amber{ background:var(--amber); color:#fff; }
+  .form{ max-width:560px; }
+  .field{ margin-bottom:12px; }
+  .field input,.field textarea{ width:100%; border:1.5px solid #E2E8F0; border-radius:10px; padding:9px 12px; font-size:13.5px; font-family:inherit; }
+  .field textarea{ min-height:60px; resize:vertical; }
+  .badge-replace{ display:inline-flex; align-items:center; gap:6px; background:#FEF3C7; color:var(--amber); border:1px solid #FCD34D; border-radius:8px; padding:5px 11px; font-size:12px; font-weight:700; margin-bottom:12px; }
+  .badge-deprecated{ display:inline-flex; gap:6px; background:#FEE2E2; color:#B91C1C; border:1px solid #FCA5A5; border-radius:8px; padding:5px 11px; font-size:12px; font-weight:700; }
+  pre{ background:#0F172A; color:#E2E8F0; border-radius:12px; padding:16px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; overflow:auto; margin:10px 0 0; }
+  .json-k{ color:#7DD3FC; } .json-s{ color:#86EFAC; } .json-flag{ color:#FCD34D; font-weight:600; }
+  .pros{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
+  .pros>div{ border-radius:12px; padding:13px 15px; font-size:12.5px; line-height:1.6; }
+  .pros .ok{ background:#ECFDF5; border:1px solid #A7F3D0; }
+  .pros .no{ background:#FEF2F2; border:1px solid #FECACA; }
+  .pros b{ display:block; margin-bottom:5px; font-size:11.5px; text-transform:uppercase; letter-spacing:.5px; }
+  .pros .ok b{ color:var(--green); } .pros .no b{ color:#B91C1C; }
+  .note{ font-size:12px; color:var(--slate); font-style:italic; margin-top:8px; }
+  .hidden{ display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tạo service "thay thế" service cũ — Demo 3 hướng</h1>
+  <p class="sub">Bấm tab để xem từng hướng. Mỗi hướng có: luồng thao tác → demo bấm thử → kết quả file xuất (JSON) → ưu/nhược.</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show(0,this)">① Clone &amp; revise + cờ thay thế</button>
+    <button class="tab" onclick="show(1,this)">② Versioning + deprecate</button>
+    <button class="tab" onclick="show(2,this)">③ Duplicate đơn giản</button>
+  </div>
+
+  <!-- ===== OPTION 1 ===== -->
+  <div class="panel active" id="p0">
+    <div class="card">
+      <div class="card-h">Clone &amp; revise + cờ thay thế <span class="pill pill-blue">Recommended</span></div>
+      <p class="card-d">Chọn service cũ → tạo bản nháp clone <b>toàn bộ cấu hình + mô tả</b> làm điểm bắt đầu. User sửa tên/field/mô tả. Khi lưu, bản mới gắn cờ <b>REPLACES</b> trỏ về service cũ. Service cũ vẫn nguyên trong list.</p>
+      <div class="flow">
+        <span class="step">Chọn service cũ</span><span class="arr">→</span>
+        <span class="step">Bấm "Tạo bản thay thế"</span><span class="arr">→</span>
+        <span class="step">Form pre-fill (clone)</span><span class="arr">→</span>
+        <span class="step">Sửa &amp; Lưu</span><span class="arr">→</span>
+        <span class="step">Xuất có cờ REPLACES</span>
+      </div>
+      <div class="demoarea">
+        <div class="lbl">Bước 1 — Service hiện có</div>
+        <div class="svc-list" id="o1-list">
+          <div class="svc">
+            <div><div class="svc-name">Integrate VNGGames Webshop</div><div class="svc-meta">PAYMENT › Tích hợp · 8 fields</div></div>
+            <button class="btn btn-ghost" onclick="o1clone()">Tạo bản thay thế</button>
+          </div>
+        </div>
+        <div id="o1-form" class="hidden" style="margin-top:16px">
+          <div class="lbl">Bước 2 — Bản nháp (đã clone, sửa được)</div>
+          <div class="badge-replace">⟳ REPLACES: "Integrate VNGGames Webshop"</div>
+          <div class="form">
+            <div class="field"><div class="lbl">Service name</div><input id="o1-name" value="Integrate VNGGames Webshop v2"></div>
+            <div class="field"><div class="lbl">Service description</div><textarea id="o1-desc">Integrate the new VNGGames Webshop (2026 revamp) with unified checkout.</textarea></div>
+            <button class="btn btn-primary" onclick="o1export()">Lưu &amp; Xem JSON xuất</button>
+          </div>
+        </div>
+        <div id="o1-out" class="hidden"></div>
+      </div>
+      <div class="pros">
+        <div class="ok"><b>Ưu</b>Giữ được link service cũ↔mới; người duyệt thấy rõ "đây là bản thay thế cái nào"; clone sẵn nên đỡ làm lại từ đầu.</div>
+        <div class="no"><b>Nhược</b>Cần thêm cờ mới trong data + cập nhật cả 4 định dạng xuất; service cũ vẫn nằm trong list (phải tự dọn).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== OPTION 2 ===== -->
+  <div class="panel" id="p1">
+    <div class="card">
+      <div class="card-h">Versioning + deprecate <span class="pill pill-amber">Chặt chẽ nhất</span></div>
+      <p class="card-d">Coi như vòng đời phiên bản: service cũ bị đánh dấu <b>Deprecated</b>, service mới ghi rõ <b>tham chiếu predecessor</b>. File xuất kèm thông tin version (cũ/mới + trạng thái), phục vụ kiểm soát thay đổi.</p>
+      <div class="flow">
+        <span class="step">Chọn service cũ</span><span class="arr">→</span>
+        <span class="step">"Tạo phiên bản thay thế"</span><span class="arr">→</span>
+        <span class="step">Cũ → Deprecated</span><span class="arr">→</span>
+        <span class="step">Mới → references old</span><span class="arr">→</span>
+        <span class="step">Xuất kèm version</span>
+      </div>
+      <div class="demoarea">
+        <div class="lbl">Bước 1 — Service hiện có</div>
+        <div class="svc-list">
+          <div class="svc" id="o2-old">
+            <div><div class="svc-name" id="o2-oldname">Integrate VNGGames Webshop</div><div class="svc-meta" id="o2-oldmeta">PAYMENT › Tích hợp · active</div></div>
+            <button class="btn btn-amber" onclick="o2run()">Tạo phiên bản thay thế</button>
+          </div>
+        </div>
+        <div id="o2-out" class="hidden"></div>
+      </div>
+      <div class="pros">
+        <div class="ok"><b>Ưu</b>Lịch sử thay đổi minh bạch nhất; rõ trạng thái deprecated; tốt cho audit/SLA review.</div>
+        <div class="no"><b>Nhược</b>Phức tạp nhất; phải quản lý trạng thái service cũ (deprecated) và quan hệ phiên bản; data + UI nặng hơn.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== OPTION 3 ===== -->
+  <div class="panel" id="p2">
+    <div class="card">
+      <div class="card-h">Duplicate đơn giản <span class="pill pill-slate">Nhẹ nhất</span></div>
+      <p class="card-d">Chỉ clone service ra một bản "(Copy)", cho đổi tên/sửa tự do. <b>Không</b> link, không cờ, không trạng thái. Người dùng tự quản lý việc thay thế.</p>
+      <div class="flow">
+        <span class="step">Chọn service</span><span class="arr">→</span>
+        <span class="step">Bấm "Duplicate"</span><span class="arr">→</span>
+        <span class="step">Đổi tên</span><span class="arr">→</span>
+        <span class="step">Lưu như service mới</span>
+      </div>
+      <div class="demoarea">
+        <div class="lbl">Service hiện có</div>
+        <div class="svc-list" id="o3-list">
+          <div class="svc">
+            <div><div class="svc-name">Integrate VNGGames Webshop</div><div class="svc-meta">PAYMENT › Tích hợp · 8 fields</div></div>
+            <button class="btn btn-ghost" onclick="o3dup()">Duplicate</button>
+          </div>
+        </div>
+        <div id="o3-out" class="hidden"></div>
+      </div>
+      <div class="pros">
+        <div class="ok"><b>Ưu</b>Đơn giản nhất, ít code; quen thuộc (giống copy file); không đụng cấu trúc xuất hiện tại.</div>
+        <div class="no"><b>Nhược</b>Không biết bản nào thay bản nào; dễ trùng/loạn list; người duyệt không có ngữ cảnh "thay thế".</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function show(i,el){
+    document.querySelectorAll('.panel').forEach((p,idx)=>p.classList.toggle('active',idx===i));
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // Option 1
+  function o1clone(){ document.getElementById('o1-form').classList.remove('hidden'); }
+  function o1export(){
+    const name=esc(document.getElementById('o1-name').value);
+    const desc=esc(document.getElementById('o1-desc').value);
+    const out=document.getElementById('o1-out');
+    out.classList.remove('hidden');
+    out.innerHTML='<div class="lbl" style="margin-top:14px">Bước 3 — JSON xuất ra</div>'+
+      '<pre>{\n'+
+      '  <span class="json-k">"version"</span>: 1,\n'+
+      '  <span class="json-k">"form"</span>: {\n'+
+      '    <span class="json-k">"name"</span>: <span class="json-s">"'+name+'"</span>,\n'+
+      '    <span class="json-k">"description"</span>: <span class="json-s">"'+desc+'"</span>,\n'+
+      '    <span class="json-k">"status"</span>: <span class="json-s">"active"</span>,\n'+
+      '    <span class="json-flag">"replaces"</span>: <span class="json-s">"Integrate VNGGames Webshop"</span>,\n'+
+      '    <span class="json-flag">"is_replacement"</span>: <span class="json-flag">true</span>,\n'+
+      '    <span class="json-k">"rows"</span>: [ /* 8 fields clone từ bản cũ */ ]\n'+
+      '  }\n}</pre>'+
+      '<p class="note">Excel summary thêm cột "Replaces" = tên service cũ. HTML export hiện badge ⟳ Replaces.</p>';
+  }
+
+  // Option 2
+  function o2run(){
+    document.getElementById('o2-oldmeta').innerHTML='PAYMENT › Tích hợp · <span style="color:#B91C1C;font-weight:700">deprecated</span>';
+    const old=document.getElementById('o2-old');
+    old.style.opacity='.6';
+    const out=document.getElementById('o2-out');
+    out.classList.remove('hidden');
+    out.innerHTML='<div class="lbl" style="margin-top:14px">Service cũ tự chuyển trạng thái + JSON bản mới</div>'+
+      '<div class="badge-deprecated" style="margin-bottom:10px">⊘ Deprecated — replaced by v2</div>'+
+      '<pre>{\n'+
+      '  <span class="json-k">"version"</span>: 1,\n'+
+      '  <span class="json-k">"form"</span>: {\n'+
+      '    <span class="json-k">"name"</span>: <span class="json-s">"Integrate VNGGames Webshop v2"</span>,\n'+
+      '    <span class="json-k">"status"</span>: <span class="json-s">"active"</span>,\n'+
+      '    <span class="json-flag">"supersedes"</span>: {\n'+
+      '      <span class="json-k">"service"</span>: <span class="json-s">"Integrate VNGGames Webshop"</span>,\n'+
+      '      <span class="json-k">"status"</span>: <span class="json-flag">"deprecated"</span>,\n'+
+      '      <span class="json-k">"version"</span>: <span class="json-s">"1 → 2"</span>\n'+
+      '    },\n'+
+      '    <span class="json-k">"rows"</span>: [ ... ]\n'+
+      '  }\n}</pre>'+
+      '<p class="note">Cả service cũ (deprecated) lẫn mới đều xuất; sheet Summary có cột Version + SLA Status.</p>';
+  }
+
+  // Option 3
+  function o3dup(){
+    const list=document.getElementById('o3-list');
+    if(document.getElementById('o3-copy')) return;
+    const div=document.createElement('div');
+    div.className='svc'; div.id='o3-copy';
+    div.innerHTML='<div><input value="Integrate VNGGames Webshop (Copy)" style="border:1.5px solid #BFDBFE;border-radius:8px;padding:7px 10px;font-size:13.5px;font-weight:600;width:320px"><div class="svc-meta">PAYMENT › Tích hợp · 8 fields (clone)</div></div><span class="pill pill-slate">service mới</span>';
+    list.appendChild(div);
+    const out=document.getElementById('o3-out');
+    out.classList.remove('hidden');
+    out.innerHTML='<p class="note">JSON xuất giống hệt service thường — không trường nào đánh dấu quan hệ thay thế:</p>'+
+      '<pre>{\n  <span class="json-k">"form"</span>: {\n    <span class="json-k">"name"</span>: <span class="json-s">"Integrate VNGGames Webshop (Copy)"</span>,\n    <span class="json-k">"status"</span>: <span class="json-s">"active"</span>,\n    <span class="json-k">"rows"</span>: [ ... ]\n  }\n}</pre>';
+  }
+</script>
+</body>
+</html>
