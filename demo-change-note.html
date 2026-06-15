@@ -3,185 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demo — Change note cho PIC (3 kênh)</title>
+<title>Demo — Change note cho PIC (mọi case)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{ --nexus:#155DFC; --ink:#1A2236; --slate:#64748B; --line:#E2E8F0; }
   *{ box-sizing:border-box; }
-  body{ font-family:'Inter',sans-serif; background:#F1F5F9; color:var(--ink); margin:0; padding:28px; }
+  body{ font-family:'Inter',sans-serif; background:#F1F5F9; color:var(--ink); margin:0; padding:26px; }
   .wrap{ max-width:980px; margin:0 auto; }
-  h1{ font-size:23px; font-weight:800; color:#1e3a8a; margin:0 0 4px; letter-spacing:-0.3px; }
-  .sub{ color:var(--slate); font-size:14px; margin-bottom:22px; }
-  .tabs{ display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
-  .tab{ border:1.5px solid var(--line); background:#fff; border-radius:11px; padding:10px 16px; font-size:13.5px; font-weight:600; cursor:pointer; transition:all .18s; color:#475569; }
+  h1{ font-size:22px; font-weight:800; color:#1e3a8a; margin:0 0 4px; letter-spacing:-0.3px; }
+  .sub{ color:var(--slate); font-size:13.5px; margin-bottom:18px; }
+  .bar-lbl{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#94A3B8; margin:0 0 7px; }
+  .cases{ display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+  .case{ border:1.5px solid var(--line); background:#fff; border-radius:9px; padding:8px 13px; font-size:12.5px; font-weight:600; cursor:pointer; transition:all .15s; color:#475569; }
+  .case:hover{ border-color:#BFDBFE; }
+  .case.active{ background:#1e3a8a; border-color:#1e3a8a; color:#fff; }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 16px; }
+  .tab{ border:1.5px solid var(--line); background:#fff; border-radius:11px; padding:9px 15px; font-size:13px; font-weight:600; cursor:pointer; transition:all .18s; color:#475569; }
   .tab.active{ background:var(--nexus); border-color:var(--nexus); color:#fff; box-shadow:0 4px 14px rgba(21,93,252,.22); }
-  .panel{ display:none; } .panel.active{ display:block; animation:fade .25s; }
-  @keyframes fade{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
-  .ctx{ font-size:12.5px; color:var(--slate); margin-bottom:12px; font-style:italic; }
+  .panel{ display:none; } .panel.active{ display:block; animation:fade .22s; }
+  @keyframes fade{ from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+  .ctx{ font-size:12px; color:var(--slate); margin-bottom:11px; font-style:italic; }
 
-  /* ===== The change note (shared, refined) ===== */
-  .chg{ background:#FCFDFF; border:1px solid #E3EBF6; border-left:4px solid var(--nexus); border-radius:12px; padding:16px 18px; box-shadow:0 1px 3px rgba(16,40,90,.05); }
+  /* change note */
+  .chg{ background:#FCFDFF; border:1px solid #E3EBF6; border-left:4px solid var(--nexus); border-radius:12px; padding:15px 18px; box-shadow:0 1px 3px rgba(16,40,90,.05); }
   .chg-head{ display:flex; align-items:center; gap:10px; margin-bottom:3px; }
   .chg-ic{ width:30px; height:30px; border-radius:8px; background:#EAF1FE; color:var(--nexus); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .chg-title{ font-size:14px; font-weight:700; color:#1e3a8a; letter-spacing:-.2px; }
   .chg-tag{ font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--nexus); background:#EAF1FE; padding:2px 8px; border-radius:999px; }
-  .chg-note{ font-size:12px; color:var(--slate); margin:0 0 13px 40px; line-height:1.5; }
+  .chg-note{ font-size:12px; color:var(--slate); margin:0 0 12px 40px; line-height:1.5; }
   .chg-tbl{ width:100%; border-collapse:collapse; font-size:13px; }
   .chg-tbl th{ text-align:left; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94A3B8; padding:7px 12px; border-bottom:1px solid #EDF1F7; }
-  .chg-tbl td{ padding:10px 12px; border-bottom:1px solid #F2F5FA; vertical-align:top; }
+  .chg-tbl td{ padding:9px 12px; border-bottom:1px solid #F2F5FA; vertical-align:top; }
   .chg-tbl tr:last-child td{ border-bottom:none; }
   .chg-field{ font-weight:600; color:#334155; white-space:nowrap; }
   .old{ color:#94A3B8; text-decoration:line-through; text-decoration-color:#CBD5E1; }
   .new{ color:#0f4ecf; font-weight:600; }
-  .arrow{ color:#B9C4D6; margin:0 4px; font-weight:700; }
-  .chg-foot{ font-size:11px; color:#94A3B8; margin-top:11px; padding-top:10px; border-top:1px dashed #E7ECF4; }
+  .chg-foot{ font-size:11px; color:#94A3B8; margin-top:10px; padding-top:9px; border-top:1px dashed #E7ECF4; }
+  .nochg{ display:flex; align-items:center; gap:10px; background:#F6FBF7; border:1px solid #D5EAD9; border-radius:11px; padding:13px 16px; font-size:13px; color:#15803D; font-weight:600; }
 
-  /* ===== Channel framing ===== */
+  /* framing */
   .browser{ background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:0 8px 28px rgba(16,40,90,.08); }
   .bbar{ background:#F8FAFC; border-bottom:1px solid var(--line); padding:9px 14px; display:flex; align-items:center; gap:7px; }
   .dot{ width:11px; height:11px; border-radius:50%; } .r{background:#FF6058}.y{background:#FFBD2E}.g{background:#28CA42}
   .burl{ margin-left:10px; font-size:11.5px; color:#94A3B8; background:#fff; border:1px solid var(--line); border-radius:7px; padding:3px 10px; }
-  .bbody{ padding:22px 24px; }
+  .bbody{ padding:20px 22px; }
   .doc-title{ font-size:20px; font-weight:800; color:var(--ink); margin:0 0 2px; }
-  .doc-meta{ font-size:12px; color:var(--slate); margin-bottom:18px; }
-  .ghost-form{ margin-top:20px; opacity:.55; }
-  .gf-row{ height:11px; background:#EEF2F7; border-radius:5px; margin-bottom:10px; }
-  .gf-row.s{ width:38%; } .gf-row.m{ width:62%; } .gf-row.l{ width:84%; }
-  .gf-input{ height:30px; background:#F4F7FB; border:1px solid #E8EEF6; border-radius:8px; margin-bottom:14px; }
+  .doc-meta{ font-size:12px; color:var(--slate); margin-bottom:16px; }
+  .ghost-form{ margin-top:18px; opacity:.5; }
+  .gf-row{ height:11px; background:#EEF2F7; border-radius:5px; margin-bottom:9px; width:62%; }
+  .gf-input{ height:28px; background:#F4F7FB; border:1px solid #E8EEF6; border-radius:8px; margin-bottom:13px; }
 
-  /* Excel mock */
-  .xls{ font-family:'Inter',sans-serif; }
-  .xtabs{ display:flex; gap:0; background:#F3F5F8; border-top:1px solid var(--line); }
-  .xtab{ font-size:12px; padding:8px 16px; border-right:1px solid var(--line); color:#64748B; cursor:default; }
-  .xtab.act{ background:#fff; font-weight:700; color:#1e7d34; border-top:2px solid #1e7d34; margin-top:-1px; }
+  .xls-title{ font-weight:800; font-size:14px; color:var(--ink); padding:10px 2px; }
   table.grid{ border-collapse:collapse; width:100%; font-size:12.5px; }
   .grid th,.grid td{ border:1px solid #DDE3EC; padding:7px 11px; text-align:left; }
   .grid thead th{ background:#F0FAF2; color:#15803D; font-weight:700; font-size:11.5px; }
-  .grid .rowh{ background:#FAFBFD; color:#475569; font-weight:600; }
+  .grid .rowh{ background:#FAFBFD; color:#475569; font-weight:600; text-align:center; }
   .grid .corner{ background:#F3F5F8; }
-  .xls-title{ font-weight:800; font-size:14px; color:var(--ink); padding:10px 2px; }
+  .xtabs{ display:flex; border-top:1px solid var(--line); margin-top:14px; }
+  .xtab{ font-size:12px; padding:8px 16px; border-right:1px solid var(--line); color:#64748B; }
+  .xtab.act{ background:#fff; font-weight:700; color:#1e7d34; border-top:2px solid #1e7d34; margin-top:-1px; }
 
-  /* On-tool mock */
   .tool-card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
-  .path{ font-size:24px; font-weight:700; color:#1e293b; letter-spacing:-.4px; margin-bottom:2px; }
-  .path .edit{ font-size:12px; font-weight:600; color:var(--nexus); cursor:pointer; margin-left:10px; vertical-align:middle; background:#EFF6FF; padding:4px 10px; border-radius:8px; border:1px solid #BFDBFE; }
-  .crumb{ font-size:12.5px; color:var(--slate); margin-bottom:16px; }
+  .path{ font-size:23px; font-weight:700; color:#1e293b; letter-spacing:-.4px; margin-bottom:3px; }
+  .path .edit{ font-size:12px; font-weight:600; color:var(--nexus); margin-left:10px; vertical-align:middle; background:#EFF6FF; padding:4px 10px; border-radius:8px; border:1px solid #BFDBFE; }
+  .crumb{ font-size:12.5px; color:var(--slate); margin-bottom:15px; }
   .desc-lbl{ font-size:12px; font-weight:700; color:#334155; margin-bottom:6px; }
-  .desc-input{ width:100%; border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13.5px; font-family:inherit; min-height:56px; }
+  .desc-input{ width:100%; border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13.5px; font-family:inherit; min-height:50px; }
   .ref{ background:#F8FAFC; border:1px dashed #D6DEEA; border-radius:9px; padding:9px 12px; font-size:12px; color:#5b6b85; margin-top:8px; line-height:1.5; }
   .ref b{ color:#475569; font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:.5px; display:block; margin-bottom:3px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Change note cho PIC — Demo thiết kế (chưa code)</h1>
-  <p class="sub">Tình huống mẫu: service <b>Integrate VNGGames Webshop</b> được đổi tên, chuyển category và cập nhật mô tả. JSON <b>giữ nguyên</b> — thông tin thay đổi chỉ hiển thị ở 3 kênh dưới.</p>
+  <h1>Change note cho PIC — Demo mọi case</h1>
+  <p class="sub">Chọn 1 case (user đổi gì) → xem change note tự cập nhật. Đổi tab để xem cùng nội dung ở 3 kênh. JSON luôn giữ nguyên.</p>
+
+  <p class="bar-lbl">Case — user đổi thông tin gì</p>
+  <div class="cases" id="cases"></div>
 
   <div class="tabs">
-    <button class="tab active" onclick="show(0,this)">① Trên tool (trước khi xuất)</button>
-    <button class="tab" onclick="show(1,this)">② HTML export</button>
-    <button class="tab" onclick="show(2,this)">③ Excel export</button>
+    <button class="tab active" data-ch="0" onclick="tab(0,this)">① Trên tool</button>
+    <button class="tab" data-ch="1" onclick="tab(1,this)">② HTML export</button>
+    <button class="tab" data-ch="2" onclick="tab(2,this)">③ Excel export</button>
   </div>
 
-  <!-- ① ON TOOL -->
   <div class="panel active" id="p0">
-    <p class="ctx">Khi user sửa định danh / mô tả, tool hiện tóm tắt ngay để tự kiểm trước khi xuất.</p>
+    <p class="ctx">Tool hiện tóm tắt ngay khi user sửa, để tự kiểm trước khi xuất.</p>
     <div class="tool-card">
-      <div class="path">Integrate VNGGames Webshop v2 <span class="edit">✎ Sửa định danh</span></div>
-      <div class="crumb">PAYMENT › <s style="color:#cbd5e1">Tích hợp</s> → Hỗ trợ vận hành</div>
+      <div class="path"><span id="t-svc"></span> <span class="edit">✎ Sửa định danh</span></div>
+      <div class="crumb" id="t-crumb"></div>
       <div class="desc-lbl">Service description</div>
-      <textarea class="desc-input">Tích hợp Webshop VNGGames bản 2026 với luồng thanh toán hợp nhất.</textarea>
-      <div class="ref"><b>Mô tả chính thức (SLA) — chỉ để tham chiếu</b>Integrate the VNGGames Webshop for the game's in-app purchase flow.</div>
-
-      <div style="margin-top:18px"></div>
-      <div class="chg">
-        <div class="chg-head">
-          <span class="chg-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
-          <span class="chg-title">Thay đổi so với service gốc</span>
-          <span class="chg-tag">3 mục</span>
-        </div>
-        <p class="chg-note">PIC cần nắm các thay đổi sau để cập nhật thủ công bên hệ thống.</p>
-        <table class="chg-tbl">
-          <thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead>
-          <tbody>
-            <tr><td class="chg-field">Tên service</td><td class="old">Integrate VNGGames Webshop</td><td class="new">Integrate VNGGames Webshop v2</td></tr>
-            <tr><td class="chg-field">Category</td><td class="old">Tích hợp</td><td class="new">Hỗ trợ vận hành</td></tr>
-            <tr><td class="chg-field">Mô tả</td><td class="old">Integrate the VNGGames Webshop for the game's in-app purchase flow.</td><td class="new">Tích hợp Webshop VNGGames bản 2026 với luồng thanh toán hợp nhất.</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <textarea class="desc-input" id="t-desc"></textarea>
+      <div class="ref"><b>Mô tả chính thức (SLA) — chỉ tham chiếu</b><span id="t-ref"></span></div>
+      <div style="margin-top:16px" id="t-note"></div>
     </div>
   </div>
 
-  <!-- ② HTML EXPORT -->
   <div class="panel" id="p1">
-    <p class="ctx">Hộp thay đổi nằm ngay đầu bản HTML xuất, trên phần preview form. Tông xanh trầm, viền trái nhấn — nổi bật vừa đủ.</p>
+    <p class="ctx">Hộp thay đổi đặt đầu bản HTML, trên preview form.</p>
     <div class="browser">
-      <div class="bbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="burl">nexus-form-integrate-vnggames-webshop-v2.html</span></div>
+      <div class="bbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="burl" id="h-url"></span></div>
       <div class="bbody">
-        <div class="doc-title">Integrate VNGGames Webshop v2</div>
-        <div class="doc-meta">PAYMENT › Hỗ trợ vận hành · 8 fields · Nexus Ticket Information Builder</div>
-
-        <div class="chg">
-          <div class="chg-head">
-            <span class="chg-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
-            <span class="chg-title">Yêu cầu cập nhật cho PIC</span>
-            <span class="chg-tag">3 thay đổi</span>
-          </div>
-          <p class="chg-note">Service này được tạo dựa trên một service hiện có. Vui lòng cập nhật các thông tin sau trên hệ thống Nexus.</p>
-          <table class="chg-tbl">
-            <thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead>
-            <tbody>
-              <tr><td class="chg-field">Tên service</td><td class="old">Integrate VNGGames Webshop</td><td class="new">Integrate VNGGames Webshop v2</td></tr>
-              <tr><td class="chg-field">Category</td><td class="old">Tích hợp</td><td class="new">Hỗ trợ vận hành</td></tr>
-              <tr><td class="chg-field">Mô tả</td><td class="old">Integrate the VNGGames Webshop for the game's in-app purchase flow.</td><td class="new">Tích hợp Webshop VNGGames bản 2026 với luồng thanh toán hợp nhất.</td></tr>
-            </tbody>
-          </table>
-          <div class="chg-foot">Thông tin thay đổi chỉ mang tính thông báo — không ảnh hưởng dữ liệu field trong file import.</div>
-        </div>
-
-        <div class="ghost-form">
-          <div class="gf-row s"></div><div class="gf-input"></div>
-          <div class="gf-row m"></div><div class="gf-input"></div>
-          <div class="gf-row l"></div><div class="gf-input"></div>
-        </div>
+        <div class="doc-title" id="h-title"></div>
+        <div class="doc-meta" id="h-meta"></div>
+        <div id="h-note"></div>
+        <div class="ghost-form"><div class="gf-row"></div><div class="gf-input"></div><div class="gf-row"></div><div class="gf-input"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ③ EXCEL EXPORT -->
   <div class="panel" id="p2">
-    <p class="ctx">Thêm sheet riêng "Changes" — không chèn vào bảng 19 cột field, nên không đụng cấu trúc hiện có.</p>
+    <p class="ctx">Sheet riêng "Changes" — không đụng bảng 19 cột field.</p>
     <div class="browser">
       <div class="bbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="burl">nexus-spec-payment-1svc-20260615.xlsx</span></div>
-      <div style="padding:20px 22px 0">
-        <div class="xls-title">⟳ Changes — Yêu cầu cập nhật cho PIC</div>
-        <table class="grid">
-          <thead><tr><th class="corner" style="width:34px"></th><th>Mục thay đổi</th><th>Giá trị hiện tại (gốc)</th><th>Giá trị đề xuất (mới)</th></tr></thead>
-          <tbody>
-            <tr><td class="rowh">1</td><td>Tên service</td><td>Integrate VNGGames Webshop</td><td>Integrate VNGGames Webshop v2</td></tr>
-            <tr><td class="rowh">2</td><td>Category</td><td>Tích hợp</td><td>Hỗ trợ vận hành</td></tr>
-            <tr><td class="rowh">3</td><td>Catalog</td><td>PAYMENT</td><td>PAYMENT</td></tr>
-            <tr><td class="rowh">4</td><td>Mô tả</td><td>Integrate the VNGGames Webshop…</td><td>Tích hợp Webshop VNGGames bản 2026…</td></tr>
-          </tbody>
-        </table>
-        <p style="font-size:11.5px;color:#94A3B8;margin:10px 2px 0">Chỉ liệt kê mục có thay đổi. Sheet field-spec (19 cột) giữ nguyên ở các sheet khác.</p>
-      </div>
-      <div class="xtabs" style="margin-top:16px">
-        <div class="xtab">Summary</div>
-        <div class="xtab act">Changes</div>
-        <div class="xtab">01_Integrate VNGGames…</div>
-      </div>
+      <div style="padding:18px 20px 0" id="x-body"></div>
+      <div class="xtabs"><div class="xtab">Summary</div><div class="xtab act">Changes</div><div class="xtab">01_Service…</div></div>
     </div>
   </div>
-
 </div>
+
 <script>
-  function show(i,el){
+  const ORIG = {
+    catalog:'PAYMENT', category:'Tích hợp', service:'Integrate VNGGames Webshop',
+    sla:"Integrate the VNGGames Webshop for the game's in-app purchase flow."
+  };
+  const NEWDESC = "Tích hợp Webshop VNGGames bản 2026 với luồng thanh toán hợp nhất.";
+  // each case = the user's resulting values
+  const CASES = [
+    { key:'desc',  lbl:'Chỉ đổi mô tả',            v:{desc:NEWDESC} },
+    { key:'svc',   lbl:'Đổi tên service (giữ category)', v:{service:'Integrate VNGGames Webshop v2'} },
+    { key:'cat',   lbl:'Đổi category (giữ service)',     v:{category:'Hỗ trợ vận hành'} },
+    { key:'catlg', lbl:'Đổi catalog',              v:{catalog:'PAYMENT INTERNAL'} },
+    { key:'svccat',lbl:'Đổi cả service + category', v:{service:'Integrate VNGGames Webshop v2', category:'Hỗ trợ vận hành'} },
+    { key:'all',   lbl:'Đổi tất cả + mô tả',        v:{catalog:'PAYMENT INTERNAL', category:'Hỗ trợ vận hành', service:'Integrate VNGGames Webshop v2', desc:NEWDESC} },
+    { key:'none',  lbl:'Không đổi gì',              v:{} },
+  ];
+  let curCase = CASES[0], curCh = 0;
+
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function cur(){
+    const v = curCase.v;
+    return {
+      catalog: v.catalog || ORIG.catalog,
+      category: v.category || ORIG.category,
+      service: v.service || ORIG.service,
+      desc: v.desc || '',                 // ô user nhập (rỗng nếu chưa nhập)
+    };
+  }
+  function changedRows(){
+    const c = cur(); const rows = [];
+    if (c.catalog !== ORIG.catalog) rows.push(['Catalog', ORIG.catalog, c.catalog]);
+    if (c.category !== ORIG.category) rows.push(['Category', ORIG.category, c.category]);
+    if (c.service !== ORIG.service) rows.push(['Tên service', ORIG.service, c.service]);
+    if (c.desc && c.desc !== ORIG.sla) rows.push(['Mô tả', ORIG.sla, c.desc]);
+    return rows;
+  }
+  function noteHTML(title, note){
+    const rows = changedRows();
+    if (!rows.length) return '<div class="nochg">✓ Không có thay đổi — service giữ nguyên định danh &amp; mô tả gốc.</div>';
+    const pencil = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    const body = rows.map(r=>`<tr><td class="chg-field">${r[0]}</td><td class="old">${esc(r[1])}</td><td class="new">${esc(r[2])}</td></tr>`).join('');
+    const plural = rows.length>1?'thay đổi':'thay đổi';
+    return `<div class="chg">
+      <div class="chg-head"><span class="chg-ic">${pencil}</span><span class="chg-title">${title}</span><span class="chg-tag">${rows.length} ${plural}</span></div>
+      <p class="chg-note">${note}</p>
+      <table class="chg-tbl"><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead><tbody>${body}</tbody></table>
+      <div class="chg-foot">Thông tin thay đổi chỉ mang tính thông báo — không ảnh hưởng dữ liệu field trong file import.</div>
+    </div>`;
+  }
+  function render(){
+    const c = cur(); const rows = changedRows();
+    // on-tool
+    document.getElementById('t-svc').textContent = c.service;
+    document.getElementById('t-crumb').innerHTML = c.catalog + ' › ' + (c.category===ORIG.category ? c.category : `<s style="color:#cbd5e1">${esc(ORIG.category)}</s> → ${esc(c.category)}`);
+    document.getElementById('t-desc').value = c.desc || '';
+    document.getElementById('t-desc').placeholder = 'Nhập mô tả… (để trống nếu dùng theo bản chính thức)';
+    document.getElementById('t-ref').textContent = ORIG.sla;
+    document.getElementById('t-note').innerHTML = noteHTML('Thay đổi so với service gốc', 'PIC cần nắm các thay đổi sau để cập nhật thủ công bên hệ thống.');
+    // html
+    const slug = c.service.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    document.getElementById('h-url').textContent = 'nexus-form-'+slug+'.html';
+    document.getElementById('h-title').textContent = c.service;
+    document.getElementById('h-meta').textContent = c.catalog+' › '+c.category+' · 8 fields · Nexus Ticket Information Builder';
+    document.getElementById('h-note').innerHTML = noteHTML('Yêu cầu cập nhật cho PIC', 'Service này dựa trên một service hiện có. Vui lòng cập nhật các thông tin sau trên hệ thống Nexus.');
+    // excel
+    let xb;
+    if (!rows.length){
+      xb = '<div class="xls-title">Changes</div><div class="nochg" style="margin-bottom:14px">✓ Không có thay đổi — không sinh sheet Changes.</div>';
+    } else {
+      const body = rows.map((r,i)=>`<tr><td class="rowh">${i+1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('');
+      xb = `<div class="xls-title">⟳ Changes — Yêu cầu cập nhật cho PIC</div>
+      <table class="grid"><thead><tr><th class="corner" style="width:34px"></th><th>Mục thay đổi</th><th>Giá trị hiện tại (gốc)</th><th>Giá trị đề xuất (mới)</th></tr></thead><tbody>${body}</tbody></table>
+      <p style="font-size:11.5px;color:#94A3B8;margin:10px 2px 0">Chỉ liệt kê mục có thay đổi. Bảng field-spec (19 cột) giữ nguyên ở sheet khác.</p>`;
+    }
+    document.getElementById('x-body').innerHTML = xb;
+  }
+  function tab(i,el){
+    curCh=i;
     document.querySelectorAll('.panel').forEach((p,idx)=>p.classList.toggle('active',idx===i));
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     el.classList.add('active');
   }
+  // build case buttons
+  const cwrap = document.getElementById('cases');
+  CASES.forEach((cs,idx)=>{
+    const b=document.createElement('button');
+    b.className='case'+(idx===0?' active':''); b.textContent=cs.lbl;
+    b.onclick=()=>{ curCase=cs; document.querySelectorAll('.case').forEach(x=>x.classList.remove('active')); b.classList.add('active'); render(); };
+    cwrap.appendChild(b);
+  });
+  render();
 </script>
 </body>
 </html>
