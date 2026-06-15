@@ -120,6 +120,13 @@
       .step-bar-d { gap: 8px; padding: 10px 14px; }
       .od-lbl { font-size: 12px; }
     }
+    @media (max-width: 480px) {
+      .step-bar-d { flex-wrap: wrap; gap: 6px 8px; }
+      .od-lbl { font-size: 11px; }
+      #desc-path > div { font-size: 20px !important; }
+      .cs-footer { flex-wrap: wrap; gap: 8px; }
+      .cs-footer .cs-btn-back, .cs-footer .cs-btn-next { flex: 1 1 auto; justify-content: center; }
+    }
     @keyframes s0FadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
     .s0-anim { animation: s0FadeUp 0.4s ease-out both; }
     .s0-d1 { animation-delay: 0.06s; }
@@ -664,12 +671,12 @@
       <span class="od-sep">·</span>
       <div class="od-step" onclick="goStep(1)" id="step-1-wrap">
         <div class="od-pill active" id="step-1-pill"></div>
-        <span class="od-lbl active" id="step-1-text">Choose service</span>
+        <span class="od-lbl active" id="step-1-text">Chọn dịch vụ</span>
       </div>
       <span class="od-sep">·</span>
       <div class="od-step" onclick="goStep(2)" id="step-2-wrap">
         <div class="od-pill idle" id="step-2-pill"></div>
-        <span class="od-lbl idle" id="step-2-text">Design form</span>
+        <span class="od-lbl idle" id="step-2-text">Thiết kế form</span>
       </div>
     </div>
 
@@ -1367,6 +1374,7 @@
         tab_internal: "Internal Service",
         select_catalog_prompt: "Please select Catalog...",
         select_category_prompt: "Please select Category...",
+        no_results: "Không tìm thấy — thử từ khóa khác",
         desc_label: "Service description",
         next_step: "Next",
         fields_title: "Fields",
@@ -1385,6 +1393,9 @@
         export_excel_full: "Confirm & Export Excel",
         tab_service: "Service",
         tab_internal: "Internal Service",
+        select_catalog_prompt: "Please select Catalog...",
+        select_category_prompt: "Please select Category...",
+        no_results: "No results — try another keyword",
         desc_label: "Service Description",
         next_step: "Next Step",
         fields_title: "List of Form Fields",
@@ -1573,6 +1584,7 @@
         }
       });
       renderCols();
+      if (typeof _updateStepBar === 'function') _updateStepBar(_currentStep);
       if (fields.length) { renderFieldList(); } renderPreview();
     }
 
@@ -1655,7 +1667,7 @@
       const colCat = document.getElementById('col-catalog');
       colCat.innerHTML = '';
       if (cs.length) cs.forEach(c => colCat.appendChild(makeItem(c, sel.s === c, () => pC(c), true)));
-      else colCat.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:#9CA3AF;">No results</div>';
+      else colCat.innerHTML = '<div style="padding:24px;text-align:center;font-size:12px;color:#9CA3AF;">' + TRANSLATIONS[CURR_LANG].no_results + '</div>';
 
       const colCategory = document.getElementById('col-category');
       colCategory.innerHTML = '';
@@ -1663,7 +1675,7 @@
       else {
         const gs = [...new Set(f.filter(r => r.s === sel.s).map(r => r.g))];
         if (gs.length) gs.forEach(g => colCategory.appendChild(makeItem(g, sel.g === g, () => pG(g), true)));
-        else colCategory.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:#9CA3AF;">No results</div>';
+        else colCategory.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:#9CA3AF;">' + TRANSLATIONS[CURR_LANG].no_results + '</div>';
       }
 
       const colSvc = document.getElementById('col-service');
@@ -1691,7 +1703,7 @@
             }
             colSvc.appendChild(div);
           });
-        } else colSvc.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:#9CA3AF;">No results</div>';
+        } else colSvc.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:#9CA3AF;">' + TRANSLATIONS[CURR_LANG].no_results + '</div>';
       }
     }
 
@@ -1740,8 +1752,17 @@
 
     function dLock() {
       const el = document.getElementById('desc-box');
-      if (sel.n) el.classList.remove('opacity-40', 'pointer-events-none');
-      else el.classList.add('opacity-40', 'pointer-events-none');
+      const di = document.getElementById('desc-input');
+      if (sel.n) {
+        el.classList.remove('opacity-40', 'pointer-events-none');
+        if (di && di.dataset.ph) di.placeholder = di.dataset.ph;   // restore original hint
+      } else {
+        el.classList.add('opacity-40', 'pointer-events-none');
+        if (di) {
+          if (!di.dataset.ph) di.dataset.ph = di.placeholder;       // remember original hint once
+          di.placeholder = '🔒 Hãy chọn một service ở cột bên trái trước khi nhập mô tả.';
+        }
+      }
       // Disable Example buttons: must be on Step 2 (Design form) with service selected
       const exTop = document.getElementById('btn-examples-top');
       const exEmpty = document.getElementById('btn-examples-empty');
@@ -1884,7 +1905,7 @@
       idbar.style.display = 'block';
       if (!_editingId) {
         idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>' +
-          '<button onclick="_idEnterEdit()" style="margin-top:8px;font-size:12px;font-weight:700;color:#155DFC;background:#EFF6FF;border:1.5px solid #BFDBFE;padding:7px 13px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px">' + pencil + ' Chỉnh sửa thông tin</button>';
+          '<button onclick="_idEnterEdit()" title="Đổi tên Catalog / Category / Service cho ticket này (không ảnh hưởng dữ liệu gốc)" onmouseover="this.style.background=\'#DBEAFE\'" onmouseout="this.style.background=\'#EFF6FF\'" style="margin-top:8px;font-size:12px;font-weight:700;color:#155DFC;background:#EFF6FF;border:1.5px solid #BFDBFE;padding:7px 13px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s">' + pencil + ' Chỉnh sửa thông tin</button>';
         panel.style.display = 'none'; ref.style.display = 'none';
         if (di) { di.readOnly = !!_origin.sla; di.style.background = _origin.sla ? '#f1f5f9' : ''; }
       } else {
@@ -2071,8 +2092,15 @@
       } else if (e.key === 'Enter') {
         e.preventDefault();
         const active = items.find(el => el.classList.contains('active'));
-        if (active) active.click();          // pick the highlighted existing item
-        else _csUseCustom(fieldId);          // otherwise commit the typed value (new or as-is)
+        if (active) {
+          active.click();                    // pick the highlighted existing item
+        } else {
+          // Commit the typed value in place: close the dropdown, stay on this field.
+          // Do NOT auto-jump to the next field (that focus-jump was opening the next
+          // field's suggestion list and looked like it "auto-filled" from this one).
+          _closeSuggest(fieldId + '-suggest');
+          validateCustomForm();
+        }
       } else if (e.key === 'Escape') {
         if (open) { e.preventDefault(); _closeSuggest(fieldId + '-suggest'); }
       }
@@ -2092,12 +2120,17 @@
         svcBtn.className = 'cs-toggle-btn';
         intBtn.className = 'cs-toggle-btn active-amber';
       }
-      // Clear fields and re-trigger suggestions
+      // Switching type = start fresh: clear every field, close all suggestion lists,
+      // and reset the description box + its word counter / warning.
       document.getElementById('cs-catalog').value = '';
       document.getElementById('cs-category').value = '';
       document.getElementById('cs-service').value = '';
+      const dEl = document.getElementById('cs-desc');
+      if (dEl) dEl.value = '';
       _closeSuggest('cs-catalog-suggest');
       _closeSuggest('cs-category-suggest');
+      _closeSuggest('cs-service-suggest');
+      onCsDescInput();   // refreshes the word counter + hides the >100-word warning
       validateCustomForm();
     }
 
@@ -2373,6 +2406,14 @@
       setStep(0, 'done');
       if (n === 1) { setStep(1, 'active'); setStep(2, 'idle'); }
       else { setStep(1, 'done'); setStep(2, 'active'); }
+      // Reflect which flow the user is in on the step labels
+      const vi = CURR_LANG === 'vi';
+      const s0 = document.getElementById('step-0-text');
+      const s1 = document.getElementById('step-1-text');
+      const s2 = document.getElementById('step-2-text');
+      if (s0) s0.textContent = vi ? 'Bắt đầu' : 'Start';
+      if (s1) s1.textContent = _isCustomService ? (vi ? 'Tạo dịch vụ mới' : 'Create new service') : (vi ? 'Chọn dịch vụ' : 'Choose service');
+      if (s2) s2.textContent = vi ? 'Thiết kế form' : 'Design form';
     }
 
     // ────────────────────────────────────────────────
