@@ -1324,7 +1324,7 @@
   </div>
 
   <div class="fixed inset-0 hub-modal-backdrop flex items-center justify-center p-4 z-[200] opacity-0 pointer-events-none transition-all duration-200" id="mo-edit" onclick="if(event.target===this)cancelEdit()">
-    <div class="hub-modal-panel w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-all duration-200" id="mo-edit-inner">
+    <div class="hub-modal-panel w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-all duration-200" id="mo-edit-inner">
       
       <div class="hub-modal-header-big shrink-0">
         <div class="flex items-start justify-between gap-3">
@@ -3765,6 +3765,9 @@ ${formScript}
       const hasDef = !['date', 'daterange', 'boolean', 'label', 'upload', 'select', 'checkbox', 'checklist', 'radio', 'branch', 'product'].includes(EW.type);
       const autoKey = EW.fieldName || toCleanFieldName(EW.label || EW.content);
       let h = '';
+      if (['country', 'language', 'product'].includes(EW.type)) {
+        h += `<div class="bg-sky-50 border border-sky-100 text-sky-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5 mb-4"><span class="shrink-0 text-sm">ℹ️</span><div>Field này nạp option từ API. <b>Tool demo chỉ hiển thị một vài option mẫu</b> — khi PIC set up trên môi trường thật, hệ thống sẽ tự kéo đầy đủ danh sách từ Nexus.</div></div>`;
+      }
       if (isLbl) {
         h += `<div class="bg-blue-50/50 border border-blue-100 text-slate-500 text-xs p-4 rounded-xl flex items-start gap-2.5 mb-4"><span class="text-base shrink-0 text-blue-500">i</span><div>Label hiển thị nội dung tĩnh, hỗ trợ HTML cơ bản — không thu thập dữ liệu.</div></div>`;
         h += renderRow('Content', 'Plain text or HTML.', true, `
@@ -4045,7 +4048,7 @@ ${formScript}
       const others = fields.filter(x => String(x.id) !== String(EW.id) && x.type !== 'label');
       const hasCondition = EW.visRule !== null;
       let h = '';
-      const isCondRow = `<div class="mt-2 grid grid-cols-12 gap-x-8 items-start"><div class="col-span-10"><p class="text-xs text-slate-400 leading-relaxed">Hiện field này chỉ khi field khác có giá trị cụ thể.</p></div><div class="col-span-2 flex justify-end"><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-cond-toggle" ${hasCondition ? 'checked' : ''} onchange="ewToggleCondition(this.checked)" class="sr-only peer"><div class="w-10 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nexus"></div></label></div></div>`;
+      const condToggle = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-cond-toggle" ${hasCondition ? 'checked' : ''} onchange="ewToggleCondition(this.checked)" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
       let conditionCard = '';
       if (hasCondition) {
         if (others.length > 0) {
@@ -4069,13 +4072,21 @@ ${formScript}
           conditionCard = `<div class="p-3 bg-amber-50 border border-amber-100 rounded-lg text-xs text-amber-700 font-semibold mt-3">⚠️ Cần ít nhất một câu hỏi khác để thiết lập điều kiện.</div>`;
         }
       }
-      h += `<div class="mb-6 pb-6 border-b border-slate-100"><span class="block text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-2">SHOW CONDITIONALLY</span><p class="text-sm font-semibold text-slate-800">Hiện có điều kiện</p>${isCondRow}${conditionCard}</div>`;
+      h += `<span class="block text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1 mt-2">SHOW CONDITIONALLY</span>`;
+      if (others.length === 0) {
+        // Field đầu tiên: chưa có câu hỏi nào khác để tham chiếu → ẩn toggle, chỉ hiện dòng hướng dẫn full-width
+        h += `<div class="py-4 border-b border-slate-100"><p class="text-sm text-slate-400 italic">Cần thêm ít nhất một câu hỏi khác trước khi thiết lập điều kiện hiển thị.</p></div>`;
+      } else {
+        h += renderRow('Hiện có điều kiện', 'Hiện field này chỉ khi field khác có giá trị cụ thể.', false, condToggle);
+        if (conditionCard) h += `<div class="pb-4 -mt-1">${conditionCard}</div>`;
+      }
       const visSwitch = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-vis" ${EW.visible !== false ? 'checked' : ''} class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
       if (EW.type === 'label') {
-        h += `<div class="mt-4">${renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn hoàn toàn khỏi form.')}</div>`;
+        h += renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn hoàn toàn khỏi form.');
       } else {
         const editSwitch = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-edit2" ${EW.editable !== false ? 'checked' : ''} class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
-        h += `<div class="mt-4">${renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn khỏi form.')}${renderRow('Editable', 'Cho phép người điền sửa.', false, editSwitch, 'Tắt để chuyển sang read-only.')}</div>`;
+        h += renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn khỏi form.');
+        h += renderRow('Editable', 'Người điền có được sửa ô này không?', false, editSwitch, 'Bật: họ tự nhập/sửa bình thường.<br>Tắt: ô bị khoá, chỉ xem — thường dùng cho thông tin đã điền sẵn như mã ticket, tên service.');
       }
       return h;
     }
