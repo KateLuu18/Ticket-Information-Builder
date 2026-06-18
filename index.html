@@ -920,9 +920,9 @@
 
       <div class="s2-split" style="display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 200px);border-top:1px solid #f1f5f9;">
         
-        <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;flex-direction:column;height:calc(100vh - 57px);overflow:hidden;position:sticky;top:57px;">
           <div style="background:#fff;overflow:hidden;display:flex;flex-direction:column;flex:1;">
-            <div class="px-8 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div class="px-8 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50" style="flex-shrink:0;">
               <div class="flex items-center gap-2">
                 <span class="font-bold text-slate-800">Fields</span>
                 <span class="bg-nexus/10 text-nexus text-xs px-2.5 py-0.5 rounded-full font-bold" id="field-count">0</span>
@@ -939,7 +939,7 @@
               </div>
             </div>
 
-            <div class="px-8 py-5">
+            <div class="px-8 py-5 overflow-y-auto custom-scrollbar" style="flex:1;min-height:0;">
               <!-- Empty state V2: Hero + 2 CTAs + helper -->
               <div id="empty-placeholder" class="py-8 text-center">
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-3" style="background:linear-gradient(135deg,#DBEAFE 0%,#EFF6FF 100%)">
@@ -3634,7 +3634,7 @@ ${formScript}
 
     function newField(tid) {
       const isChoice = CHOICE_TYPES.includes(tid);
-      return { id: fuid(), type: tid, label: '', hint: '', description: '', placeholder: '', defaultValue: '', fieldName: '', required: false, multiple: false, visible: true, editable: true, searchable: false, options: isChoice ? ['Option 1', 'Option 2'] : [], optionValues: {}, branchFields: {}, content: '', acceptTypes: '', productFamily: '', pattern: '', minLen: 0, maxLen: 255, visRule: null, openBranchIdx: null, uploadMode: 'online', uploadLink: '', minVal: '', maxVal: '', inlineStyles: [], isFieldNameManual: false, halfWidth: false };
+      return { id: fuid(), type: tid, label: '', hint: '', description: '', placeholder: '', defaultValue: '', fieldName: '', required: false, multiple: false, visible: true, editable: false, searchable: false, options: isChoice ? ['Option 1', 'Option 2'] : [], optionValues: {}, branchFields: {}, content: '', acceptTypes: '', productFamily: '', pattern: '', minLen: 0, maxLen: 255, visRule: null, openBranchIdx: null, uploadMode: 'online', uploadLink: '', minVal: '', maxVal: '', inlineStyles: [], isFieldNameManual: false, halfWidth: false };
     }
 
     let EW = null;
@@ -3658,6 +3658,13 @@ ${formScript}
       const f = fields.find(x => x.id === id);
       if (!f) return;
       EW = JSON.parse(JSON.stringify(f));
+      // Bug#1: bảo vệ value option đã có sẵn (template/import/phiên trước) khỏi bị auto-slug ghi đè khi sửa nhãn
+      if (EW.optionValues && typeof EW.optionValues === 'object') {
+        if (!EW.optionValueManual) EW.optionValueManual = {};
+        Object.keys(EW.optionValues).forEach(k => {
+          if (EW.optionValues[k] != null && String(EW.optionValues[k]).trim() !== '') EW.optionValueManual[k] = true;
+        });
+      }
       EW_isNew = false; EW_tabIdx = 0;
       openEditorWizard();
     }
