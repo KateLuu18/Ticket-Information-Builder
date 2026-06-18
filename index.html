@@ -3789,6 +3789,19 @@ ${formScript}
               <button type="button" onmousedown="event.preventDefault();rtFmt('insertUnorderedList')" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1">≡ Bullet</button>
               <button type="button" onmousedown="event.preventDefault();rtShowLinkModal()" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1">🔗 Link</button>
               <button type="button" onmousedown="event.preventDefault();rtBr()" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1">↵ Xuống dòng</button>
+              <div class="relative inline-flex">
+                <button type="button" onmousedown="event.preventDefault();rtToggleColors()" class="px-2.5 py-1 text-[11px] bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-200 hover:text-nexus text-slate-700 transition inline-flex items-center gap-1"><span class="font-bold" style="color:#E11D48">A</span> Màu</button>
+                <div id="ew-rt-colors" class="hidden absolute z-50 top-full left-0 mt-1 p-2 bg-white border border-slate-200 rounded-lg shadow-xl flex flex-wrap gap-1.5 w-[156px]">
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#1E293B')" title="Mặc định" class="w-6 h-6 rounded-md border border-slate-300" style="background:#1E293B"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#64748B')" title="Xám" class="w-6 h-6 rounded-md border border-slate-200" style="background:#64748B"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#E11D48')" title="Đỏ" class="w-6 h-6 rounded-md border border-slate-200" style="background:#E11D48"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#EA580C')" title="Cam" class="w-6 h-6 rounded-md border border-slate-200" style="background:#EA580C"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#CA8A04')" title="Vàng" class="w-6 h-6 rounded-md border border-slate-200" style="background:#CA8A04"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#16A34A')" title="Xanh lá" class="w-6 h-6 rounded-md border border-slate-200" style="background:#16A34A"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#155DFC')" title="Xanh nexus" class="w-6 h-6 rounded-md border border-slate-200" style="background:#155DFC"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#7C3AED')" title="Tím" class="w-6 h-6 rounded-md border border-slate-200" style="background:#7C3AED"></button>
+                </div>
+              </div>
             </div>
             <div id="ew-rt-editor" class="min-h-[110px] p-3 border border-slate-300 rounded-b-xl text-sm leading-relaxed bg-white text-slate-800" contenteditable="true" data-placeholder="Gõ nội dung hướng dẫn ở đây..." oninput="rtSyncVisual()"></div>
           </div>
@@ -3909,6 +3922,20 @@ ${formScript}
       if (!ed) return;
       ed.focus();
       document.execCommand('insertHTML', false, '<br>');
+      rtSyncVisual();
+    }
+    function rtToggleColors() {
+      const pal = document.getElementById('ew-rt-colors');
+      if (pal) pal.classList.toggle('hidden');
+    }
+    function rtColor(c) {
+      const ed = document.getElementById('ew-rt-editor');
+      if (!ed) return;
+      ed.focus();
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('foreColor', false, c);
+      const pal = document.getElementById('ew-rt-colors');
+      if (pal) pal.classList.add('hidden');
       rtSyncVisual();
     }
     function rtShowLinkModal() {
