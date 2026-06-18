@@ -2591,7 +2591,7 @@
             inputHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input type="date" id="inp-'+f.id+'-from" name="'+fn+'_from" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" onchange="updateProgress()" style="'+S.input+';cursor:pointer"><input type="date" id="inp-'+f.id+'-to" name="'+fn+'_to" onfocus="'+S.inputFocus+'" onblur="'+S.inputBlur+'" onchange="updateProgress()" style="'+S.input+';cursor:pointer"></div>';
             break;
           case 'boolean':
-            inputHtml = '<label class="pv-toggle" style="position:relative;display:inline-flex;align-items:center;cursor:pointer;margin-top:4px"><input type="checkbox" id="inp-'+f.id+'" name="'+fn+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" '+(f.defaultValue==='true'?'checked':'')+' onchange="updateProgress()" style="position:absolute;opacity:0;width:0;height:0" class="pv-toggle-inp"><span class="pv-toggle-track"></span><span style="margin-left:8px;font-size:12px;font-weight:600;color:#475569">Active</span></label>';
+            inputHtml = '<label class="pv-toggle" style="position:relative;display:inline-flex;align-items:center;cursor:pointer"><input type="checkbox" id="inp-'+f.id+'" name="'+fn+'" data-fid="'+f.id+'" data-label="'+H2(f.label||'')+'" data-required="'+(f.required?'1':'0')+'" '+(f.defaultValue==='true'?'checked':'')+' onchange="updateProgress()" style="position:absolute;opacity:0;width:0;height:0" class="pv-toggle-inp"><span class="pv-toggle-track"></span></label>';
             break;
           case 'select': {
             const opts = (f.options||[]).map(function(o,i){return '<option value="'+H2((f.optionValues&&f.optionValues[i])||o)+'">'+H2(o)+'</option>'}).join('');
@@ -2655,6 +2655,11 @@
         const isLabel = f.type === 'label';
         const labelRow = isLabel ? '' : '<label for="inp-'+f.id+'" style="'+S.label+'">'+displayLabel+reqStar+'</label>'+hintHtml;
         const errorEl = (!isLabel) ? '<div id="err-'+f.id+'" style="display:none;font-size:11px;color:#EF4444;margin-top:4px;align-items:center;gap:4px"><span>\u26a0</span><span id="err-msg-'+f.id+'">Tr\u01b0\u1eddng n\u00e0y b\u1eaft bu\u1ed9c</span></div>' : '';
+
+        // Yes/No: h\u00e0ng c\u00f4ng t\u1eafc \u2014 nh\u00e3n tr\u00e1i, c\u00f4ng t\u1eafc ph\u1ea3i (gi\u1ed1ng Nexus)
+        if (f.type === 'boolean') {
+          return '<div id="'+wrapId+'" style="'+wrapHide+'" data-fid="'+f.id+'"'+visAttr+'><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><label for="inp-'+f.id+'" style="'+S.label+';margin:0">'+displayLabel+reqStar+'</label>'+hintHtml+'</div>'+inputHtml+'</div>'+errorEl+'</div>';
+        }
 
         return '<div id="'+wrapId+'" style="'+wrapHide+'" data-fid="'+f.id+'"'+visAttr+'><div style="display:flex;flex-direction:column;gap:6px">'+labelRow+'<div>'+inputHtml+'</div>'+errorEl+'</div></div>';
       }
@@ -4813,6 +4818,9 @@ ${formScript}
           if (f.type === 'label') {
             const labelStyle = (f.inlineStyles || []).map(s => `${s.key}:${s.value}`).join(';');
             h += `<div class="p-3.5 rounded-xl text-xs text-slate-700 leading-relaxed border border-slate-200/60 bg-slate-50/70" style="${labelStyle}">${f.content || '<span class=\'text-slate-400 italic\'>Nội dung label...</span>'}</div>`;
+          } else if (f.type === 'boolean') {
+            // Yes/No: hàng công tắc — nhãn trái, công tắc phải (giống Nexus), không chữ "Active"
+            h += `<div class="flex items-center justify-between gap-3"><div><span class="block text-xs font-bold text-slate-700">${H(displayLabel)}${reqStar}</span>${f.hint ? `<p class="text-[10px] text-slate-400 leading-relaxed">${H(f.hint)}</p>` : ''}</div><label class="relative inline-flex items-center cursor-pointer shrink-0"><input type="checkbox" ${f.defaultValue === 'true' ? 'checked' : ''} onchange="updatePreviewState('${f.fieldName}', String(this.checked))" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label></div>`;
           } else {
             h += `<label class="block text-xs font-bold text-slate-700">${H(displayLabel)}${reqStar}</label>`;
             if (f.hint) h += `<p class="text-[10px] text-slate-400 leading-relaxed">${H(f.hint)}</p>`;
@@ -4822,7 +4830,7 @@ ${formScript}
               case 'number': h += `<input type="number" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-nexus" placeholder="VD: 100" value="${H(previewState[f.fieldName])}" oninput="updatePreviewState('${f.fieldName}', this.value)">`; break;
               case 'date': h += `<input type="date" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-nexus cursor-pointer" onchange="updatePreviewState('${f.fieldName}', this.value)">`; break;
               case 'daterange': h += `<div class="grid grid-cols-2 gap-2"><input type="date" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-nexus cursor-pointer"><input type="date" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-nexus cursor-pointer"></div>`; break;
-              case 'boolean': h += `<label class="relative inline-flex items-center cursor-pointer mt-1"><input type="checkbox" ${f.defaultValue === 'true' ? 'checked' : ''} onchange="updatePreviewState('${f.fieldName}', String(this.checked))" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div><span class="ml-2 text-xs font-semibold text-slate-600">Active</span></label>`; break;
+              // boolean: xử lý ở nhánh else-if phía trên (hàng công tắc)
               case 'select': h += `<select class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer" onchange="updatePreviewState('${f.fieldName}', this.value)"><option value="">-- Chọn --</option>${f.options.map((o, i) => `<option value="${H(_pvVal(f, i, o))}">${H(o)}</option>`).join('')}</select>`; break;
               case 'radio': h += f.options.map((o, i) => `<label class="flex items-center gap-2 px-1 py-1 cursor-pointer"><input type="radio" name="pv-radio-${f.id}" value="${H(_pvVal(f, i, o))}" class="w-3.5 h-3.5 text-nexus cursor-pointer" onchange="updatePreviewState('${f.fieldName}', this.value)"><span class="text-xs font-semibold text-slate-600">${H(o)}</span></label>`).join(''); break;
               case 'checkbox': { const cbId = `pv-cb-${f.id}`; h += `<div id="${cbId}">${f.options.map((o, i) => `<label class="flex items-center gap-2 px-1 py-1 cursor-pointer"><input type="checkbox" value="${H(_pvVal(f, i, o))}" class="w-3.5 h-3.5 text-nexus rounded cursor-pointer" onchange="updateCheckboxPreviewState('${f.fieldName}', '${cbId}')"><span class="text-xs font-semibold text-slate-600">${H(o)}</span></label>`).join('')}</div>`; } break;
