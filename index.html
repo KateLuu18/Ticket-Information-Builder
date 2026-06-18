@@ -4081,7 +4081,7 @@ ${formScript}
       } else {
         const editSwitch = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-edit2" ${EW.editable !== false ? 'checked' : ''} class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
         h += renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn khỏi form.');
-        h += renderRow('Editable', 'Cho phép người điền sửa giá trị field này.', false, editSwitch, 'Tắt → read-only: field vẫn hiện & vẫn lưu, nhưng người điền chỉ xem, không sửa (dùng cho giá trị auto-fill / khoá sẵn).');
+        h += renderRow('Editable', 'Người điền có được sửa ô này không?', false, editSwitch, 'Bật: họ tự nhập/sửa bình thường.<br>Tắt: ô bị khoá, chỉ xem — thường dùng cho thông tin đã điền sẵn như mã ticket, tên service.');
       }
       return h;
     }
