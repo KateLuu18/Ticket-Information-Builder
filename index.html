@@ -4073,8 +4073,13 @@ ${formScript}
         }
       }
       h += `<span class="block text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1 mt-2">SHOW CONDITIONALLY</span>`;
-      h += renderRow('Hiện có điều kiện', 'Hiện field này chỉ khi field khác có giá trị cụ thể.', false, condToggle);
-      if (conditionCard) h += `<div class="pb-4 -mt-1">${conditionCard}</div>`;
+      if (others.length === 0) {
+        // Field đầu tiên: chưa có câu hỏi nào khác để tham chiếu → ẩn toggle, chỉ hiện dòng hướng dẫn full-width
+        h += `<div class="py-4 border-b border-slate-100"><p class="text-sm text-slate-400 italic">Cần thêm ít nhất một câu hỏi khác trước khi thiết lập điều kiện hiển thị.</p></div>`;
+      } else {
+        h += renderRow('Hiện có điều kiện', 'Hiện field này chỉ khi field khác có giá trị cụ thể.', false, condToggle);
+        if (conditionCard) h += `<div class="pb-4 -mt-1">${conditionCard}</div>`;
+      }
       const visSwitch = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-vis" ${EW.visible !== false ? 'checked' : ''} class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
       if (EW.type === 'label') {
         h += renderRow('Visible', 'Hiển thị cho người điền.', false, visSwitch, 'Tắt để ẩn hoàn toàn khỏi form.');
