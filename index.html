@@ -4153,7 +4153,10 @@ ${formScript}
     function applyPattern(p) { EW.pattern = p; const i = document.getElementById('ew-pattern'); if (i) i.value = p; }
 
     function renderEWAdvanced() {
-      const others = fields.filter(x => String(x.id) !== String(EW.id) && x.type !== 'label');
+      // Nguồn điều kiện phải là field ĐỨNG TRƯỚC field này (đã có giá trị khi người dùng tới field này)
+      const _ewIdx = fields.findIndex(x => String(x.id) === String(EW.id));
+      const _precedingPool = _ewIdx === -1 ? fields : fields.slice(0, _ewIdx);
+      const others = _precedingPool.filter(x => String(x.id) !== String(EW.id) && x.type !== 'label');
       const hasCondition = EW.visRule !== null;
       let h = '';
       const condToggle = `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-cond-toggle" ${hasCondition ? 'checked' : ''} onchange="ewToggleCondition(this.checked)" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`;
@@ -4182,8 +4185,10 @@ ${formScript}
       }
       h += `<span class="block text-[11px] font-bold text-slate-400 tracking-wider uppercase mb-1 mt-2">SHOW CONDITIONALLY</span>`;
       if (others.length === 0) {
-        // Field đầu tiên: chưa có câu hỏi nào khác để tham chiếu → ẩn toggle, chỉ hiện dòng hướng dẫn full-width
-        h += `<div class="py-4 border-b border-slate-100"><p class="text-sm text-slate-400 italic">Cần thêm ít nhất một câu hỏi khác trước khi thiết lập điều kiện hiển thị.</p></div>`;
+        // Không có field hợp lệ nào ĐỨNG TRƯỚC field này → khoá toggle + thông báo (tiếng Anh)
+        const lockedToggle = `<label class="relative inline-flex items-center cursor-not-allowed opacity-50" title="No preceding field available"><input type="checkbox" disabled class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4"></div></label>`;
+        h += renderToggleRow('Show conditionally', 'Show this field only when another field has a specific value.', lockedToggle);
+        h += `<div class="pb-4 -mt-1"><div class="p-3 bg-amber-50 border border-amber-100 rounded-lg text-xs text-amber-700 font-semibold flex items-start gap-2"><span class="shrink-0">🔒</span><span>Add at least one field with a valid value before this field to enable conditional visibility.</span></div></div>`;
       } else {
         h += renderToggleRow('Hiện có điều kiện', 'Hiện field này chỉ khi field khác có giá trị cụ thể.', condToggle);
         if (conditionCard) h += `<div class="pb-4 -mt-1">${conditionCard}</div>`;
