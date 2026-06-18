@@ -5942,6 +5942,39 @@ ${formScript}
     // Holds the parsed + validated JSON for the current Verify session
     // null when modal closed or no valid file loaded yet
     let _rjData = null;
+    let _rjPreviewState = {};  // state riêng cho preview của Review-JSON (không đụng previewState editor)
+
+    // Cập nhật giá trị 1 field trong preview review → đánh giá lại điều kiện
+    function _rjSetVal(fieldName, value) { _rjPreviewState[fieldName] = value; _rjEvalConditions(); }
+    // Checkbox/checklist nhiều lựa chọn: gom các value đang tick (nối bằng phẩy)
+    function _rjCollectChecks(fieldName, containerId) {
+      const c = document.getElementById(containerId);
+      if (!c) return;
+      const vals = Array.from(c.querySelectorAll('input:checked')).map(i => i.value);
+      _rjPreviewState[fieldName] = vals.join(',');
+      _rjEvalConditions();
+    }
+    // Đánh giá điều kiện ẩn/hiện cho preview review — match logic giống form thật (kể cả contains cho nguồn multi)
+    function _rjEvalConditions() {
+      if (!_rjData) return;
+      const fs = _rjData.parsedFields || [];
+      const byId = {}; fs.forEach(f => { byId[f.id] = f; });
+      fs.forEach(f => {
+        const el = document.getElementById('rj-pvw-' + f.id);
+        if (!el) return;
+        if (!(f.visRule && f.visRule.source != null)) { el.style.display = ''; return; }
+        const src = byId[f.visRule.source];
+        if (!src) { el.style.display = ''; return; }
+        const cur = String(_rjPreviewState[src.fieldName] || '').trim().toLowerCase();
+        const ruleVal = String(f.visRule.values || '').trim().toLowerCase();
+        const srcMulti = src.type === 'checkbox' || src.type === 'checklist' || (src.type === 'select' && src.multiple);
+        const present = srcMulti
+          ? cur.split(',').map(s => s.trim()).filter(Boolean).includes(ruleVal)
+          : cur === ruleVal;
+        const negate = f.visRule.op === 'not_equals' || f.visRule.op === 'not_contains';
+        el.style.display = (negate ? !present : present) ? '' : 'none';
+      });
+    }
 
     // ── Modal: file picker ──
     function openReviewJSONPicker() {
@@ -6509,6 +6542,9 @@ ${formScript}
       const parsedFields = _rjData.parsedFields || [];
       const prevEl = document.getElementById('rj-v-fields-preview');
       prevEl.innerHTML = '';
+      // Reset + seed state preview review (mặc định field)
+      _rjPreviewState = {};
+      parsedFields.forEach(f => { if (f.fieldName) _rjPreviewState[f.fieldName] = f.defaultValue || ''; });
       if (!parsedFields.length) {
         prevEl.innerHTML = '<div class="text-center py-6 text-[11px] text-slate-400">No fields to preview</div>';
         return;
@@ -6549,11 +6585,13 @@ ${formScript}
       });
 
       prevEl.appendChild(container);
+      _rjEvalConditions();  // áp ẩn/hiện điều kiện ngay khi mở preview
     }
 
     // ── Build single field node for preview view (mimics real form rendering) ──
     function _buildPreviewFieldNode(f) {
       const wrap = document.createElement('div');
+      wrap.id = 'rj-pvw-' + f.id;
       wrap.className = 'bg-white border border-slate-200 rounded-md p-2.5';
 
       // Label line
@@ -6594,10 +6632,13 @@ ${formScript}
 
     function _buildPreviewInput(f) {
       const escape = (s) => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const fn = String(f.fieldName || f.id).replace(/'/g, "\\'");
       const ph = f.placeholder ? ' placeholder="' + escape(f.placeholder) + '"' : '';
       const dv = f.defaultValue ? ' value="' + escape(f.defaultValue) + '"' : '';
-      const base = 'class="w-full bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600 px-2 py-1.5 pointer-events-none"';
+      // bỏ pointer-events-none → preview tương tác được (để thử điều kiện như form thật)
+      const base = 'class="w-full bg-slate-50 border border-slate-200 rounded text-[11px] text-slate-600 px-2 py-1.5"';
       const div = document.createElement('div');
+      const optVal = (i, o) => (f.optionValues && f.optionValues[i] != null && f.optionValues[i] !== '') ? f.optionValues[i] : o;
 
       switch (f.type) {
         case 'label': {
@@ -6608,38 +6649,47 @@ ${formScript}
           return div;
         }
         case 'textarea':
-          div.innerHTML = '<textarea ' + base + ph + ' rows="2">' + escape(f.defaultValue || '') + '</textarea>';
+          div.innerHTML = '<textarea ' + base + ph + ' rows="2" oninput="_rjSetVal(\'' + fn + '\', this.value)">' + escape(f.defaultValue || '') + '</textarea>';
           return div.firstChild;
         case 'number':
-          div.innerHTML = '<input type="number" ' + base + ph + dv + '>';
+          div.innerHTML = '<input type="number" ' + base + ph + dv + ' oninput="_rjSetVal(\'' + fn + '\', this.value)">';
           return div.firstChild;
         case 'email':
-          div.innerHTML = '<input type="email" ' + base + ph + dv + '>';
+          div.innerHTML = '<input type="email" ' + base + ph + dv + ' oninput="_rjSetVal(\'' + fn + '\', this.value)">';
           return div.firstChild;
         case 'date':
-          div.innerHTML = '<input type="date" ' + base + dv + '>';
+          div.innerHTML = '<input type="date" ' + base + dv + ' onchange="_rjSetVal(\'' + fn + '\', this.value)">';
           return div.firstChild;
         case 'daterange':
           div.className = 'grid grid-cols-2 gap-1.5';
           div.innerHTML = '<input type="date" ' + base + '><input type="date" ' + base + '>';
           return div;
         case 'boolean': {
-          div.className = 'inline-flex items-center gap-1.5';
-          div.innerHTML = '<div class="w-8 h-4 bg-slate-200 rounded-full relative"><div class="w-3 h-3 bg-white border border-slate-300 rounded-full absolute top-0.5 left-0.5"></div></div><span class="text-[11px] text-slate-500">No</span>';
+          const checked = f.defaultValue === 'true';
+          div.className = 'inline-flex items-center';
+          div.innerHTML = '<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="_rjSetVal(\'' + fn + '\', String(this.checked))" class="sr-only peer"><div class="w-8 h-4 bg-slate-200 rounded-full peer peer-checked:bg-nexus relative after:content-[\'\'] after:absolute after:top-0.5 after:left-0.5 after:w-3 after:h-3 after:bg-white after:border after:border-slate-300 after:rounded-full after:transition-all peer-checked:after:translate-x-4"></div></label>';
           return div;
         }
         case 'select': {
-          const opts = (f.options || []).map(o => '<option>' + escape(o) + '</option>').join('');
-          div.innerHTML = '<select ' + base + '><option value="" class="text-slate-400">' + (f.placeholder ? escape(f.placeholder) : 'Choose...') + '</option>' + opts + '</select>';
+          const opts = (f.options || []).map((o, i) => '<option value="' + escape(optVal(i, o)) + '">' + escape(o) + '</option>').join('');
+          div.innerHTML = '<select ' + base + ' onchange="_rjSetVal(\'' + fn + '\', this.value)"><option value="">' + (f.placeholder ? escape(f.placeholder) : 'Choose...') + '</option>' + opts + '</select>';
           return div.firstChild;
         }
-        case 'radio':
+        case 'radio': {
+          const items = (f.options || []).map((o, i) =>
+            '<label class="flex items-center gap-1.5 text-[11px] text-slate-600"><input type="radio" name="rj-radio-' + f.id + '" value="' + escape(optVal(i, o)) + '" onchange="_rjSetVal(\'' + fn + '\', this.value)"> ' + escape(o) + '</label>'
+          ).join('');
+          div.className = 'space-y-1 bg-slate-50 border border-slate-200 rounded px-2 py-1.5';
+          div.innerHTML = items || '<div class="text-[10px] text-slate-400 italic">No options defined</div>';
+          return div;
+        }
         case 'checkbox':
         case 'checklist': {
-          const type = (f.type === 'radio') ? 'radio' : 'checkbox';
-          const items = (f.options || []).map(o =>
-            '<label class="flex items-center gap-1.5 text-[11px] text-slate-600"><input type="' + type + '" disabled class="pointer-events-none"> ' + escape(o) + '</label>'
+          const cid = 'rj-cb-' + f.id;
+          const items = (f.options || []).map((o, i) =>
+            '<label class="flex items-center gap-1.5 text-[11px] text-slate-600"><input type="checkbox" value="' + escape(optVal(i, o)) + '" onchange="_rjCollectChecks(\'' + fn + '\', \'' + cid + '\')"> ' + escape(o) + '</label>'
           ).join('');
+          div.id = cid;
           div.className = 'space-y-1 bg-slate-50 border border-slate-200 rounded px-2 py-1.5';
           div.innerHTML = items || '<div class="text-[10px] text-slate-400 italic">No options defined</div>';
           return div;
@@ -6651,11 +6701,11 @@ ${formScript}
         case 'country':
         case 'language':
         case 'product':
-          div.innerHTML = '<input type="text" ' + base + ' placeholder="🔍 Search ' + f.type + '..." disabled>';
+          div.innerHTML = '<input type="text" ' + base + ' placeholder="🔍 Search ' + f.type + '...">';
           return div.firstChild;
         default:
           // text + fallback
-          div.innerHTML = '<input type="text" ' + base + ph + dv + '>';
+          div.innerHTML = '<input type="text" ' + base + ph + dv + ' oninput="_rjSetVal(\'' + fn + '\', this.value)">';
           return div.firstChild;
       }
     }
