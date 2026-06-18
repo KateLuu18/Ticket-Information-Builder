@@ -4043,8 +4043,8 @@ ${formScript}
         if (tid === 'select') h += renderToggleRow('Multi-select', 'Cho phép chọn nhiều giá trị.', `<label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="ew-multiple" ${EW.multiple ? 'checked' : ''} onchange="EW.multiple=this.checked" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label>`, 'Bật để chọn nhiều giá trị cùng lúc trong dropdown.');
         h += `<div id="ew-opts-list" class="space-y-2 mt-4">`;
         EW.options.forEach((opt, i) => {
-          const v = EW.optionValues && EW.optionValues[i] != null ? EW.optionValues[i] : opt.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-          h += `<div class="flex items-center gap-2 bg-white border border-slate-200 p-2.5 rounded-xl"><span class="text-slate-400 text-sm select-none">⋮⋮</span><div class="grid grid-cols-2 gap-2 flex-1"><input class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 transition" value="${H(opt)}" placeholder="Nhãn..." oninput="ewUpdOpt(${i},'l',this.value)"><input class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-500 focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 transition" value="${H(v)}" placeholder="value" oninput="ewUpdOpt(${i},'v',this.value)"></div><button onclick="ewDelOpt(${i})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition">✕</button></div>`;
+          const v = EW.optionValues && EW.optionValues[i] != null ? EW.optionValues[i] : _optValSlug(opt);
+          h += `<div class="flex items-center gap-2 bg-white border border-slate-200 p-2.5 rounded-xl"><span class="text-slate-400 text-sm select-none">⋮⋮</span><div class="grid grid-cols-2 gap-2 flex-1"><input class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 transition" value="${H(opt)}" placeholder="Nhãn..." oninput="ewUpdOpt(${i},'l',this.value)"><input class="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm font-mono text-slate-500 focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 transition" value="${H(v)}" id="ew-optval-${i}" placeholder="value" oninput="ewUpdOpt(${i},'v',this.value)"></div><button onclick="ewDelOpt(${i})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition">✕</button></div>`;
         });
         h += `</div><button onclick="ewAddOpt()" class="w-full border-2 border-dashed border-slate-300 hover:border-nexus text-slate-500 hover:text-nexus text-xs font-bold py-3.5 rounded-xl transition mt-3">+ Thêm option</button><div class="hidden text-xs text-red-500 font-semibold mt-2" id="ew-opts-warn">Phải nhập ít nhất một đáp án!</div>`;
       }
@@ -4082,12 +4082,39 @@ ${formScript}
         });
         EW.branchFields = newBF;
       }
+      if (EW.optionValueManual) {
+        const newM = {};
+        Object.keys(EW.optionValueManual).forEach(k => {
+          const ki = parseInt(k);
+          if (ki < idx) newM[ki] = EW.optionValueManual[k];
+          else if (ki > idx) newM[ki - 1] = EW.optionValueManual[k];
+        });
+        EW.optionValueManual = newM;
+      }
       renderEWBody();
       checkEWNextBtn();
     }
+    // Slug giá trị option: bỏ dấu tiếng Việt + lowercase + a-z0-9_ (vd "App Store" → app_store, "Mô tả" → mo_ta)
+    function _optValSlug(s) {
+      return removeVietnameseTones(s || '').toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+    }
     function ewUpdOpt(idx, type, val) {
-      if (type === 'l') EW.options[idx] = val;
-      else { if (!EW.optionValues) EW.optionValues = {}; EW.optionValues[idx] = val; }
+      if (type === 'l') {
+        EW.options[idx] = val;
+        // Value bên phải tự nhảy theo nhãn (slug), trừ khi user đã tự sửa value
+        if (!EW.optionValueManual || !EW.optionValueManual[idx]) {
+          if (!EW.optionValues) EW.optionValues = {};
+          const slug = _optValSlug(val);
+          EW.optionValues[idx] = slug;
+          const vi = document.getElementById('ew-optval-' + idx);
+          if (vi) vi.value = slug;
+        }
+      } else {
+        if (!EW.optionValues) EW.optionValues = {};
+        EW.optionValues[idx] = val;
+        if (!EW.optionValueManual) EW.optionValueManual = {};
+        EW.optionValueManual[idx] = true;  // đánh dấu value do user tự nhập → ngừng auto theo nhãn
+      }
       checkEWNextBtn();
     }
 
