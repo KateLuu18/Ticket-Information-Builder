@@ -3235,12 +3235,14 @@ ${formScript}
     function _buildNexusJSON(entry) {
       // Build field ID → field_name lookup for resolving visRule.source
       const idToName = {};
+      const idToMulti = {};  // nguồn có giá trị dạng mảng (checkbox/checklist/select-multiple) → cần toán tử contains
+      const _isMulti = (x) => x && (x.type === 'checkbox' || x.type === 'checklist' || (x.type === 'select' && x.multiple));
       (entry.fields || []).forEach(f => {
-        if (f && f.id != null) idToName[f.id] = f.fieldName || ('field_' + f.id);
+        if (f && f.id != null) { idToName[f.id] = f.fieldName || ('field_' + f.id); idToMulti[f.id] = _isMulti(f); }
         if (f.branchFields) {
           Object.values(f.branchFields).forEach(arr => {
             (arr || []).forEach(sf => {
-              if (sf && sf.id != null) idToName[sf.id] = sf.fieldName || ('field_' + sf.id);
+              if (sf && sf.id != null) { idToName[sf.id] = sf.fieldName || ('field_' + sf.id); idToMulti[sf.id] = _isMulti(sf); }
             });
           });
         }
@@ -3256,10 +3258,10 @@ ${formScript}
 
         if (f.type === 'branch') {
           // Flatten branch → select + sub-fields with visibility_rule
-          const branchRows = _flattenBranch(f, idToName, isInline);
+          const branchRows = _flattenBranch(f, idToName, isInline, idToMulti);
           branchRows.forEach(r => rows.push(r));
         } else {
-          rows.push(_buildNexusRow(f, isInline, idToName));
+          rows.push(_buildNexusRow(f, isInline, idToName, idToMulti));
         }
       });
 
@@ -3275,10 +3277,10 @@ ${formScript}
       };
     }
 
-    function _flattenBranch(f, idToName, isInline) {
+    function _flattenBranch(f, idToName, isInline, idToMulti) {
       const rows = [];
       const branchName = f.fieldName || ('field_' + f.id);
-      rows.push(_buildNexusRow({ ...f, type: 'select' }, isInline, idToName));
+      rows.push(_buildNexusRow({ ...f, type: 'select' }, isInline, idToName, idToMulti));
       if (f.branchFields) {
         Object.entries(f.branchFields).forEach(([optIdx, subFields]) => {
           const optLabel = (f.options && f.options[parseInt(optIdx)]) || optIdx;
@@ -3287,7 +3289,7 @@ ${formScript}
           (subFields || []).forEach(sf => {
             const subInline = sf.halfWidth && subLastWasHalf;
             subLastWasHalf = sf.halfWidth && !subInline;
-            const subRow = _buildNexusRow(sf, subInline, idToName);
+            const subRow = _buildNexusRow(sf, subInline, idToName, idToMulti);
             // Use confirmed Nexus visibility_rule format
             subRow.visibility_rule = {
               source_field: branchName,
@@ -3301,15 +3303,21 @@ ${formScript}
       return rows;
     }
 
-    function _buildNexusRow(f, isInline, idToName) {
+    function _buildNexusRow(f, isInline, idToName, idToMulti) {
       const fieldName = f.fieldName || ('field_' + f.id);
       // Build visibility_rule using confirmed Nexus format: {source_field, operator, values:[]}
       let visRule = null;
       if (f.visRule && f.visRule.source && String(f.visRule.source).trim() !== '' && f.visRule.values && String(f.visRule.values).trim() !== '' && idToName) {
         const srcName = idToName[f.visRule.source] || ('field_' + f.visRule.source);
+        let op = f.visRule.op || 'equals';
+        // Nguồn là multi-select (checkbox/checklist/select-multiple) → Nexus cần contains, không phải equals
+        if (idToMulti && idToMulti[f.visRule.source]) {
+          if (op === 'equals') op = 'contains';
+          else if (op === 'not_equals') op = 'not_contains';
+        }
         visRule = {
           source_field: srcName,
-          operator: f.visRule.op || 'equals',
+          operator: op,
           values: [f.visRule.values || '']
         };
       }
@@ -4716,7 +4724,11 @@ ${formScript}
           if (!srcField) return;
           const currentVal = String(previewState[srcField.fieldName] || '').trim().toLowerCase();
           const ruleVal = String(f.visRule.values || '').trim().toLowerCase();
-          const isMatch = currentVal === ruleVal;
+          // Nguồn multi-select (checkbox/checklist/select-multiple) lưu nhiều value nối bằng dấu phẩy → match kiểu "contains"
+          const srcMulti = srcField.type === 'checkbox' || srcField.type === 'checklist' || (srcField.type === 'select' && srcField.multiple);
+          const isMatch = srcMulti
+            ? currentVal.split(',').map(s => s.trim()).filter(Boolean).includes(ruleVal)
+            : currentVal === ruleVal;
           const shouldShow = f.visRule.op === 'not_equals' ? !isMatch : isMatch;
           if (shouldShow) { el.classList.remove('hidden'); el.classList.add('fade-item-enter'); }
           else { el.classList.add('hidden'); /* M5 fix: keep previewState value — don't reset */ }
