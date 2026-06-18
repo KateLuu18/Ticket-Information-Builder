@@ -1535,10 +1535,12 @@
 
     function toCleanFieldName(label) {
       let str = removeVietnameseTones(label || '');
+      str = str.replace(/<[^>]*>/g, ' ');   // bỏ thẻ HTML (khi paste từ Word/Docs/web)
       str = str.toLowerCase();
       str = str.replace(/[^a-z0-9_]/g, '_');
       str = str.replace(/__+/g, '_');
       str = str.replace(/^_+|_+$/g, '');
+      if (str.length > 64) str = str.slice(0, 64).replace(/_+$/, '');  // giới hạn 64 ký tự (DB Nexus)
       return str;
     }
 
