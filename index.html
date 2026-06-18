@@ -2784,12 +2784,10 @@
         var srcVal = '';
         var srcText = '';
         if (srcEl.type === 'radio' || srcEl.type === 'checkbox') {
-          var checked = document.querySelector('[name="'+srcName+'"]:checked');
-          if (checked) {
-            srcVal = checked.value || '';
-            var nextSpan = checked.nextElementSibling;
-            if (nextSpan && nextSpan.tagName === 'SPAN') srcText = (nextSpan.textContent || '').trim();
-          }
+          // Gom TẤT CẢ ô đang tick (checkbox chọn nhiều) — không chỉ ô đầu tiên
+          var checkedEls = document.querySelectorAll('[name="'+srcName+'"]:checked');
+          srcVal = Array.prototype.map.call(checkedEls, function(ch){ return (ch.value||'').trim(); }).filter(Boolean).join('|');
+          srcText = Array.prototype.map.call(checkedEls, function(ch){ var ns=ch.nextElementSibling; return (ns && ns.tagName==='SPAN') ? (ns.textContent||'').trim() : ''; }).filter(Boolean).join('|');
         } else if (srcEl.tagName === 'SELECT') {
           srcVal = srcEl.value || '';
           if (srcEl.selectedIndex >= 0 && srcEl.options[srcEl.selectedIndex]) {
@@ -2799,10 +2797,12 @@
           srcVal = srcEl.value || '';
         }
         var cv = String(condVal).trim().toLowerCase();
-        var sv = String(srcVal).trim().toLowerCase();
-        var st = String(srcText).trim().toLowerCase();
-        var isEqual = (sv !== '' && sv === cv) || (st !== '' && st === cv);
-        var match = op === 'not_equals' ? !isEqual : isEqual;
+        var svParts = String(srcVal).trim().toLowerCase().split('|').filter(Boolean);
+        var stParts = String(srcText).trim().toLowerCase().split('|').filter(Boolean);
+        // khớp nếu BẤT KỲ giá trị/nhãn đang chọn == điều kiện (đúng cả khi tick nhiều options)
+        var isEqual = svParts.indexOf(cv) >= 0 || stParts.indexOf(cv) >= 0;
+        var negate = op === 'not_equals' || op === 'not_contains';
+        var match = negate ? !isEqual : isEqual;
         wrap.style.display = match ? 'block' : 'none';
       });
     }
