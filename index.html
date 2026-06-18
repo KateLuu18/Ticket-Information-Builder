@@ -2783,7 +2783,11 @@
         if (!srcEl) return;
         var srcVal = '';
         var srcText = '';
-        if (srcEl.type === 'radio' || srcEl.type === 'checkbox') {
+        if (srcEl.classList && srcEl.classList.contains('pv-toggle-inp')) {
+          // Nguồn Yes/No (boolean): giá trị true/false theo trạng thái bật/tắt (không dựa vào value="on")
+          srcVal = srcEl.checked ? 'true' : 'false';
+          srcText = srcVal;
+        } else if (srcEl.type === 'radio' || srcEl.type === 'checkbox') {
           // Gom TẤT CẢ ô đang tick (checkbox chọn nhiều) — không chỉ ô đầu tiên
           var checkedEls = document.querySelectorAll('[name="'+srcName+'"]:checked');
           srcVal = Array.prototype.map.call(checkedEls, function(ch){ return (ch.value||'').trim(); }).filter(Boolean).join('|');
