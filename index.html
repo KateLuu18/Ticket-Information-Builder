@@ -891,7 +891,10 @@
       </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:flex-end;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
+        <button id="rename-export-btn" onclick="exportRenameOnlyFromStep1()" style="display:none;align-items:center;gap:8px;background:#fff;color:#155DFC;border:1.5px solid #BFDBFE;font-weight:700;padding:11px 18px;border-radius:12px;cursor:pointer;font-size:14px" title="Chỉ đổi định danh — xuất 1 phiếu cho PIC, không cần dựng form">
+          <span>🏷️</span><span>Xuất phiếu định danh</span>
+        </button>
         <button class="flex items-center gap-2 bg-slate-100 text-slate-400 font-bold px-5 py-3 rounded-xl transition" id="next-btn" onclick="goStep(2)" disabled>
           <span data-lang-key="next_step">Next</span>
           <svg id="next-arrow" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
@@ -1951,6 +1954,7 @@
         if (di) { di.readOnly = false; di.style.background = ''; }
       }
       _idRenderNote();
+      _syncRenameBtn();
     }
     function _idOnInput() {
       if (!_origin) return;
@@ -1962,6 +1966,7 @@
       _idUpdateBar();
       _idRenderNote();
       sv();
+      _syncRenameBtn();
     }
     function _idEnterEdit() { _editingId = true; _idRender(); }
     function _idExitEdit() { _editingId = false; _idRender(); }
@@ -5052,6 +5057,9 @@ ${formScript}
       menu.appendChild(makeItem(tplIcon, 'Use as template\u2026', 'text-indigo-700', () => useAsTemplate(idx)));
       menu.appendChild(makeItem(dlIcon, 'Download', 'text-nexus', () => exportSingle(idx)));
 
+      const renameIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      menu.appendChild(makeItem(renameIcon, 'Cập nhật định danh', 'text-slate-700', () => openRenameDialog(idx)));
+
       // Divider
       const div = document.createElement('div');
       div.className = 'h-px bg-slate-100 my-1';
@@ -5403,6 +5411,191 @@ ${formScript}
       _dlZipBundle([entry]);
       _exportCtx = null;
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // "Cập nhật định danh" — đổi Catalog/Category/Service mà KHÔNG đụng template.
+    // Xuất DUY NHẤT 1 phiếu HTML (change note). Không sinh JSON/template/ZIP.
+    // Toàn bộ additive — không sửa logic builder/export hiện có.
+    // ═══════════════════════════════════════════════════════════
+    function _rnVal(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+    // Rows = các field định danh thay đổi (Catalog/Category/Tên service). Chỉ định danh, không gồm mô tả.
+    function _renameRows(base, cur) {
+      const rows = [];
+      if ((cur.catalog || '')  !== (base.catalog || ''))  rows.push(['Catalog',     base.catalog || '',  cur.catalog || '']);
+      if ((cur.category || '') !== (base.category || '')) rows.push(['Category',    base.category || '', cur.category || '']);
+      if ((cur.service || '')  !== (base.service || ''))  rows.push(['Tên service', base.service || '',  cur.service || '']);
+      return rows;
+    }
+
+    function _renameNoteData(origin, rows) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' });
+      const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' });
+      const dp = dateStr.split('/'), tp = timeStr.split(':');
+      const code = 'RNM-' + (dp[2] || '') + (dp[1] || '') + (dp[0] || '') + '-' + (tp[0] || '') + (tp[1] || '');
+      return {
+        originService: origin.service || '',
+        originPath: [origin.catalog, origin.category].filter(Boolean).join(' › '),
+        rows: rows, dateStr: dateStr, timeStr: timeStr, code: code
+      };
+    }
+
+    function _buildRenameNoteHTML(d) {
+      const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const rowsHTML = d.rows.map(r =>
+        '<tr><td class="f">' + esc(r[0]) + '</td>' +
+        '<td class="old">' + esc(r[1]) + '</td>' +
+        '<td class="new">' + esc(r[2]) + '</td></tr>').join('');
+      return '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<title>Phiếu yêu cầu cập nhật định danh — ' + esc(d.originService) + '</title>' +
+        '<style>' +
+        '*{box-sizing:border-box}' +
+        'body{margin:0;background:#EEF2F8;color:#1A2236;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.6;padding:28px 16px}' +
+        '.sheet{max-width:680px;margin:0 auto;background:#fff;border:1px solid #D7DEE8;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(16,40,90,.09)}' +
+        '.hd{padding:22px 26px 20px;background:linear-gradient(135deg,#1e3a8a,#155DFC);color:#fff}' +
+        '.badge{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:12px}' +
+        '.hd h1{font-size:21px;font-weight:780;letter-spacing:-.3px;margin:0}' +
+        '.hd .sub{font-size:12.5px;opacity:.85;margin-top:3px}' +
+        '.bd{padding:22px 26px 26px}' +
+        '.meta{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#EEF1F5;border:1px solid #EEF1F5;border-radius:11px;overflow:hidden;margin-bottom:22px}' +
+        '.mc{background:#fff;padding:11px 14px}' +
+        '.mc .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;margin-bottom:3px}' +
+        '.mc .v{font-size:13.5px;font-weight:600;color:#1A2236;word-break:break-word}' +
+        'h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin:0 0 10px}' +
+        'table{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid #E2E8F0;border-radius:11px;overflow:hidden;margin-bottom:22px}' +
+        'th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;background:#F8FAFC;padding:9px 14px;border-bottom:1px solid #E2E8F0}' +
+        'td{padding:11px 14px;border-bottom:1px solid #EEF1F5;vertical-align:top}' +
+        'tr:last-child td{border-bottom:none}' +
+        '.f{font-weight:700;color:#334155;white-space:nowrap}' +
+        '.old{color:#64748B;text-decoration:line-through;text-decoration-color:#CBD5E1}' +
+        '.new{color:#0f4ecf;font-weight:700}' +
+        '.keep{display:flex;gap:13px;background:#F0F8F3;border:1px solid #CCE8D8;border-radius:13px;padding:15px 17px;margin-bottom:20px}' +
+        '.keep .ic{flex:none;width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid #CCE8D8;color:#15803D;display:flex;align-items:center;justify-content:center;font-size:17px}' +
+        '.keep .t{font-size:13.5px;font-weight:700;color:#166534;margin-bottom:3px}' +
+        '.keep .d{font-size:12.5px;color:#2c6a47}' +
+        '.todo{background:#FCFDFF;border:1px solid #E3EBF6;border-left:4px solid #155DFC;border-radius:11px;padding:14px 17px}' +
+        '.todo .t{font-size:12.5px;font-weight:700;color:#1e3a8a;margin-bottom:5px}' +
+        '.todo .d{font-size:13px;color:#3c4660}' +
+        '.ft{padding:13px 26px;border-top:1px solid #EEF1F5;background:#FBFCFE;font-size:11px;color:#94A3B8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}' +
+        '</style></head><body>' +
+        '<div class="sheet">' +
+        '<div class="hd"><span class="badge">🏷️ Cập nhật định danh · Không đổi form</span>' +
+        '<h1>Phiếu yêu cầu cập nhật định danh</h1>' +
+        '<div class="sub">Service Identity Update Request — Nexus Ticket Information Builder</div></div>' +
+        '<div class="bd">' +
+        '<div class="meta">' +
+        '<div class="mc"><div class="k">Service (định danh gốc)</div><div class="v">' + esc(d.originService) + '</div></div>' +
+        '<div class="mc"><div class="k">Đường dẫn</div><div class="v">' + esc(d.originPath) + '</div></div>' +
+        '<div class="mc"><div class="k">Ngày tạo yêu cầu</div><div class="v">' + esc(d.dateStr + ' — ' + d.timeStr + ' (GMT+7)') + '</div></div>' +
+        '<div class="mc"><div class="k">Mã phiếu</div><div class="v">' + esc(d.code) + '</div></div>' +
+        '</div>' +
+        '<h3>Nội dung thay đổi</h3>' +
+        '<table><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead><tbody>' + rowsHTML + '</tbody></table>' +
+        '<div class="keep"><div class="ic">✓</div><div>' +
+        '<div class="t">Giữ nguyên form hiện hành trên Nexus</div>' +
+        '<div class="d">Toàn bộ field &amp; cấu hình form của service đang chạy trên Nexus (tính đến ' + esc(d.dateStr) + ') được <b>GIỮ NGUYÊN</b>. Yêu cầu này chỉ đổi định danh — không thêm / sửa / xoá field nào.</div>' +
+        '</div></div>' +
+        '<div class="todo"><div class="t">▶ Việc cần làm (PIC)</div>' +
+        '<div class="d">Cập nhật <b>định danh</b> của service trên Nexus admin theo bảng trên. <b>Không cần import lại form</b>, không chạm tới field.</div></div>' +
+        '</div>' +
+        '<div class="ft"><span>Tạo bởi Ticket Information Builder</span><span>Mã phiếu: ' + esc(d.code) + '</span></div>' +
+        '</div></body></html>';
+    }
+
+    function _dlRenameNote(noteData) {
+      try {
+        const html = _buildRenameNoteHTML(noteData);
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const fname = 'yeu-cau-dinh-danh__' + _slug(noteData.originService || 'service', 60) + '.html';
+        _triggerDownload(blob, fname);
+        toast('✅ Đã tải phiếu cập nhật định danh — ' + fname, 5000);
+      } catch (err) {
+        toast('❌ Lỗi tạo phiếu: ' + (err.message || err));
+      }
+    }
+
+    // ── Entry 1: từ menu ⋯ của service đã lưu ──
+    let _renameBase = null;
+    function openRenameDialog(idx) {
+      const entry = sessionServices[idx];
+      if (!entry) return;
+      _renameBase = { catalog: entry.catalog || '', category: entry.category || '', service: entry.service || '' };
+      const b = _renameBase;
+      const ov = document.createElement('div');
+      ov.id = '_rename_overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px';
+      ov.onclick = function (e) { if (e.target === ov) closeRenameDialog(); };
+      const fld = (id, label, v) => '<div style="margin-bottom:11px"><label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:5px">' + label + '</label>' +
+        '<input id="' + id + '" value="' + H(v || '') + '" autocomplete="off" oninput="_renameDlgUpdate()" style="width:100%;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13.5px;font-family:inherit;color:#1A2236"></div>';
+      ov.innerHTML =
+        '<div style="width:100%;max-width:440px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(16,40,90,.2)" onclick="event.stopPropagation()">' +
+        '<div style="padding:15px 18px;border-bottom:1px solid #EEF1F5;display:flex;align-items:center;gap:9px"><span style="font-size:17px">🏷️</span><span style="font-size:15px;font-weight:740">Cập nhật định danh</span><span style="margin-left:auto;cursor:pointer;color:#94A3B8;font-size:16px" onclick="closeRenameDialog()">✕</span></div>' +
+        '<div style="padding:16px 18px">' +
+        '<div style="font-size:11.5px;color:#64748b;margin-bottom:13px">Chỉ đổi định danh (Catalog / Category / Tên service). <b>Form fields giữ nguyên</b> — xuất 1 phiếu yêu cầu cho PIC.</div>' +
+        fld('rn-svc', 'Tên service', b.service) +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' + fld('rn-cat', 'Catalog', b.catalog) + fld('rn-ctg', 'Category', b.category) + '</div>' +
+        '<div id="rn-note" style="margin-top:6px"></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:9px;justify-content:flex-end;padding:13px 18px;border-top:1px solid #EEF1F5;background:#FBFCFE">' +
+        '<button onclick="closeRenameDialog()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #E2E8F0;background:#fff;color:#475569;cursor:pointer">Huỷ</button>' +
+        '<button id="rn-save" onclick="confirmRename()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #155DFC;background:#155DFC;color:#fff;cursor:pointer">Lưu &amp; xuất phiếu</button>' +
+        '</div></div>';
+      document.body.appendChild(ov);
+      document.addEventListener('keydown', _renameEsc);
+      _renameDlgUpdate();
+      setTimeout(() => { const el = document.getElementById('rn-svc'); if (el) el.focus(); }, 50);
+    }
+    function _renameEsc(e) { if (e.key === 'Escape') closeRenameDialog(); }
+    function closeRenameDialog() {
+      const ov = document.getElementById('_rename_overlay');
+      if (ov) ov.remove();
+      document.removeEventListener('keydown', _renameEsc);
+      _renameBase = null;
+    }
+    function _renameCur() {
+      const b = _renameBase || {};
+      return { catalog: _rnVal('rn-cat') || b.catalog, category: _rnVal('rn-ctg') || b.category, service: _rnVal('rn-svc') || b.service };
+    }
+    function _renameDlgUpdate() {
+      if (!_renameBase) return;
+      const rows = _renameRows(_renameBase, _renameCur());
+      const note = document.getElementById('rn-note');
+      const save = document.getElementById('rn-save');
+      if (save) { save.disabled = !rows.length; save.style.opacity = rows.length ? '1' : '.45'; save.style.cursor = rows.length ? 'pointer' : 'not-allowed'; }
+      if (!note) return;
+      if (!rows.length) { note.innerHTML = '<div style="display:flex;align-items:center;gap:8px;background:#F6FBF7;border:1px solid #D5EAD9;border-radius:10px;padding:10px 13px;font-size:11.5px;color:#15803D;font-weight:600">✓ Chưa có thay đổi định danh.</div>'; return; }
+      const trs = rows.map(r => '<tr><td style="padding:6px 9px;border-bottom:1px solid #F2F5FA;font-weight:600;color:#334155;white-space:nowrap">' + H(r[0]) + '</td><td style="padding:6px 9px;border-bottom:1px solid #F2F5FA;color:#94A3B8;text-decoration:line-through">' + H(r[1]) + '</td><td style="padding:6px 9px;border-bottom:1px solid #F2F5FA;color:#0f4ecf;font-weight:600">' + H(r[2]) + '</td></tr>').join('');
+      note.innerHTML = '<div style="background:#FCFDFF;border:1px solid #E3EBF6;border-left:4px solid #155DFC;border-radius:11px;padding:12px 14px"><div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:7px">Thay đổi (' + rows.length + ')</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tbody>' + trs + '</tbody></table></div>';
+    }
+    function confirmRename() {
+      if (!_renameBase) return;
+      const rows = _renameRows(_renameBase, _renameCur());
+      if (!rows.length) { toast('⚠️ Chưa có thay đổi định danh nào'); return; }
+      const nd = _renameNoteData({ service: _renameBase.service, catalog: _renameBase.catalog, category: _renameBase.category }, rows);
+      _dlRenameNote(nd);
+      closeRenameDialog();
+    }
+
+    // ── Entry 2: nút ở Step 1 (service mới chọn, chưa dựng form) ──
+    function _renameRowsStep1() {
+      if (!_origin || !_idEdit) return [];
+      return _renameRows(_origin, _idEdit);
+    }
+    function _syncRenameBtn() {
+      const b = document.getElementById('rename-export-btn');
+      if (!b) return;
+      b.style.display = (_origin && _renameRowsStep1().length > 0) ? 'inline-flex' : 'none';
+    }
+    function exportRenameOnlyFromStep1() {
+      if (!_origin) { toast('⚠️ Chưa chọn service'); return; }
+      const rows = _renameRowsStep1();
+      if (!rows.length) { toast('⚠️ Chưa có thay đổi định danh. Bấm "Chỉnh sửa thông tin" để sửa Catalog / Category / Tên service.'); return; }
+      const nd = _renameNoteData({ service: _origin.service, catalog: _origin.catalog, category: _origin.category }, rows);
+      _dlRenameNote(nd);
+    }
+
         function showCancelBanner() {} // no-op (UI banner not implemented)
     function hideCancelBanner() {} // no-op
 
