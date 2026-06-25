@@ -5646,8 +5646,45 @@ ${formScript}
       const e = _idEdit || base;
       const cur = { catalog: e.catalog || base.catalog, category: e.category || base.category, service: e.service || base.service, desc: (di ? di.value : '').trim() };
       if (!_umHasChange(base, cur)) { toast('⚠️ Chưa có thay đổi. Bấm "Chỉnh sửa thông tin" để sửa, rồi xuất phiếu.'); return; }
-      _dlUpdateNote(base, cur);
+      _openUpdateConfirm(base, cur);
     }
+
+    // Bước xác nhận: cho user soát lại thay đổi (read-only) một lần nữa rồi mới xuất phiếu.
+    let _ucData = null;
+    function _ucPreview(base, cur) {
+      const css = '#uc-prev table{width:100%;border-collapse:collapse;font-size:12.5px;border:1px solid #E2E8F0;border-radius:9px;overflow:hidden}'
+        + '#uc-prev th{text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;background:#F8FAFC;padding:7px 10px;border-bottom:1px solid #E2E8F0}'
+        + '#uc-prev td{padding:8px 10px;border-bottom:1px solid #EEF1F5}#uc-prev tr:last-child td{border-bottom:none}'
+        + '#uc-prev .f{font-weight:700;color:#334155;white-space:nowrap}#uc-prev .old{color:#94A3B8;text-decoration:line-through}#uc-prev .new{color:#0f4ecf;font-weight:700}#uc-prev .sm{color:#475569}'
+        + '#uc-prev .bg{display:inline-block;font-size:8.5px;font-weight:800;padding:2px 6px;border-radius:999px}#uc-prev .bg.keep{background:#F1F4F8;color:#7c879b;border:1px solid #E2E8F0}#uc-prev .bg.chg{background:#EAF1FE;color:#155DFC;border:1px solid #BFDBFE}'
+        + '#uc-prev .dsec{margin-top:12px}#uc-prev .dh{font-size:11px;font-weight:700;color:#334155;display:flex;gap:8px;align-items:center;margin:0 0 6px}#uc-prev .dba{border:1px solid #E3EBF6;border-radius:8px;overflow:hidden}'
+        + '#uc-prev .dc{padding:8px 10px;font-size:12px;line-height:1.5}#uc-prev .dc .dl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#94A3B8;margin-bottom:2px}'
+        + '#uc-prev .dc.o{background:#FCF4F4;color:#8a6b6b;border-bottom:1px solid #F1E2E2}#uc-prev .dc.o .dt{text-decoration:line-through}#uc-prev .dc.n{background:#F0F8F3;color:#234a39;font-weight:600}#uc-prev .dc.s{background:#F8FAFC;color:#475569}';
+      return '<style>' + css + '</style>' + _umIdTableHTML(base, cur) + _umDescHTML(base, cur);
+    }
+    function _openUpdateConfirm(base, cur) {
+      _ucData = { base: base, cur: cur };
+      const ov = document.createElement('div');
+      ov.id = '_uc_overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:620;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px';
+      ov.onclick = function (e) { if (e.target === ov) _closeUpdateConfirm(); };
+      ov.innerHTML =
+        '<div style="width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(16,40,90,.2)" onclick="event.stopPropagation()">'
+        + '<div style="padding:14px 18px;border-bottom:1px solid #EEF1F5;display:flex;align-items:center;gap:9px"><span style="font-size:17px">🔎</span><span style="font-size:15px;font-weight:740">Xác nhận thay đổi trước khi xuất</span><span style="margin-left:auto;cursor:pointer;color:#94A3B8;font-size:16px" onclick="_closeUpdateConfirm()">✕</span></div>'
+        + '<div style="padding:16px 18px;overflow:auto">'
+        + '<div style="font-size:11.5px;color:#64748b;margin-bottom:12px">Kiểm tra lại các thay đổi dưới đây. Đúng rồi bấm <b>Xuất phiếu</b> để tải về gửi PIC. <b>Form fields giữ nguyên.</b></div>'
+        + '<div id="uc-prev">' + _ucPreview(base, cur) + '</div>'
+        + '</div>'
+        + '<div style="display:flex;gap:9px;justify-content:flex-end;padding:13px 18px;border-top:1px solid #EEF1F5;background:#FBFCFE">'
+        + '<button onclick="_closeUpdateConfirm()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #E2E8F0;background:#fff;color:#475569;cursor:pointer">Quay lại sửa</button>'
+        + '<button onclick="_doUpdateExport()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #155DFC;background:#155DFC;color:#fff;cursor:pointer">📥 Xuất phiếu</button>'
+        + '</div></div>';
+      document.body.appendChild(ov);
+      document.addEventListener('keydown', _ucEsc);
+    }
+    function _ucEsc(e) { if (e.key === 'Escape') _closeUpdateConfirm(); }
+    function _closeUpdateConfirm() { const ov = document.getElementById('_uc_overlay'); if (ov) ov.remove(); document.removeEventListener('keydown', _ucEsc); _ucData = null; }
+    function _doUpdateExport() { if (!_ucData) return; _dlUpdateNote(_ucData.base, _ucData.cur); _closeUpdateConfirm(); }
 
         function showCancelBanner() {} // no-op (UI banner not implemented)
     function hideCancelBanner() {} // no-op
