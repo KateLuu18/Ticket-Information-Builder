@@ -891,9 +891,9 @@
       </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
         <div id="upd-foot-left" style="position:relative;display:flex;align-items:center">
-          <button id="rename-export-btn" onclick="openUpdateModalStep1()" style="display:none;flex-direction:column;align-items:flex-start;gap:0;background:#fff;color:#155DFC;border:1.5px solid #BFDBFE;font-weight:700;padding:8px 16px;border-radius:12px;cursor:pointer" title="Sửa tên / Catalog / Category / mô tả — xuất 1 phiếu cho PIC, không update form">
+          <button id="rename-export-btn" onclick="exportUpdateFromStep1()" style="display:none;flex-direction:column;align-items:flex-start;gap:0;background:#fff;color:#155DFC;border:1.5px solid #BFDBFE;font-weight:700;padding:8px 16px;border-radius:12px;cursor:pointer" title="Xuất 1 phiếu cập nhật thông tin cho PIC — không update form">
             <span style="font-size:13.5px;font-weight:700">Cập nhật thông tin service</span>
             <span style="font-size:10.5px;font-weight:500;color:#64748B">không update form</span>
           </button>
@@ -1940,7 +1940,8 @@
       const pencil = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
       idbar.style.display = 'block';
       if (!_editingId) {
-        idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>';
+        idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>' +
+          '<button onclick="_idEnterEdit()" title="Sửa Catalog / Category / Service / mô tả cho service này (không ảnh hưởng dữ liệu gốc)" onmouseover="this.style.background=\'#DBEAFE\'" onmouseout="this.style.background=\'#EFF6FF\'" style="margin-top:8px;font-size:12px;font-weight:700;color:#155DFC;background:#EFF6FF;border:1.5px solid #BFDBFE;padding:7px 13px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s">Chỉnh sửa thông tin</button>';
         panel.style.display = 'none'; ref.style.display = 'none';
         if (di) { di.readOnly = !!_origin.sla; di.style.background = _origin.sla ? '#f1f5f9' : ''; }
       } else {
@@ -5636,6 +5637,17 @@ ${formScript}
       } else if ((!show || seen) && coach) { coach.remove(); }
     }
     function _dismissUpdCoach() { try { localStorage.setItem('tib_upd_coach', '1'); } catch (e) {} const c = document.getElementById('upd-coach'); if (c) c.remove(); }
+
+    // Step 1: xuất phiếu từ những gì user đã sửa INLINE (Chỉnh sửa thông tin + ô mô tả).
+    function exportUpdateFromStep1() {
+      if (!_origin) { toast('⚠️ Chưa chọn service'); return; }
+      const di = document.getElementById('desc-input');
+      const base = { catalog: _origin.catalog || '', category: _origin.category || '', service: _origin.service || '', desc: _origin.sla || '' };
+      const e = _idEdit || base;
+      const cur = { catalog: e.catalog || base.catalog, category: e.category || base.category, service: e.service || base.service, desc: (di ? di.value : '').trim() };
+      if (!_umHasChange(base, cur)) { toast('⚠️ Chưa có thay đổi. Bấm "Chỉnh sửa thông tin" để sửa, rồi xuất phiếu.'); return; }
+      _dlUpdateNote(base, cur);
+    }
 
         function showCancelBanner() {} // no-op (UI banner not implemented)
     function hideCancelBanner() {} // no-op
