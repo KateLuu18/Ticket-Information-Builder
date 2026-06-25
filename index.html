@@ -580,6 +580,26 @@
       color: var(--hub-text-primary);
     }
   </style>
+<style id="ug-styles">
+.ug-help-wrap{position:absolute;top:14px;right:18px;z-index:6;display:flex;flex-direction:column;align-items:center;gap:7px}
+.ug-bubble{background:#F59E0B;color:#3a1d00;font-size:12px;font-weight:700;padding:6px 12px;border-radius:9px;position:relative;white-space:nowrap;box-shadow:0 2px 8px rgba(245,158,11,.32);font-family:inherit}
+.ug-bubble i{position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #F59E0B}
+@keyframes ugbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:no-preference){.ug-bubble{animation:ugbob 2.2s ease-in-out infinite}}
+.ug-help-btn{display:inline-flex;align-items:center;gap:6px;background:#155DFC;color:#fff;font-size:13px;font-weight:700;font-family:inherit;border:none;cursor:pointer;padding:8px 14px;border-radius:10px;box-shadow:0 2px 8px rgba(21,93,252,.25);transition:background .15s}
+.ug-help-btn:hover{background:#0f4ecf}
+.ug-help-btn svg{width:16px;height:16px}
+.ug-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9998;visibility:hidden;opacity:0;transition:opacity .2s,visibility .2s}
+.ug-overlay.open{visibility:visible;opacity:1}
+.ug-modal{width:min(1000px,94vw);height:92vh;background:#fff;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.32);transform:scale(.96);transition:transform .2s}
+.ug-overlay.open .ug-modal{transform:scale(1)}
+.ug-modal-head{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid #e5e9f0;flex-shrink:0}
+.ug-modal-title{font-size:15px;font-weight:800;color:#1E3A8A;font-family:inherit}
+.ug-modal-close{margin-left:auto;width:34px;height:34px;border:none;background:#f1f5f9;border-radius:9px;cursor:pointer;font-size:17px;color:#64748b;display:flex;align-items:center;justify-content:center}
+.ug-modal-close:hover{background:#e2e8f0}
+.ug-iframe{flex:1;width:100%;border:none}
+@media (max-width:520px){.ug-bubble{display:none}.ug-modal{width:100%;height:100%;border-radius:0}}
+</style>
 </head>
 <body class="font-sans text-slate-900 min-h-screen flex flex-col antialiased">
 
@@ -696,6 +716,13 @@
 
     <!-- ═══ Step 0: Path selector ═══ -->
     <div id="page0" style="display:none">
+      <div class="ug-help-wrap">
+        <span class="ug-bubble">Bắt đầu từ đây nhé!<i></i></span>
+        <button class="ug-help-btn" onclick="ugOpen()" aria-label="Mở hướng dẫn sử dụng">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Hướng dẫn
+        </button>
+      </div>
       <div class="s0-inner">
         <div class="s0-header s0-anim">
           <div class="s0-title">Bạn đang tạo form<br>cho loại service nào?</div>
@@ -7108,5 +7135,770 @@ ${formScript}
       requestAnimationFrame(() => requestAnimationFrame(() => ld()));
     };
   </script>
+<div class="ug-overlay" id="ugOverlay" onclick="ugBg(event)">
+  <div class="ug-modal" role="dialog" aria-modal="true" aria-label="Hướng dẫn sử dụng">
+    <div class="ug-modal-head">
+      <span class="ug-modal-title">Hướng dẫn sử dụng</span>
+      <button class="ug-modal-close" onclick="ugClose()" aria-label="Đóng">&#10005;</button>
+    </div>
+    <iframe class="ug-iframe" id="ugFrame" title="Hướng dẫn sử dụng" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;vi&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;[User Guide] Ticket Information Builder&lt;/title&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --nexus:#155DFC; --nexus-dark:#1E3A8A; --nexus-light:#EFF6FF; --border:#E5E9F0;
+    --ink:#1A2236; --muted:#64748B; --bg:#F4F6FB;
+    --blue:#3b82f6; --emerald:#10b981; --purple:#a855f7; --amber:#f59e0b; --rose:#f43f5e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:&#x27;Inter&#x27;,system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif;
+    font-size:15px;line-height:1.6;padding:30px 14px}
+  .doc{max-width:960px;margin:0 auto;background:#fff;border:1px solid #DDE3EE;
+    border-radius:20px;box-shadow:0 18px 44px rgba(16,40,90,.10);overflow:hidden}
+  .doc-hd{background:linear-gradient(130deg,#1e1b4b 0%,var(--nexus-dark) 45%,var(--nexus) 100%);
+    color:#fff;padding:30px 36px}
+  .doc-hd .eyebrow{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#c7d2fe;margin-bottom:6px}
+  .doc-hd h1{margin:0;font-size:25px;font-weight:800;letter-spacing:-.4px}
+  .doc-body{padding:8px 36px 42px}
+
+  h2{font-size:20px;font-weight:700;color:var(--nexus-dark);margin:38px 0 14px;
+    display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;
+    background:var(--nexus-light);border:1px solid #DBEAFE;border-left:4px solid #93C5FD}
+  h2 .num{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:#fff;
+    border:1px solid #BFDBFE;color:var(--nexus);
+    font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  h3{font-size:16px;font-weight:700;color:var(--ink);margin:22px 0 8px}
+  p{margin:8px 0}
+  code{background:#EEF2FA;border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:13px;
+    font-family:ui-monospace,&quot;Fira Code&quot;,monospace;color:#0f4ecf}
+
+  .biglist{margin:14px 0;padding-left:24px}
+  .biglist li{margin:9px 0;font-size:15px;line-height:1.5}
+  /* Lead bullets */
+  .lead{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+  .lead div{background:var(--nexus-light);border:1px solid #DBEAFE;border-radius:11px;padding:11px 14px;font-size:13.5px;font-weight:500}
+  .lead b{color:var(--nexus-dark)}
+
+  /* Flow cards */
+  .flow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0}
+  .flow-card{border:1px solid var(--border);border-radius:16px;padding:18px;background:#fff;
+    position:relative;display:flex;flex-direction:column;box-shadow:0 4px 14px rgba(16,40,90,.04)}
+  .flow-card::before{content:&quot;&quot;;position:absolute;top:0;left:0;right:0;height:5px;border-radius:16px 16px 0 0}
+  .flow-card.f-green::before{background:var(--emerald)}
+  .flow-card.f-blue::before{background:var(--blue)}
+  .flow-card.f-amber::before{background:var(--amber)}
+  .flow-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:21px;margin-bottom:10px;margin-top:4px}
+  .f-green .flow-ico{background:#ECFDF5}.f-blue .flow-ico{background:#EFF6FF}.f-amber .flow-ico{background:#FFFBEB}
+  .flow-title{font-size:14.5px;font-weight:800;color:var(--ink);line-height:1.3;margin-bottom:12px;min-height:38px}
+  .flow-steps{list-style:none;margin:0;padding:0;flex:1}
+  .flow-steps li{display:flex;gap:9px;font-size:13px;color:#3a4254;margin-bottom:9px;line-height:1.4}
+  .flow-steps .s-n{flex-shrink:0;width:19px;height:19px;border-radius:50%;font-size:11px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;color:#fff}
+  .f-green .s-n{background:var(--emerald)}.f-blue .s-n{background:var(--blue)}.f-amber .s-n{background:var(--amber)}
+  .flow-result{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);font-size:12px;font-weight:600;color:var(--muted);
+    display:flex;align-items:center;gap:8px}
+  .res-pill{font-size:12px;font-weight:800;padding:3px 11px;border-radius:999px}
+  .res-zip{background:#EFF6FF;color:var(--nexus);border:1px solid #BFDBFE}
+  .res-upd{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA}
+
+  /* Info card blocks */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+  .info-card{border:1px solid var(--border);border-radius:14px;padding:16px 18px;background:#FAFBFE}
+  .info-card h4{margin:0 0 8px;font-size:13.5px;font-weight:800;color:var(--nexus-dark);text-transform:uppercase;letter-spacing:.04em}
+  .info-card ul{margin:0;padding-left:18px;font-size:13px;color:#3a4254}
+  .info-card li{margin:5px 0}
+  .tabs-row{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+  .tab-chip{font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;background:var(--nexus-light);color:var(--nexus);border:1px solid #BFDBFE}
+
+  .callout{border-radius:12px;padding:13px 16px;margin:14px 0;font-size:13.5px}
+  .c-info{background:#EFF6FF;border:1px solid #BFDBFE}
+
+  .tip{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:11px;padding:11px 14px;margin:12px 0;
+    font-size:13px;color:#14532d}
+  .tip b{color:#15803d}
+  .opt-tag{display:inline-block;font-size:11px;font-weight:800;color:#15803d;background:#DCFCE7;
+    border:1px solid #BBF7D0;border-radius:999px;padding:2px 9px;margin-left:6px}
+  /* Field Type Advisor mockup */
+  .fta-where{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;align-items:start;margin:14px 0}
+  .fta-trigger{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#FEF3C7,#FFFBEB);
+    border:1px solid #FCD34D;border-radius:12px;padding:11px 14px;font-size:13px;font-weight:600;color:#92400E;margin-bottom:12px}
+  .fta-trigger .ar{margin-left:auto;font-weight:800;color:#b45309}
+  .fta-modal{border:1px solid #D7DEE8;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 10px 26px rgba(16,40,90,.10)}
+  .fta-h{background:linear-gradient(120deg,var(--nexus-dark),var(--nexus));color:#fff;padding:11px 15px;font-weight:800;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+  .fta-h .x{opacity:.85}
+  .fta-prog{display:flex;align-items:center;gap:7px;padding:11px 15px 4px;font-size:11px;font-weight:700;flex-wrap:wrap}
+  .fta-prog .on{color:var(--nexus)}
+  .fta-prog .off{color:#94a3b8}
+  .fta-prog .ln{width:14px;height:2px;background:#e2e8f0;border-radius:2px}
+  .fta-q{padding:6px 15px 2px;font-size:14px;font-weight:800;color:var(--ink)}
+  .fta-opts{padding:8px 15px 4px;display:flex;flex-direction:column;gap:7px}
+  .fta-opt{border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:12.5px;color:#3a4254;background:#fff}
+  .fta-opt.sel{border-color:var(--nexus);background:var(--nexus-light);color:var(--nexus-dark);font-weight:700}
+  .fta-foot{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-top:1px solid var(--border)}
+  .fta-skip{font-size:12px;color:var(--muted);font-weight:600}
+  .fta-next{font-size:12px;font-weight:800;color:#fff;background:var(--nexus);border-radius:8px;padding:7px 14px}
+  .fta-how{font-size:13.5px;color:#3a4254}
+  .fta-how ol{padding-left:20px;margin:6px 0}
+  .fta-how li{margin:6px 0}
+  @media (max-width:760px){ .fta-where{grid-template-columns:1fr} }
+  .ftaw-cap{font-size:12.5px;font-weight:700;color:var(--nexus-dark);margin-bottom:7px}
+  .ftaw .fta-opt{cursor:pointer}
+  .ftaw .fta-opt:hover{border-color:#93C5FD;background:#F8FBFF}
+  .ftaw .fta-opt.sel{border-color:var(--nexus);background:var(--nexus-light);color:var(--nexus-dark);font-weight:700}
+  .ftaw .fta-next{cursor:pointer;border:0;font-family:inherit}
+  .ftaw .fta-next.dis{background:#CBD5E1;cursor:not-allowed}
+  .ftaw .fta-skip{cursor:pointer;background:none;border:0;font-family:inherit}
+  .ftaw-res{padding:12px 15px}
+  .ftaw-badge{display:inline-block;font-size:11px;font-weight:800;color:#15803d;background:#DCFCE7;border:1px solid #BBF7D0;border-radius:999px;padding:3px 11px;margin-bottom:8px}
+  .ftaw-type{font-size:18px;font-weight:800;color:var(--nexus-dark);margin:2px 0 4px}
+  .ftaw-desc{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  .ftaw-pvlabel{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .ftaw-pv{border:1px dashed #CBD5E1;border-radius:10px;padding:12px;background:#FAFBFE}
+  .pv-in{width:100%;border:1px solid #CBD5E1;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#94a3b8;background:#fff}
+  .pv-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#475569;margin:4px 0}
+  .pv-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid #94a3b8;flex-shrink:0}
+  .pv-sq{width:14px;height:14px;border-radius:4px;border:1.5px solid #94a3b8;flex-shrink:0}
+  .pv-note{font-size:11.5px;color:#7c3aed;background:#FAF5FF;border:1px solid #F3E8FF;border-radius:8px;padding:7px 10px;margin-top:10px}
+  /* Feature highlight (Branching) */
+  .feature{position:relative;border:1.5px solid #E9D5FF;background:linear-gradient(135deg,#FAF5FF 0%,#fff 70%);
+    border-radius:16px;padding:18px 22px 18px 58px;margin:18px 0;box-shadow:0 8px 22px rgba(168,85,247,.10)}
+  .feature::before{content:&quot;🌿&quot;;position:absolute;left:20px;top:17px;font-size:23px}
+  .feature .ftag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:#7c3aed;background:#F3E8FF;border:1px solid #E9D5FF;padding:3px 11px;border-radius:999px;margin-bottom:8px}
+  .feature h4{margin:0 0 6px;font-size:15.5px;font-weight:800;color:#6b21a8}
+  .feature p{margin:5px 0;font-size:13.5px;color:#3a4254}
+  .feature .ex{font-size:12.5px;color:#7c3aed;background:#FAF5FF;border:1px solid #F3E8FF;border-radius:9px;
+    padding:8px 12px;margin-top:9px;display:block}
+
+  /* Vertical step timeline */
+  .steps{margin:18px 0 6px}
+  .step{position:relative;padding:0 0 24px 56px}
+  .step:last-child{padding-bottom:0}
+  .step::before{content:&quot;&quot;;position:absolute;left:18px;top:38px;bottom:-2px;width:2px;background:#DBE2EE}
+  .step:last-child::before{display:none}
+  .step .sn{position:absolute;left:0;top:0;width:38px;height:38px;border-radius:50%;background:var(--nexus);color:#fff;
+    font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 12px rgba(21,93,252,.28)}
+  .step .stitle{font-size:16.5px;font-weight:800;color:var(--ink);margin:6px 0 4px}
+  .step .sbody{font-size:14px;color:#3a4254}
+  .step .sbody p{margin:6px 0}
+  .opt-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0 2px}
+  .opt{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#FAFBFE}
+  .opt .ot{font-weight:800;font-size:13.5px;color:var(--nexus-dark);margin-bottom:3px;display:flex;align-items:center;gap:7px}
+  .opt .od{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .result-line{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);
+    background:#F4F6FB;border:1px solid var(--border);border-radius:10px;padding:7px 13px;margin-top:10px}
+
+  .special{position:relative;border:1.5px solid #FED7AA;background:linear-gradient(135deg,#FFFBEB 0%,#fff 70%);
+    border-radius:16px;padding:18px 22px 18px 58px;margin:20px 0;box-shadow:0 8px 22px rgba(245,158,11,.10)}
+  .special::before{content:&quot;✏️&quot;;position:absolute;left:20px;top:17px;font-size:22px}
+  .special .ftag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:#b45309;background:#FEF3C7;border:1px solid #FDE68A;padding:3px 11px;border-radius:999px;margin-bottom:8px}
+  .special h4{margin:0 0 6px;font-size:15.5px;font-weight:800;color:#92400E}
+  .special p{margin:5px 0;font-size:13.5px;color:#3a4254}
+
+  .tab-ol{margin:8px 0 4px;padding-left:20px;font-size:13.5px;color:#3a4254}
+  .tab-ol li{margin:5px 0}
+  .gifwrap{margin:16px 0 4px}
+  .gif{width:100%;max-width:600px;display:block;border:1px solid var(--border);border-radius:12px;box-shadow:0 4px 14px rgba(16,40,90,.06)}
+  .gifcap{font-size:12px;color:var(--muted);font-style:italic;margin-top:7px}
+  /* Accordion (click to expand per need) */
+  .acc{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin:14px 0;background:#fff;
+    box-shadow:0 4px 14px rgba(16,40,90,.05)}
+  .acc-head{width:100%;border:0;background:#fff;cursor:pointer;text-align:left;padding:16px 18px;
+    display:flex;align-items:center;gap:14px;font-family:inherit;border-left:5px solid transparent}
+  .acc.g-blue .acc-head{border-left-color:var(--blue)}
+  .acc.g-amber .acc-head{border-left-color:var(--amber)}
+  .acc-ico{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .acc.g-blue .acc-ico{background:#EFF6FF}.acc.g-amber .acc-ico{background:#FFFBEB}
+  .acc-meta{flex:1;min-width:0}
+  .acc-title{font-size:15.5px;font-weight:800;color:var(--ink);line-height:1.25}
+  .acc-sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .acc-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .acc-chev{font-size:15px;color:var(--muted);transition:transform .2s}
+  .acc.open .acc-chev{transform:rotate(90deg)}
+  .acc-body{display:none;padding:4px 18px 20px 18px;border-top:1px solid var(--border)}
+  .acc.open .acc-body{display:block}
+  .acc-hint{font-size:12.5px;color:var(--muted);font-style:italic;margin:10px 0 2px}
+
+  .branch-step{position:relative}
+  .branch-flag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#7c3aed;
+    background:#F3E8FF;border:1px solid #E9D5FF;border-radius:999px;padding:3px 12px;margin-top:6px}
+
+  /* Mini animated demo */
+  .demo{margin:14px 0 4px;border:1px solid var(--border);border-radius:14px;background:#F8FAFD;padding:14px;
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .demo-label{font-size:12px;font-weight:800;color:var(--nexus-dark);text-transform:uppercase;letter-spacing:.05em;
+    grid-column:1 / -1;display:flex;align-items:center;gap:7px}
+  .demo-screen{border:1px solid #D7DEE8;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 4px 12px rgba(16,40,90,.06)}
+  .demo-bar{height:26px;background:#EEF2F8;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:5px;padding:0 11px}
+  .demo-bar i{width:8px;height:8px;border-radius:50%;background:#CBD5E1;display:inline-block}
+  .demo-bar i:nth-child(1){background:#F87171}.demo-bar i:nth-child(2){background:#FBBF24}.demo-bar i:nth-child(3){background:#34D399}
+  .demo-list{padding:11px 12px;display:flex;flex-direction:column;gap:8px}
+  .demo-step{font-size:12.5px;font-weight:600;color:#475569;border:1.5px solid var(--border);border-radius:9px;
+    padding:8px 11px;background:#fff}
+  .demo-vid{border:1.5px dashed #C7D2E4;border-radius:12px;background:#fff;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;min-height:140px}
+  .demo-play{width:46px;height:46px;border-radius:50%;background:var(--nexus);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
+  .demo-vid .vt{font-size:12.5px;font-weight:700;color:var(--nexus-dark)}
+  .demo-vid .vs{font-size:11.5px;color:var(--muted)}
+  @media (prefers-reduced-motion: no-preference){
+    .demo.run .demo-step{animation:demoPulse 6.4s ease-in-out infinite}
+    .demo.run .demo-step:nth-child(1){animation-delay:0s}
+    .demo.run .demo-step:nth-child(2){animation-delay:1.6s}
+    .demo.run .demo-step:nth-child(3){animation-delay:3.2s}
+    .demo.run .demo-step:nth-child(4){animation-delay:4.8s}
+  }
+  @keyframes demoPulse{
+    0%,100%{background:#fff;border-color:var(--border);color:#475569}
+    5%,20%{background:var(--hl-bg);border-color:var(--hl-bd);color:var(--hl-tx)}
+    27%{background:#fff;border-color:var(--border);color:#475569}
+  }
+  .demo.d-blue{--hl-bg:#EFF6FF;--hl-bd:#93C5FD;--hl-tx:#1d4ed8}
+  .demo.d-amber{--hl-bg:#FFFBEB;--hl-bd:#FCD34D;--hl-tx:#b45309}
+  @media (max-width:760px){ .demo{grid-template-columns:1fr} }
+
+  /* Suggestion grid */
+  .sug-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+  .sug{border:1px solid var(--border);border-radius:12px;padding:11px 14px;background:#fff;
+    display:flex;flex-direction:column;gap:5px;transition:box-shadow .15s,transform .15s}
+  .sug:hover{box-shadow:0 6px 16px rgba(16,40,90,.07);transform:translateY(-1px)}
+  .sug .tag{align-self:flex-start;font-size:12px;font-weight:800;padding:3px 11px;border-radius:7px}
+  .sug .ex{font-size:12.5px;color:var(--muted);line-height:1.45}
+  .t-blue{background:#EFF6FF;color:#2563eb;border:1px solid #DBEAFE}
+  .t-emerald{background:#ECFDF5;color:#059669;border:1px solid #D1FAE5}
+  .t-purple{background:#FAF5FF;color:#7c3aed;border:1px solid #F3E8FF}
+  .t-amber{background:#FFFBEB;color:#d97706;border:1px solid #FEF3C7}
+  .t-rose{background:#FFF1F2;color:#e11d48;border:1px solid #FFE4E6}
+
+  details{border:1px solid var(--border);border-radius:12px;margin:14px 0;background:#FAFBFE;overflow:hidden}
+  summary{cursor:pointer;padding:13px 16px;font-weight:700;color:var(--nexus-dark);background:#fff;
+    list-style:none;display:flex;align-items:center;gap:9px;user-select:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:&quot;▸&quot;;color:var(--nexus);transition:transform .15s}
+  details[open] summary::before{transform:rotate(90deg)}
+  .details-body{padding:8px 16px 16px}
+  .details-body table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
+  .details-body th,.details-body td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+  .details-body th{background:var(--nexus-light);color:var(--nexus-dark);font-weight:700}
+
+  hr{border:none;border-top:1px solid var(--border);margin:30px 0}
+  .end{text-align:center;color:var(--muted);font-weight:700;margin-top:26px}
+
+  @media (max-width:760px){
+    .flow-grid,.info-grid,.sug-grid,.lead{grid-template-columns:1fr}
+    .doc-body{padding:8px 20px 32px}
+  }
+
+  /* ============ MIND MAP (scoped) ============ */
+  #confluence-mindmap-wrapper *{box-sizing:border-box;margin:0;padding:0}
+  #confluence-mindmap-wrapper{font-family:&#x27;Inter&#x27;,sans-serif;background:#f8fafc;color:#1e293b;
+    width:100%;padding:14px 8px;display:flex;flex-direction:column;align-items:center;border-radius:14px;border:1px solid var(--border);margin:14px 0}
+  #confluence-mindmap-wrapper .canvas-viewport{width:1200px;height:814px;display:flex;justify-content:center;overflow:visible;transition:width .15s,height .15s}
+  #confluence-mindmap-wrapper .mindmap-canvas{width:1200px;height:814px;position:relative;background:#f8fafc;transform-origin:top center;transition:transform .15s}
+  #confluence-mindmap-wrapper .grid-background{position:absolute;inset:0;pointer-events:none;opacity:.55;background-image:radial-gradient(#cbd5e1 1.2px,transparent 1.2px);background-size:24px 24px}
+  #confluence-mindmap-wrapper .svg-links-layer{position:absolute;inset:0;pointer-events:none;z-index:1}
+  #confluence-mindmap-wrapper .tree-branch{fill:none;stroke-linecap:round;stroke-width:3px}
+  #confluence-mindmap-wrapper .branch-blue{stroke:#3b82f6}
+  #confluence-mindmap-wrapper .branch-emerald{stroke:#10b981}
+  #confluence-mindmap-wrapper .branch-purple{stroke:#a855f7}
+  #confluence-mindmap-wrapper .branch-amber{stroke:#f59e0b}
+  #confluence-mindmap-wrapper .branch-rose{stroke:#f43f5e}
+  #confluence-mindmap-wrapper .absolute-node{position:absolute;pointer-events:auto;z-index:2}
+  #confluence-mindmap-wrapper .root-card{background:linear-gradient(135deg,#1e1b4b,#312e81);border:1.5px solid #6366f1;padding:8px 6px;border-radius:12px;box-shadow:0 8px 22px -6px rgba(99,102,241,.45);display:flex;flex-direction:column;justify-content:center;height:100%;text-align:center}
+  #confluence-mindmap-wrapper .root-subtitle{font-size:12px;font-weight:800;color:#c7d2fe;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+  #confluence-mindmap-wrapper .root-title{font-size:16px;font-weight:900;color:#fff;letter-spacing:.04em}
+  #confluence-mindmap-wrapper .root-badge{font-size:9.5px;font-weight:600;color:#e0e7ff;background:rgba(49,46,129,.6);border:1px solid rgba(99,102,241,.4);padding:1px 7px;border-radius:999px;margin-top:5px;align-self:center}
+  #confluence-mindmap-wrapper .group-card{background:#fff;border-radius:10px;padding:8px 11px;box-shadow:0 3px 9px rgba(15,23,42,.05);border:1px solid #cbd5e1;display:flex;align-items:center;gap:9px;height:100%}
+  #confluence-mindmap-wrapper .group-icon{width:31px;height:31px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  #confluence-mindmap-wrapper .group-tag{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+  #confluence-mindmap-wrapper .group-title{font-size:13px;font-weight:800;color:#0f172a}
+  #confluence-mindmap-wrapper .group-desc{font-size:11.5px;color:#64748b;margin-top:1px;font-weight:500}
+  #confluence-mindmap-wrapper .theme-blue{border-left:3px solid #3b82f6}#confluence-mindmap-wrapper .theme-blue .group-icon{background:#eff6ff;color:#3b82f6}#confluence-mindmap-wrapper .theme-blue .group-tag{color:#3b82f6}
+  #confluence-mindmap-wrapper .theme-emerald{border-left:3px solid #10b981}#confluence-mindmap-wrapper .theme-emerald .group-icon{background:#ecfdf5;color:#10b981}#confluence-mindmap-wrapper .theme-emerald .group-tag{color:#10b981}
+  #confluence-mindmap-wrapper .theme-purple{border-left:3px solid #a855f7}#confluence-mindmap-wrapper .theme-purple .group-icon{background:#faf5ff;color:#a855f7}#confluence-mindmap-wrapper .theme-purple .group-tag{color:#a855f7}
+  #confluence-mindmap-wrapper .theme-amber{border-left:3px solid #f59e0b}#confluence-mindmap-wrapper .theme-amber .group-icon{background:#fffbeb;color:#f59e0b}#confluence-mindmap-wrapper .theme-amber .group-tag{color:#f59e0b}
+  #confluence-mindmap-wrapper .theme-rose{border-left:3px solid #f43f5e}#confluence-mindmap-wrapper .theme-rose .group-icon{background:#fff1f2;color:#f43f5e}#confluence-mindmap-wrapper .theme-rose .group-tag{color:#f43f5e}
+  #confluence-mindmap-wrapper .leaf-card{background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:4px 13px;box-shadow:0 1.5px 3px rgba(15,23,42,.03);display:flex;align-items:center;justify-content:space-between;gap:12px;height:100%}
+  #confluence-mindmap-wrapper .leaf-left{display:flex;align-items:center;gap:9px;max-width:55%}
+  #confluence-mindmap-wrapper .leaf-icon{font-size:15px;flex-shrink:0}
+  #confluence-mindmap-wrapper .leaf-title{font-size:13px;font-weight:700;color:#1e293b;line-height:1.2}
+  #confluence-mindmap-wrapper .leaf-desc{font-size:11.5px;color:#64748b;margin-top:2px;font-weight:500}
+  #confluence-mindmap-wrapper .leaf-example{font-size:11px;font-weight:500;padding:3px 9px;border-radius:5px;max-width:44%;text-align:left;word-break:break-word;margin-left:auto}
+  #confluence-mindmap-wrapper .example-blue{background:#eff6ff;border:1px solid #dbeafe;color:#2563eb}
+  #confluence-mindmap-wrapper .example-emerald{background:#ecfdf5;border:1px solid #d1fae5;color:#059669}
+  #confluence-mindmap-wrapper .example-purple{background:#faf5ff;border:1px solid #f3e8ff;color:#7c3aed}
+  #confluence-mindmap-wrapper .example-amber{background:#fffbeb;border:1px solid #fef3c7;color:#d97706}
+  #confluence-mindmap-wrapper .example-rose{background:#fff1f2;border:1px solid #ffe4e6;color:#e11d48}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;doc&quot;&gt;
+  &lt;div class=&quot;doc-hd&quot;&gt;
+    &lt;div class=&quot;eyebrow&quot;&gt;GPP-POE&lt;/div&gt;
+    &lt;h1&gt;User Guide — Ticket Information Builder&lt;/h1&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;doc-body&quot;&gt;
+
+    &lt;!-- I --&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;I&lt;/span&gt; Builder giúp gì cho Service Owner?&lt;/h2&gt;
+    &lt;ul class=&quot;biglist&quot;&gt;
+      &lt;li&gt;&lt;b&gt;Chủ động thiết kế form&lt;/b&gt; theo nhu cầu, không cần tạo file request thủ công.&lt;/li&gt;
+      &lt;li&gt;&lt;b&gt;Chuẩn hoá dữ liệu&lt;/b&gt; với nhiều loại field (Text, Number, Date, Dropdown, Attachment…).&lt;/li&gt;
+      &lt;li&gt;&lt;b&gt;Đặt ràng buộc&lt;/b&gt; cho từng field (bắt buộc, độ dài, định dạng…).&lt;/li&gt;
+      &lt;li&gt;&lt;b&gt;Xem trước form realtime&lt;/b&gt; trong lúc thiết kế.&lt;/li&gt;
+      &lt;li&gt;&lt;b&gt;Xuất template chuẩn&lt;/b&gt; để gửi PIC xử lý.&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;div class=&quot;callout c-info&quot;&gt;💡 &lt;b&gt;Nói gọn:&lt;/b&gt; bạn “vẽ” form → tool giúp PIC chủ động dựng form. Tiết kiệm thời gian, ít sai sót.&lt;/div&gt;
+
+    &lt;!-- II --&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;II&lt;/span&gt; Các bước sử dụng Tool&lt;/h2&gt;
+    &lt;p&gt;Chọn đúng việc bạn cần làm bằng cách &lt;b&gt;bấm vào 1 trong 2 mục&lt;/b&gt; dưới đây để xem hướng dẫn từng bước.&lt;/p&gt;
+
+    &lt;div class=&quot;acc g-blue open&quot;&gt;
+      &lt;button class=&quot;acc-head&quot; onclick=&quot;toggleAcc(this)&quot;&gt;
+        &lt;span class=&quot;acc-meta&quot;&gt;
+          &lt;span class=&quot;acc-title&quot;&gt;A. Thiết kế / chỉnh sửa FIELD trong form&lt;/span&gt;
+          &lt;span class=&quot;acc-sub&quot;&gt;Khi tạo form cho service mới, hoặc thêm / sửa / xóa field của service đã có&lt;/span&gt;
+        &lt;/span&gt;
+        &lt;span class=&quot;acc-right&quot;&gt;&lt;span class=&quot;res-pill res-zip&quot;&gt;Xuất file: .zip&lt;/span&gt;&lt;span class=&quot;acc-chev&quot;&gt;▸&lt;/span&gt;&lt;/span&gt;
+      &lt;/button&gt;
+      &lt;div class=&quot;acc-body&quot;&gt;
+        &lt;div class=&quot;steps&quot;&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;1&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Khởi chạy tool&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;&lt;p&gt;Mở &lt;code&gt;https://poe-ticket-information-builder.up.railway.app/&lt;/code&gt; bằng Chrome / Edge.&lt;/p&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;2&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Chọn service&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;
+              &lt;div class=&quot;opt-row&quot;&gt;
+                &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;Service đã có trên Nexus&lt;/div&gt;&lt;div class=&quot;od&quot;&gt;Chọn theo Catalog → Category → Service (có sẵn), rồi bấm &quot;Dựng form&quot;.&lt;/div&gt;&lt;/div&gt;
+                &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;Service mới chưa có&lt;/div&gt;&lt;div class=&quot;od&quot;&gt;Tự nhập Catalog / Category / Service + mô tả ngắn (≤100 từ).&lt;/div&gt;&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;3&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Thiết kế form (thêm field)&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;
+              &lt;p&gt;Bấm &quot;+ Add field&quot;, chọn loại field (xem Mục III), rồi cấu hình lần lượt qua 4 tab &lt;b&gt;theo thứ tự&lt;/b&gt;:&lt;/p&gt;
+              &lt;ol class=&quot;tab-ol&quot;&gt;
+                &lt;li&gt;&lt;b&gt;Basics&lt;/b&gt; — Label (tên câu hỏi, bắt buộc), mô tả/gợi ý nhập, giá trị mặc định.&lt;/li&gt;
+                &lt;li&gt;&lt;b&gt;Configure&lt;/b&gt; — danh sách options, chế độ upload, loại file cho phép (chỉ field lựa chọn / upload).&lt;/li&gt;
+                &lt;li&gt;&lt;b&gt;Rules&lt;/b&gt; — bắt buộc điền, giới hạn độ dài (min/max), định dạng (regex), điều kiện hiển thị.&lt;/li&gt;
+                &lt;li&gt;&lt;b&gt;Advanced&lt;/b&gt; — Field name / Internal key (dùng cho API/DB).&lt;/li&gt;
+              &lt;/ol&gt;
+              &lt;div class=&quot;tip&quot;&gt;💡 &lt;b&gt;Gợi ý:&lt;/b&gt; không cần điền hết mọi thiết lập — field &lt;b&gt;không bắt buộc&lt;/b&gt; thì chỉ cần Label, phần nào phức tạp hoặc chưa cần thì cứ để trống.&lt;/div&gt;
+              &lt;p&gt;&lt;b&gt;Quản lý field&lt;/b&gt; bằng các nút trên mỗi dòng field: &lt;span style=&quot;font-weight:700;letter-spacing:-3px;color:#94a3b8;font-size:16px&quot;&gt;⋮⋮&lt;/span&gt; kéo thả để sắp xếp &amp;nbsp;·&amp;nbsp; &lt;svg style=&quot;vertical-align:-3px&quot; width=&quot;15&quot; height=&quot;15&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;#64748b&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;5&quot; width=&quot;8&quot; height=&quot;14&quot; rx=&quot;1.5&quot;/&gt;&lt;rect x=&quot;13&quot; y=&quot;5&quot; width=&quot;8&quot; height=&quot;14&quot; rx=&quot;1.5&quot;/&gt;&lt;/svg&gt; Gộp dòng — hiện song song với field trước &amp;nbsp;·&amp;nbsp; &lt;svg style=&quot;vertical-align:-3px&quot; width=&quot;15&quot; height=&quot;15&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;#64748b&quot;&gt;&lt;circle cx=&quot;5&quot; cy=&quot;12&quot; r=&quot;1.6&quot;/&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;1.6&quot;/&gt;&lt;circle cx=&quot;19&quot; cy=&quot;12&quot; r=&quot;1.6&quot;/&gt;&lt;/svg&gt; mở menu Edit / Duplicate / Delete. Preview bên phải cập nhật tức thời.&lt;/p&gt;
+
+              &lt;div class=&quot;feature&quot;&gt;
+                &lt;span class=&quot;ftag&quot;&gt;Lưu ý — chọn ở Bước 3 này&lt;/span&gt;
+                &lt;h4&gt;Branching dropdown (field phân nhánh)&lt;/h4&gt;
+                &lt;p&gt;Ngay tại bước thêm field này, ngoài các loại field thường, bạn có thể chọn &lt;b&gt;Branching dropdown&lt;/b&gt;. Đây không phải kiểu dữ liệu thông thường mà là field &lt;b&gt;phân nhánh&lt;/b&gt;: chọn 1 giá trị sẽ &lt;b&gt;tự bung ra các câu hỏi con&lt;/b&gt; tương ứng — dùng khi câu hỏi tiếp theo phụ thuộc vào lựa chọn trước đó.&lt;/p&gt;
+                &lt;span class=&quot;ex&quot;&gt;Ví dụ: chọn &quot;Loại sự cố = Thanh toán&quot; → hỏi Mã giao dịch; chọn &quot;Đăng nhập&quot; → hỏi UID.&lt;/span&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;4&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Xuất &amp;amp; bàn giao&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;
+              &lt;p&gt;Bấm &quot;Xuất Template&quot; → tải file &lt;code&gt;.zip&lt;/code&gt; gồm &lt;code&gt;&amp;lt;tên-service&amp;gt;.json&lt;/code&gt; (để PIC import) + &lt;code&gt;&amp;lt;tên-service&amp;gt;.html&lt;/code&gt; (xem lại form) + &lt;code&gt;README.txt&lt;/code&gt;. Có thể gộp nhiều service trong 1 file.&lt;/p&gt;
+              &lt;p&gt;&lt;b&gt;Kiểm tra trước khi gửi&lt;/b&gt;&lt;span class=&quot;opt-tag&quot;&gt;Tùy chọn&lt;/span&gt;: có thể dùng &quot;Review JSON&quot; để soát lại, hoặc &quot;Export Excel&quot; để backup toàn bộ field.&lt;/p&gt;
+              &lt;p&gt;Gửi file qua email cho PIC.&lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;acc g-amber&quot;&gt;
+      &lt;button class=&quot;acc-head&quot; onclick=&quot;toggleAcc(this)&quot;&gt;
+        &lt;span class=&quot;acc-meta&quot;&gt;
+          &lt;span class=&quot;acc-title&quot;&gt;B. Chỉ đổi TÊN hoặc MÔ TẢ của service&lt;/span&gt;
+          &lt;span class=&quot;acc-sub&quot;&gt;Service đã có rồi, không động đến các field trong form&lt;/span&gt;
+        &lt;/span&gt;
+        &lt;span class=&quot;acc-right&quot;&gt;&lt;span class=&quot;res-pill res-upd&quot;&gt;Xuất file: Phiếu UPD&lt;/span&gt;&lt;span class=&quot;acc-chev&quot;&gt;▸&lt;/span&gt;&lt;/span&gt;
+      &lt;/button&gt;
+      &lt;div class=&quot;acc-body&quot;&gt;
+        &lt;div class=&quot;steps&quot;&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;1&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Khởi chạy tool&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;&lt;p&gt;Mở bằng Chrome / Edge như trên.&lt;/p&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;2&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Chọn &quot;Service đã có trên Nexus&quot;&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;&lt;p&gt;Tìm đúng service cần cập nhật theo Catalog → Category → Service.&lt;/p&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;3&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Cập nhật thông tin&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;&lt;p&gt;Bấm &quot;Cập nhật thông tin service&quot; → sửa Catalog / Category / Service / mô tả. Không đụng tới field.&lt;/p&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;step&quot;&gt;
+            &lt;div class=&quot;sn&quot;&gt;4&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Xuất phiếu &amp;amp; bàn giao&lt;/div&gt;
+            &lt;div class=&quot;sbody&quot;&gt;&lt;p&gt;Xuất ra &lt;b&gt;1 file HTML &quot;phiếu cập nhật&quot;&lt;/b&gt; (mã &lt;code&gt;UPD-…&lt;/code&gt;, có bảng so sánh trước/sau) → gửi PIC. Không sinh JSON/ZIP.&lt;/p&gt;&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+
+    &lt;!-- III --&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;III&lt;/span&gt; Field Type&lt;/h2&gt;
+    &lt;h3&gt;3.1 Khái niệm&lt;/h3&gt;
+    &lt;p&gt;Mỗi thông tin cần thu thập là một &lt;b&gt;field&lt;/b&gt;. SO chọn đúng &lt;b&gt;type&lt;/b&gt; (kiểu dữ liệu) — type quyết định cách nhập liệu, cách validate, và độ chuẩn của dữ liệu nhận về.&lt;/p&gt;
+
+    &lt;h3&gt;3.2 Danh sách Field Type — 16 loại, 5 nhóm&lt;/h3&gt;
+
+    &lt;div id=&quot;confluence-mindmap-wrapper&quot;&gt;
+      &lt;div class=&quot;canvas-viewport&quot;&gt;
+        &lt;div class=&quot;mindmap-canvas&quot; id=&quot;mindmapCanvas&quot;&gt;
+          &lt;div class=&quot;grid-background&quot;&gt;&lt;/div&gt;
+          &lt;svg class=&quot;svg-links-layer&quot; id=&quot;mmLinks&quot; width=&quot;1200&quot; height=&quot;814&quot; viewBox=&quot;0 0 1200 814&quot;&gt;&lt;/svg&gt;
+
+          &lt;div class=&quot;absolute-node&quot; style=&quot;left:90px;top:369px;width:160px;height:80px;&quot;&gt;
+            &lt;div class=&quot;root-card&quot;&gt;
+              &lt;span class=&quot;root-subtitle&quot;&gt;Builder Form&lt;/span&gt;
+              &lt;h2 class=&quot;root-title&quot; style=&quot;color:#fff;margin:0;border:0;padding:0;display:block&quot;&gt;16 TYPE FIELDS&lt;/h2&gt;
+              &lt;span class=&quot;root-badge&quot;&gt;5 Main Groups&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div class=&quot;absolute-node&quot; style=&quot;left:300px;top:133px;width:210px;height:60px;&quot;&gt;
+            &lt;div class=&quot;group-card theme-blue&quot;&gt;&lt;div class=&quot;group-icon&quot;&gt;💬&lt;/div&gt;&lt;div&gt;
+              &lt;span class=&quot;group-tag&quot;&gt;Nhóm 1&lt;/span&gt;&lt;h3 class=&quot;group-title&quot;&gt;BASIC INPUTS&lt;/h3&gt;&lt;p class=&quot;group-desc&quot;&gt;Type cơ bản&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;absolute-node&quot; style=&quot;left:300px;top:325px;width:210px;height:60px;&quot;&gt;
+            &lt;div class=&quot;group-card theme-emerald&quot;&gt;&lt;div class=&quot;group-icon&quot;&gt;📅&lt;/div&gt;&lt;div&gt;
+              &lt;span class=&quot;group-tag&quot;&gt;Nhóm 2&lt;/span&gt;&lt;h3 class=&quot;group-title&quot;&gt;DATES&lt;/h3&gt;&lt;p class=&quot;group-desc&quot;&gt;Lựa chọn thời gian&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;absolute-node&quot; style=&quot;left:300px;top:471px;width:210px;height:60px;&quot;&gt;
+            &lt;div class=&quot;group-card theme-purple&quot;&gt;&lt;div class=&quot;group-icon&quot;&gt;🔘&lt;/div&gt;&lt;div&gt;
+              &lt;span class=&quot;group-tag&quot;&gt;Nhóm 3&lt;/span&gt;&lt;h3 class=&quot;group-title&quot;&gt;CHOICES&lt;/h3&gt;&lt;p class=&quot;group-desc&quot;&gt;Các lựa chọn có sẵn&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;absolute-node&quot; style=&quot;left:300px;top:640px;width:210px;height:60px;&quot;&gt;
+            &lt;div class=&quot;group-card theme-amber&quot;&gt;&lt;div class=&quot;group-icon&quot;&gt;⚡&lt;/div&gt;&lt;div&gt;
+              &lt;span class=&quot;group-tag&quot;&gt;Nhóm 4&lt;/span&gt;&lt;h3 class=&quot;group-title&quot;&gt;SMART PICKERS&lt;/h3&gt;&lt;p class=&quot;group-desc&quot;&gt;Đồng bộ tự động API&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;absolute-node&quot; style=&quot;left:300px;top:740px;width:210px;height:60px;&quot;&gt;
+            &lt;div class=&quot;group-card theme-rose&quot;&gt;&lt;div class=&quot;group-icon&quot;&gt;📁&lt;/div&gt;&lt;div&gt;
+              &lt;span class=&quot;group-tag&quot;&gt;Nhóm 5&lt;/span&gt;&lt;h3 class=&quot;group-title&quot;&gt;FILES&lt;/h3&gt;&lt;p class=&quot;group-desc&quot;&gt;Đính kèm ảnh, tệp tin…&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;div id=&quot;mmLeaves&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;h3&gt;3.3 Lưu ý khi chọn Type&lt;/h3&gt;
+    &lt;p&gt;Chọn type đúng giúp dữ liệu chuẩn và dễ tự động hóa. Chọn sai dễ gây dữ liệu lộn xộn, phải hỏi lại, requester khó điền, khó parse.&lt;/p&gt;
+
+        &lt;details&gt;
+      &lt;summary&gt;Gợi ý nhanh — nên dùng field nào cho thông tin gì (bấm để xem)&lt;/summary&gt;
+      &lt;div class=&quot;details-body&quot;&gt;
+        &lt;table&gt;
+          &lt;thead&gt;&lt;tr&gt;&lt;th style=&quot;width:32%&quot;&gt;Field&lt;/th&gt;&lt;th&gt;Ví dụ tham khảo&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+          &lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Label / Rich text&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Hướng dẫn nhập, lưu ý, link tài liệu&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Short text&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Tên Game, Bundle ID, Player ID, Ticket ID&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Long text&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Mô tả lỗi, Business Requirement, Root Cause&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Number&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Số lượng User, Budget, % Discount&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Email&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Email người yêu cầu, PIC, nhận thông báo&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Yes / No&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Đã kiểm thử chưa? Cần triển khai Production?&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Date&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Ngày phát hành, Ngày triển khai, Deadline&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Date Range&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Thời gian Event, Promotion, Maintenance&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Dropdown&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Môi trường (DEV/UAT/PROD), Priority&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Single Choice&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Platform chính, phương thức thanh toán&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Multiple Choice&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Thị trường áp dụng, Platform hỗ trợ&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Checklist&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Checklist trước Go-live, nghiệm thu&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Country&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Quốc gia phát hành, bị ảnh hưởng&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Language&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Ngôn ngữ hỗ trợ, áp dụng&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Game Product&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Game áp dụng, bị ảnh hưởng, tích hợp&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Attachment&lt;/b&gt;&lt;/td&gt;&lt;td&gt;Screenshot lỗi, Crash Log, file cấu hình&lt;/td&gt;&lt;/tr&gt;
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/details&gt;
+    &lt;h3&gt;Field Type Advisor — trợ lý gợi ý loại field&lt;/h3&gt;
+    &lt;p&gt;Chưa chắc nên chọn loại field nào? Trả lời 2-3 câu hỏi, tool sẽ gợi ý loại phù hợp nhất.&lt;/p&gt;
+    &lt;details&gt;
+      &lt;summary&gt;Xem Advisor trông ra sao &amp;amp; cách dùng (bấm để mở)&lt;/summary&gt;
+      &lt;div class=&quot;details-body&quot;&gt;
+        &lt;div class=&quot;fta-where&quot;&gt;
+          &lt;div&gt;
+            &lt;p style=&quot;font-size:13.5px;margin:0 0 6px&quot;&gt;&lt;b&gt;Tìm ở đâu:&lt;/b&gt; khi bấm &lt;b&gt;+ Add field&lt;/b&gt;, trong bảng chọn loại field có banner vàng — bấm vào để mở Advisor:&lt;/p&gt;
+            &lt;div class=&quot;fta-trigger&quot;&gt;Không chắc chọn loại nào? Trả lời 2-3 câu hỏi → tool gợi ý cho bạn &lt;span class=&quot;ar&quot;&gt;→&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;fta-how&quot;&gt;
+              &lt;p style=&quot;margin:0 0 4px&quot;&gt;&lt;b&gt;Cách hoạt động:&lt;/b&gt; trả lời lần lượt &lt;b&gt;Input kind → Detail → Visibility&lt;/b&gt;, tool gợi ý loại field + cho xem trước. Bạn thử ngay ở bên phải.&lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div&gt;
+            &lt;div class=&quot;ftaw-cap&quot;&gt;Bản demo chạy thật — bấm chọn để thử:&lt;/div&gt;
+            &lt;div class=&quot;fta-modal ftaw&quot; id=&quot;ftaLive&quot;&gt;&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/details&gt;
+
+    &lt;details&gt;
+      &lt;summary&gt;Ví dụ thực tế — bấm expand để xem chi tiết&lt;/summary&gt;
+      &lt;div class=&quot;details-body&quot;&gt;
+        &lt;p&gt;Services cần Requester cung cấp 3 thông tin sau:&lt;/p&gt;
+        &lt;p&gt;&lt;b&gt;1. Platform áp dụng:&lt;/b&gt; Có nhiều cách chọn type:&lt;/p&gt;
+        &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;Cách hoạt động&lt;/th&gt;&lt;th&gt;Ưu điểm / Nhược điểm&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Multiple Choice&lt;/b&gt; ✅ Nên dùng&lt;/td&gt;&lt;td&gt;SO list sẵn: iOS, Android, PC, Web → Requester tick các platform cần&lt;/td&gt;&lt;td&gt;&lt;b&gt;Ưu:&lt;/b&gt; Chuẩn hóa (không lo typo), Nhanh. &lt;b&gt;Nhược:&lt;/b&gt; Phải maintain list options&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Short Text&lt;/b&gt; ⚠️ Không khuyến khích&lt;/td&gt;&lt;td&gt;Requester tự gõ: &quot;iOS, Android&quot;&lt;/td&gt;&lt;td&gt;&lt;b&gt;Ưu:&lt;/b&gt; Linh hoạt. &lt;b&gt;Nhược:&lt;/b&gt; Dễ lỗi typo (&quot;Andoid&quot;, &quot;IOS&quot;), Phải hỏi lại nếu không rõ&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Dropdown&lt;/b&gt; ⚠️ Chỉ khi chọn 1&lt;/td&gt;&lt;td&gt;Chọn đúng 1 platform&lt;/td&gt;&lt;td&gt;&lt;b&gt;Ưu:&lt;/b&gt; OK nếu chỉ cho phép 1 platform. &lt;b&gt;Nhược:&lt;/b&gt; Không phù hợp nếu promotion áp dụng nhiều platform&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;&lt;/table&gt;
+        &lt;p&gt;&lt;b&gt;2. Thời gian của Promotion:&lt;/b&gt; Có nhiều cách chọn type:&lt;/p&gt;
+        &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;Cách hoạt động&lt;/th&gt;&lt;th&gt;Khi nào dùng&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Date Range&lt;/b&gt; ✅ Nên dùng&lt;/td&gt;&lt;td&gt;Chọn start date → end date (1 lần)&lt;/td&gt;&lt;td&gt;Promotion có thời gian bắt đầu và kết thúc rõ ràng&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;2 fields Date riêng&lt;/b&gt; ⚠️ OK nhưng dài dòng&lt;/td&gt;&lt;td&gt;Field 1: Start Date — Field 2: End Date&lt;/td&gt;&lt;td&gt;Cần thêm logic hoặc description riêng cho từng field&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Short Text&lt;/b&gt; ❌ Không nên&lt;/td&gt;&lt;td&gt;Requester tự gõ: &quot;01/05/2026 - 31/05/2026&quot;&lt;/td&gt;&lt;td&gt;❌ Dễ nhầm dd/mm vs mm/dd&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;&lt;/table&gt;
+        &lt;p&gt;&lt;b&gt;3. Danh sách user được áp dụng Promotion:&lt;/b&gt; Có nhiều cách chọn type:&lt;/p&gt;
+        &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;Cách hoạt động&lt;/th&gt;&lt;th&gt;Khi nào dùng&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Attachment&lt;/b&gt; ✅ Nên dùng&lt;/td&gt;&lt;td&gt;Upload file Excel/CSV chứa list user IDs&lt;/td&gt;&lt;td&gt;Danh sách lớn (&amp;gt;50 users), có format chuẩn (template Excel), cần validate data structure&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Long Text&lt;/b&gt; ⚠️ OK nếu list nhỏ&lt;/td&gt;&lt;td&gt;Requester paste: &quot;user123, user456, user789...&quot;&lt;/td&gt;&lt;td&gt;List nhỏ (&amp;lt;50 users), không cần validate từng user&lt;/td&gt;&lt;/tr&gt;
+          &lt;tr&gt;&lt;td&gt;&lt;b&gt;Short Text&lt;/b&gt; ❌ Không nên&lt;/td&gt;&lt;td&gt;Giống Long Text nhưng chỉ 1 dòng&lt;/td&gt;&lt;td&gt;❌ Không đủ chỗ nếu list dài&lt;/td&gt;&lt;/tr&gt;
+        &lt;/tbody&gt;&lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/details&gt;
+
+    &lt;!-- IV --&gt;
+    &lt;h2&gt;&lt;span class=&quot;num&quot;&gt;IV&lt;/span&gt; Contact&lt;/h2&gt;
+    &lt;p&gt;&lt;b&gt;HuongLM&lt;/b&gt;: liên hệ khi cần hỗ trợ về công cụ hoặc làm rõ thông tin liên quan.&lt;/p&gt;
+
+    &lt;hr&gt;
+    &lt;p class=&quot;end&quot;&gt;~ END OF DOCUMENT ~ · THANK YOU!&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  function toggleAcc(btn){ btn.parentElement.classList.toggle(&#x27;open&#x27;); }
+
+  var FTAW = (function(){
+    var S1=[
+      {id:&#x27;list&#x27;, t:&#x27;Chọn từ danh sách có sẵn&#x27;},
+      {id:&#x27;text&#x27;, t:&#x27;Nhập chữ / số&#x27;},
+      {id:&#x27;date&#x27;, t:&#x27;Ngày / khoảng thời gian&#x27;},
+      {id:&#x27;file&#x27;, t:&#x27;Đính kèm tệp&#x27;},
+      {id:&#x27;info&#x27;, t:&#x27;Chỉ hiển thị thông tin (không nhập)&#x27;}
+    ];
+    var S2={
+      list:[
+        {id:&#x27;radio&#x27;, t:&#x27;Dưới 5 lựa chọn — hiện sẵn&#x27;},
+        {id:&#x27;select&#x27;, t:&#x27;5–30 lựa chọn — gọn trong dropdown&#x27;},
+        {id:&#x27;checkbox&#x27;, t:&#x27;Chọn nhiều giá trị cùng lúc&#x27;},
+        {id:&#x27;checklist&#x27;, t:&#x27;Checklist việc cần tick&#x27;},
+        {id:&#x27;country&#x27;, t:&#x27;Danh sách quốc gia (tự động)&#x27;},
+        {id:&#x27;language&#x27;, t:&#x27;Danh sách ngôn ngữ (tự động)&#x27;},
+        {id:&#x27;product&#x27;, t:&#x27;Danh sách game / sản phẩm (tự động)&#x27;}
+      ],
+      text:[
+        {id:&#x27;text&#x27;, t:&#x27;Văn bản ngắn (tên, mã, ID)&#x27;},
+        {id:&#x27;textarea&#x27;, t:&#x27;Mô tả dài, nhiều dòng&#x27;},
+        {id:&#x27;email&#x27;, t:&#x27;Địa chỉ email&#x27;},
+        {id:&#x27;number&#x27;, t:&#x27;Số thuần (đếm, số ngày…)&#x27;},
+        {id:&#x27;boolean&#x27;, t:&#x27;Xác nhận Yes / No&#x27;}
+      ],
+      date:[
+        {id:&#x27;date&#x27;, t:&#x27;Một ngày duy nhất&#x27;},
+        {id:&#x27;daterange&#x27;, t:&#x27;Khoảng thời gian từ → đến&#x27;}
+      ],
+      file:[
+        {id:&#x27;upload&#x27;, t:&#x27;Chỉ upload tệp&#x27;},
+        {id:&#x27;combo&#x27;, t:&#x27;Link template mẫu + Upload (combo)&#x27;}
+      ]
+    };
+    var Q2={list:&#x27;Danh sách đó như thế nào?&#x27;, text:&#x27;Dữ liệu chữ/số kiểu gì?&#x27;, date:&#x27;Ngày hay khoảng thời gian?&#x27;, file:&#x27;Cách đính kèm?&#x27;};
+    var NAME={radio:&#x27;Single Choice&#x27;, select:&#x27;Dropdown&#x27;, checkbox:&#x27;Multiple Choice&#x27;, checklist:&#x27;Checklist&#x27;,
+      country:&#x27;Country&#x27;, language:&#x27;Language&#x27;, product:&#x27;Game Product&#x27;, text:&#x27;Short text&#x27;, textarea:&#x27;Long text&#x27;,
+      email:&#x27;Email&#x27;, number:&#x27;Number&#x27;, boolean:&#x27;Yes / No&#x27;, date:&#x27;Date&#x27;, daterange:&#x27;Date Range&#x27;,
+      upload:&#x27;Attachment&#x27;, combo:&#x27;Template link + Upload (combo)&#x27;, label:&#x27;Label / Rich text&#x27;};
+    var DESC={radio:&#x27;Nút tròn, chọn đúng 1&#x27;, select:&#x27;Danh sách thả xuống&#x27;, checkbox:&#x27;Ô vuông, chọn nhiều&#x27;,
+      checklist:&#x27;Danh sách tick từng mục&#x27;, country:&#x27;Quốc gia, tự nạp&#x27;, language:&#x27;Ngôn ngữ, tự nạp&#x27;,
+      product:&#x27;Game/sản phẩm, tự nạp từ Nexus&#x27;, text:&#x27;Ô nhập 1 dòng&#x27;, textarea:&#x27;Ô nhập nhiều dòng&#x27;,
+      email:&#x27;Có kiểm tra định dạng&#x27;, number:&#x27;Chỉ nhập số&#x27;, boolean:&#x27;1 ô tick có/không&#x27;,
+      date:&#x27;Chọn 1 ngày từ lịch&#x27;, daterange:&#x27;Chọn ngày bắt đầu → kết thúc&#x27;,
+      upload:&#x27;Đính kèm 1 hoặc nhiều tệp&#x27;, combo:&#x27;Gồm 2 field: 1 Label chứa link tải mẫu + 1 Attachment để nộp lại.&#x27;, label:&#x27;Văn bản tĩnh để đọc, không nhập&#x27;};
+    var st={step:1, s1:null, s2:null, s3:null};
+    var el;
+
+    function opt(o, selId, fn){
+      return &#x27;&lt;div class=&quot;fta-opt&#x27;+(selId===o.id?&#x27; sel&#x27;:&#x27;&#x27;)+&#x27;&quot; onclick=&quot;FTAW.&#x27;+fn+&#x27;(\&#x27;&#x27;+o.id+&#x27;\&#x27;)&quot;&gt;&#x27;+o.t+&#x27;&lt;/div&gt;&#x27;;
+    }
+    function prog(active){
+      var labs=[&#x27;Input kind&#x27;,&#x27;Detail&#x27;,&#x27;Visibility&#x27;,&#x27;Result&#x27;];
+      var h=&#x27;&#x27;;
+      for(var i=0;i&lt;4;i++){ if(i)h+=&#x27;&lt;span class=&quot;ln&quot;&gt;&lt;/span&gt;&#x27;;
+        h+=&#x27;&lt;span class=&quot;&#x27;+(i+1===active?&#x27;on&#x27;:&#x27;off&#x27;)+&#x27;&quot;&gt;&#x27;+&#x27;①②③④&#x27;[i]+&#x27; &#x27;+labs[i]+&#x27;&lt;/span&gt;&#x27;; }
+      return &#x27;&lt;div class=&quot;fta-prog&quot;&gt;&#x27;+h+&#x27;&lt;/div&gt;&#x27;;
+    }
+    function preview(type){
+      switch(type){
+        case &#x27;text&#x27;: case &#x27;email&#x27;: case &#x27;number&#x27;:
+          return &#x27;&lt;input class=&quot;pv-in&quot; disabled placeholder=&quot;&#x27;+(type===&#x27;email&#x27;?&#x27;name@vng.com.vn&#x27;:type===&#x27;number&#x27;?&#x27;123&#x27;:&#x27;Nhập...&#x27;)+&#x27;&quot;&gt;&#x27;;
+        case &#x27;textarea&#x27;: return &#x27;&lt;textarea class=&quot;pv-in&quot; rows=&quot;2&quot; disabled placeholder=&quot;Nhập mô tả...&quot;&gt;&lt;/textarea&gt;&#x27;;
+        case &#x27;select&#x27;: return &#x27;&lt;div class=&quot;pv-in&quot;&gt;— Chọn — ▾&lt;/div&gt;&#x27;;
+        case &#x27;date&#x27;: return &#x27;&lt;div class=&quot;pv-in&quot;&gt;dd / mm / yyyy&lt;/div&gt;&#x27;;
+        case &#x27;daterange&#x27;: return &#x27;&lt;div style=&quot;display:flex;gap:8px&quot;&gt;&lt;div class=&quot;pv-in&quot;&gt;Từ…&lt;/div&gt;&lt;div class=&quot;pv-in&quot;&gt;Đến…&lt;/div&gt;&lt;/div&gt;&#x27;;
+        case &#x27;radio&#x27;: return &#x27;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-dot&quot;&gt;&lt;/span&gt; Lựa chọn A&lt;/div&gt;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-dot&quot;&gt;&lt;/span&gt; Lựa chọn B&lt;/div&gt;&#x27;;
+        case &#x27;checkbox&#x27;: return &#x27;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-sq&quot;&gt;&lt;/span&gt; Lựa chọn A&lt;/div&gt;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-sq&quot;&gt;&lt;/span&gt; Lựa chọn B&lt;/div&gt;&#x27;;
+        case &#x27;checklist&#x27;: return &#x27;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-sq&quot;&gt;&lt;/span&gt; Việc cần tick 1&lt;/div&gt;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-sq&quot;&gt;&lt;/span&gt; Việc cần tick 2&lt;/div&gt;&#x27;;
+        case &#x27;boolean&#x27;: return &#x27;&lt;div class=&quot;pv-row&quot;&gt;&lt;span class=&quot;pv-sq&quot;&gt;&lt;/span&gt; Tôi xác nhận&lt;/div&gt;&#x27;;
+        case &#x27;country&#x27;: case &#x27;language&#x27;: case &#x27;product&#x27;: return &#x27;&lt;div class=&quot;pv-in&quot;&gt;Tìm &amp;amp; chọn… ▾&lt;/div&gt;&#x27;;
+        case &#x27;upload&#x27;: return &#x27;&lt;div class=&quot;pv-in&quot; style=&quot;text-align:center;border-style:dashed&quot;&gt;Kéo thả hoặc chọn tệp&lt;/div&gt;&#x27;;
+        case &#x27;combo&#x27;: return &#x27;&lt;div style=&quot;font-size:12px;color:#1e3a8a;background:#eef4ff;border-left:3px solid #155DFC;border-radius:4px;padding:8px 10px;margin-bottom:6px&quot;&gt;Tải template mẫu &lt;u&gt;tại đây&lt;/u&gt; rồi nộp lại bên dưới.&lt;/div&gt;&lt;div class=&quot;pv-in&quot; style=&quot;text-align:center;border-style:dashed&quot;&gt;Kéo thả hoặc chọn tệp&lt;/div&gt;&#x27;;
+        case &#x27;label&#x27;: return &#x27;&lt;div style=&quot;font-size:12.5px;color:#64748b;font-style:italic&quot;&gt;(Dòng hướng dẫn / lưu ý hiển thị cho người điền)&lt;/div&gt;&#x27;;
+        default: return &#x27;&#x27;;
+      }
+    }
+    function render(){
+      if(!el) el=document.getElementById(&#x27;ftaLive&#x27;);
+      if(!el) return;
+      var h=&#x27;&lt;div class=&quot;fta-h&quot;&gt;&lt;span&gt;Field Type Advisor&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;✕&lt;/span&gt;&lt;/div&gt;&#x27;;
+      if(st.step===1){
+        h+=prog(1)+&#x27;&lt;div class=&quot;fta-q&quot;&gt;Bạn cần thu thập kiểu dữ liệu gì?&lt;/div&gt;&lt;div class=&quot;fta-opts&quot;&gt;&#x27;;
+        S1.forEach(function(o){h+=opt(o, st.s1, &#x27;pick1&#x27;);}); h+=&#x27;&lt;/div&gt;&#x27;;
+        h+=&#x27;&lt;div class=&quot;fta-foot&quot;&gt;&lt;button class=&quot;fta-skip&quot; onclick=&quot;FTAW.reset()&quot;&gt;Đặt lại&lt;/button&gt;&lt;button class=&quot;fta-next&#x27;+(st.s1?&#x27;&#x27;:&#x27; dis&#x27;)+&#x27;&quot; onclick=&quot;FTAW.next()&quot;&gt;Tiếp →&lt;/button&gt;&lt;/div&gt;&#x27;;
+      } else if(st.step===2){
+        h+=prog(2)+&#x27;&lt;div class=&quot;fta-q&quot;&gt;&#x27;+(Q2[st.s1]||&#x27;Chi tiết&#x27;)+&#x27;&lt;/div&gt;&lt;div class=&quot;fta-opts&quot;&gt;&#x27;;
+        S2[st.s1].forEach(function(o){h+=opt(o, st.s2, &#x27;pick2&#x27;);}); h+=&#x27;&lt;/div&gt;&#x27;;
+        h+=&#x27;&lt;div class=&quot;fta-foot&quot;&gt;&lt;button class=&quot;fta-skip&quot; onclick=&quot;FTAW.back()&quot;&gt;← Quay lại&lt;/button&gt;&lt;button class=&quot;fta-next&#x27;+(st.s2?&#x27;&#x27;:&#x27; dis&#x27;)+&#x27;&quot; onclick=&quot;FTAW.next()&quot;&gt;Tiếp →&lt;/button&gt;&lt;/div&gt;&#x27;;
+      } else if(st.step===3){
+        h+=prog(3)+&#x27;&lt;div class=&quot;fta-q&quot;&gt;Field này có luôn hiển thị không?&lt;/div&gt;&lt;div class=&quot;fta-opts&quot;&gt;&#x27;;
+        [{id:&#x27;always&#x27;,t:&#x27;Luôn hiển thị với mọi người&#x27;},{id:&#x27;cond&#x27;,t:&#x27;Hiện theo điều kiện (dựa câu trả lời khác)&#x27;}].forEach(function(o){h+=opt(o, st.s3, &#x27;pick3&#x27;);}); h+=&#x27;&lt;/div&gt;&#x27;;
+        h+=&#x27;&lt;div class=&quot;fta-foot&quot;&gt;&lt;button class=&quot;fta-skip&quot; onclick=&quot;FTAW.back()&quot;&gt;← Quay lại&lt;/button&gt;&lt;button class=&quot;fta-next&#x27;+(st.s3?&#x27;&#x27;:&#x27; dis&#x27;)+&#x27;&quot; onclick=&quot;FTAW.next()&quot;&gt;Xem kết quả →&lt;/button&gt;&lt;/div&gt;&#x27;;
+      } else {
+        var type = (st.s1===&#x27;info&#x27;)?&#x27;label&#x27;:st.s2;
+        h+=prog(4)+&#x27;&lt;div class=&quot;ftaw-res&quot;&gt;&lt;div class=&quot;ftaw-badge&quot;&gt;Gợi ý cho bạn&lt;/div&gt;&#x27;+
+           &#x27;&lt;div class=&quot;ftaw-type&quot;&gt;&#x27;+NAME[type]+&#x27;&lt;/div&gt;&lt;div class=&quot;ftaw-desc&quot;&gt;&#x27;+DESC[type]+&#x27;&lt;/div&gt;&#x27;+
+           &#x27;&lt;div class=&quot;ftaw-pvlabel&quot;&gt;Xem trước — user sẽ thấy&lt;/div&gt;&lt;div class=&quot;ftaw-pv&quot;&gt;&#x27;+preview(type)+&#x27;&lt;/div&gt;&#x27;;
+        if(st.s3===&#x27;cond&#x27;) h+=&#x27;&lt;div class=&quot;pv-note&quot;&gt;Đặt thêm điều kiện hiển thị ở tab &lt;b&gt;Rules → Show this field when…&lt;/b&gt;&lt;/div&gt;&#x27;;
+        h+=&#x27;&lt;/div&gt;&lt;div class=&quot;fta-foot&quot;&gt;&lt;button class=&quot;fta-skip&quot; onclick=&quot;FTAW.reset()&quot;&gt;↻ Thử lại&lt;/button&gt;&lt;button class=&quot;fta-next&quot; onclick=&quot;FTAW.reset()&quot;&gt;Xong&lt;/button&gt;&lt;/div&gt;&#x27;;
+      }
+      el.innerHTML=h;
+    }
+    return {
+      pick1:function(v){st.s1=v; st.s2=null; render();},
+      pick2:function(v){st.s2=v; render();},
+      pick3:function(v){st.s3=v; render();},
+      next:function(){
+        if(st.step===1){ if(!st.s1)return; if(st.s1===&#x27;info&#x27;){st.step=4;} else st.step=2; }
+        else if(st.step===2){ if(!st.s2)return; st.step=3; }
+        else if(st.step===3){ if(!st.s3)return; st.step=4; }
+        render();
+      },
+      back:function(){ if(st.step===2)st.step=1; else if(st.step===3)st.step=2; render(); },
+      reset:function(){ st={step:1,s1:null,s2:null,s3:null}; render(); },
+      init:function(){ render(); }
+    };
+  })();
+  document.addEventListener(&#x27;DOMContentLoaded&#x27;, function(){ FTAW.init(); });
+
+  var MM = [
+    {color:&#x27;blue&#x27;, cy:163, leaves:[
+      {y:48,  icon:&#x27;💬&#x27;, t:&#x27;Label / Rich text&#x27;, d:&#x27;Chỉ hiển thị lưu ý, không lưu dữ liệu&#x27;, ex:&#x27;⚠️ Chuẩn bị trước Bundle ID…&#x27;},
+      {y:94,  icon:&#x27;✍️&#x27;, t:&#x27;Short text&#x27;, d:&#x27;Văn bản ngắn gọn 1 dòng&#x27;, ex:&#x27;Game name, Bundle ID, Transaction ID&#x27;},
+      {y:140, icon:&#x27;📝&#x27;, t:&#x27;Long text&#x27;, d:&#x27;Mô tả nhiều dòng&#x27;, ex:&#x27;Mô tả chi tiết lỗi, Notes cụ thể&#x27;},
+      {y:186, icon:&#x27;🔢&#x27;, t:&#x27;Number&#x27;, d:&#x27;Chỉ nhập ký tự số&#x27;, ex:&#x27;Player ID, Budget, Số lượng user&#x27;},
+      {y:232, icon:&#x27;✉️&#x27;, t:&#x27;Email&#x27;, d:&#x27;Tự bắt lỗi định dạng&#x27;, ex:&#x27;contact_person@vng.com.vn&#x27;},
+      {y:278, icon:&#x27;🔘&#x27;, t:&#x27;Yes / No&#x27;, d:&#x27;Xác nhận hoặc đồng ý&#x27;, ex:&#x27;&quot;I confirm info correct&quot;&#x27;}
+    ]},
+    {color:&#x27;emerald&#x27;, cy:355, leaves:[
+      {y:332, icon:&#x27;📅&#x27;, t:&#x27;Date&#x27;, d:&#x27;Chọn một mốc ngày&#x27;, ex:&#x27;Release date, Incident date&#x27;},
+      {y:378, icon:&#x27;📆&#x27;, t:&#x27;Date range&#x27;, d:&#x27;Chọn khoảng thời gian&#x27;, ex:&#x27;10/10/2026 - 20/10/2026&#x27;}
+    ]},
+    {color:&#x27;purple&#x27;, cy:501, leaves:[
+      {y:432, icon:&#x27;🔽&#x27;, t:&#x27;Dropdown&#x27;, d:&#x27;Danh sách thả xuống&#x27;, ex:&#x27;Platform, Environment (STG/PROD)&#x27;},
+      {y:478, icon:&#x27;🔘&#x27;, t:&#x27;Single choice&#x27;, d:&#x27;Radio, chỉ chọn 1&#x27;, ex:&#x27;Channel, Priority (Low/High)&#x27;},
+      {y:524, icon:&#x27;☑️&#x27;, t:&#x27;Multiple choice&#x27;, d:&#x27;Checkbox, chọn nhiều&#x27;, ex:&#x27;Devices (iPhone, iPad, S24)&#x27;},
+      {y:570, icon:&#x27;📋&#x27;, t:&#x27;Checklist&#x27;, d:&#x27;To-do kiểm thử trước launch&#x27;, ex:&#x27;&quot;Tested on STG&quot;, &quot;Checked logs&quot;&#x27;}
+    ]},
+    {color:&#x27;amber&#x27;, cy:670, leaves:[
+      {y:624, icon:&#x27;🌍&#x27;, t:&#x27;Country&#x27;, d:&#x27;Chọn quốc gia (đồng bộ API)&#x27;, ex:&#x27;Vietnam, Thailand…&#x27;},
+      {y:670, icon:&#x27;🗣️&#x27;, t:&#x27;Language&#x27;, d:&#x27;Chọn ngôn ngữ (đồng bộ API)&#x27;, ex:&#x27;Vietnamese, English, Thai&#x27;},
+      {y:716, icon:&#x27;🎮&#x27;, t:&#x27;Game product&#x27;, d:&#x27;List game VNGGames từ API&#x27;, ex:&#x27;Kiếm Thế Origin, VLTK MAX&#x27;}
+    ]},
+    {color:&#x27;rose&#x27;, cy:770, leaves:[
+      {y:770, icon:&#x27;📁&#x27;, t:&#x27;Attachment&#x27;, d:&#x27;Tải lên file đính kèm&#x27;, ex:&#x27;Screenshots, Crash logs, APK/IPA&#x27;}
+    ]}
+  ];
+
+  (function(){
+    var svg = document.getElementById(&#x27;mmLinks&#x27;);
+    var leavesBox = document.getElementById(&#x27;mmLeaves&#x27;);
+    var rootPaths = {blue:163, emerald:355, purple:501, amber:670, rose:770};
+    var SVGNS=&#x27;http://www.w3.org/2000/svg&#x27;;
+    function path(d, cls, w){
+      var p=document.createElementNS(SVGNS,&#x27;path&#x27;);
+      p.setAttribute(&#x27;d&#x27;,d); p.setAttribute(&#x27;class&#x27;,&#x27;tree-branch branch-&#x27;+cls);
+      if(w) p.setAttribute(&#x27;stroke-width&#x27;,w); svg.appendChild(p);
+    }
+    Object.keys(rootPaths).forEach(function(c){
+      var y=rootPaths[c];
+      path(&#x27;M 250 409 C 275 409, 275 &#x27;+y+&#x27;, 300 &#x27;+y, c);
+    });
+    MM.forEach(function(g){
+      g.leaves.forEach(function(l){
+        if(l.y===g.cy) path(&#x27;M 510 &#x27;+g.cy+&#x27; H 560&#x27;, g.color, 2);
+        else path(&#x27;M 510 &#x27;+g.cy+&#x27; C 535 &#x27;+g.cy+&#x27;, 535 &#x27;+l.y+&#x27;, 560 &#x27;+l.y, g.color, 2);
+        var node=document.createElement(&#x27;div&#x27;);
+        node.className=&#x27;absolute-node&#x27;;
+        node.style.cssText=&#x27;left:560px;top:&#x27;+(l.y-20)+&#x27;px;width:550px;height:40px;&#x27;;
+        node.innerHTML=&#x27;&lt;div class=&quot;leaf-card&quot;&gt;&lt;div class=&quot;leaf-left&quot;&gt;&lt;span class=&quot;leaf-icon&quot;&gt;&#x27;+l.icon+&#x27;&lt;/span&gt;&#x27;+
+          &#x27;&lt;div&gt;&lt;h4 class=&quot;leaf-title&quot;&gt;&#x27;+l.t+&#x27;&lt;/h4&gt;&lt;p class=&quot;leaf-desc&quot;&gt;&#x27;+l.d+&#x27;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&#x27;+
+          &#x27;&lt;div class=&quot;leaf-example example-&#x27;+g.color+&#x27;&quot;&gt;Ví dụ: &#x27;+l.ex+&#x27;&lt;/div&gt;&lt;/div&gt;&#x27;;
+        leavesBox.appendChild(node);
+      });
+    });
+  })();
+
+  function autoFitCanvas(){
+    var wrapper=document.getElementById(&#x27;confluence-mindmap-wrapper&#x27;);
+    var canvas=document.getElementById(&#x27;mindmapCanvas&#x27;);
+    var viewport=wrapper.querySelector(&#x27;.canvas-viewport&#x27;);
+    var avail=(wrapper.getBoundingClientRect().width||window.innerWidth)-20;
+    var W=1200, H=814;
+    if(avail&lt;W){
+      var s=avail/W;
+      canvas.style.transform=&#x27;scale(&#x27;+s+&#x27;)&#x27;;
+      canvas.style.transformOrigin=&#x27;top left&#x27;;
+      viewport.style.width=(W*s)+&#x27;px&#x27;;
+      viewport.style.height=(H*s)+&#x27;px&#x27;;
+    } else {
+      canvas.style.transform=&#x27;none&#x27;;
+      viewport.style.width=W+&#x27;px&#x27;; viewport.style.height=H+&#x27;px&#x27;;
+    }
+  }
+  window.addEventListener(&#x27;resize&#x27;, autoFitCanvas);
+  window.addEventListener(&#x27;DOMContentLoaded&#x27;, autoFitCanvas);
+  window.addEventListener(&#x27;load&#x27;, autoFitCanvas);
+  setTimeout(autoFitCanvas,300); setTimeout(autoFitCanvas,1000);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+  </div>
+</div>
+<script>
+  function ugOpen(){document.getElementById('ugOverlay').classList.add('open');document.body.style.overflow='hidden';}
+  function ugClose(){document.getElementById('ugOverlay').classList.remove('open');document.body.style.overflow='';}
+  function ugBg(e){ if(e.target===document.getElementById('ugOverlay')) ugClose(); }
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') ugClose(); });
+</script>
 </body>
 </html>
