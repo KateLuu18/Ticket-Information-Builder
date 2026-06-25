@@ -891,12 +891,15 @@
       </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
-        <button id="rename-export-btn" onclick="exportRenameOnlyFromStep1()" style="display:none;align-items:center;gap:8px;background:#fff;color:#155DFC;border:1.5px solid #BFDBFE;font-weight:700;padding:11px 18px;border-radius:12px;cursor:pointer;font-size:14px" title="Chỉ đổi định danh — xuất 1 phiếu cho PIC, không cần dựng form">
-          <span>🏷️</span><span>Xuất phiếu định danh</span>
-        </button>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
+        <div id="upd-foot-left" style="position:relative;display:flex;align-items:center">
+          <button id="rename-export-btn" onclick="openUpdateModalStep1()" style="display:none;flex-direction:column;align-items:flex-start;gap:0;background:#fff;color:#155DFC;border:1.5px solid #BFDBFE;font-weight:700;padding:8px 16px;border-radius:12px;cursor:pointer" title="Sửa tên / Catalog / Category / mô tả — xuất 1 phiếu cho PIC, không update form">
+            <span style="font-size:13.5px;font-weight:700">Cập nhật thông tin service</span>
+            <span style="font-size:10.5px;font-weight:500;color:#64748B">không update form</span>
+          </button>
+        </div>
         <button class="flex items-center gap-2 bg-slate-100 text-slate-400 font-bold px-5 py-3 rounded-xl transition" id="next-btn" onclick="goStep(2)" disabled>
-          <span data-lang-key="next_step">Next</span>
+          <span>Dựng form</span>
           <svg id="next-arrow" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
         </button>
       </div>
@@ -1929,6 +1932,7 @@
       if (!_origin) {
         idbar.style.display = 'none'; panel.style.display = 'none'; ref.style.display = 'none'; note.style.display = 'none';
         if (di) { di.readOnly = false; di.style.background = ''; }
+        _syncRenameBtn();
         return;
       }
       const dp = document.getElementById('desc-path');
@@ -1936,8 +1940,7 @@
       const pencil = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
       idbar.style.display = 'block';
       if (!_editingId) {
-        idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>' +
-          '<button onclick="_idEnterEdit()" title="Đổi tên Catalog / Category / Service cho ticket này (không ảnh hưởng dữ liệu gốc)" onmouseover="this.style.background=\'#DBEAFE\'" onmouseout="this.style.background=\'#EFF6FF\'" style="margin-top:8px;font-size:12px;font-weight:700;color:#155DFC;background:#EFF6FF;border:1.5px solid #BFDBFE;padding:7px 13px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s">' + pencil + ' Chỉnh sửa thông tin</button>';
+        idbar.innerHTML = '<div id="ed-crumb">' + _idCrumbInner() + '</div>';
         panel.style.display = 'none'; ref.style.display = 'none';
         if (di) { di.readOnly = !!_origin.sla; di.style.background = _origin.sla ? '#f1f5f9' : ''; }
       } else {
@@ -5057,8 +5060,8 @@ ${formScript}
       menu.appendChild(makeItem(tplIcon, 'Use as template\u2026', 'text-indigo-700', () => useAsTemplate(idx)));
       menu.appendChild(makeItem(dlIcon, 'Download', 'text-nexus', () => exportSingle(idx)));
 
-      const renameIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-      menu.appendChild(makeItem(renameIcon, 'Cập nhật định danh', 'text-slate-700', () => openRenameDialog(idx)));
+      const renameIcon = '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-4 7h3m-3 4h3"/></svg>';
+      menu.appendChild(makeItem(renameIcon, 'Cập nhật thông tin service', 'text-slate-700', () => openUpdateModalEntry(idx)));
 
       // Divider
       const div = document.createElement('div');
@@ -5413,188 +5416,226 @@ ${formScript}
     }
 
     // ═══════════════════════════════════════════════════════════
-    // "Cập nhật định danh" — đổi Catalog/Category/Service mà KHÔNG đụng template.
-    // Xuất DUY NHẤT 1 phiếu HTML (change note). Không sinh JSON/template/ZIP.
+    // "Cập nhật thông tin service" — sửa Catalog/Category/Service + mô tả,
+    // KHÔNG đụng template. Xuất DUY NHẤT 1 phiếu HTML cho PIC.
     // Toàn bộ additive — không sửa logic builder/export hiện có.
     // ═══════════════════════════════════════════════════════════
     function _rnVal(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
-    // Rows = các field định danh thay đổi (Catalog/Category/Tên service). Chỉ định danh, không gồm mô tả.
-    function _renameRows(base, cur) {
-      const rows = [];
-      if ((cur.catalog || '')  !== (base.catalog || ''))  rows.push(['Catalog',     base.catalog || '',  cur.catalog || '']);
-      if ((cur.category || '') !== (base.category || '')) rows.push(['Category',    base.category || '', cur.category || '']);
-      if ((cur.service || '')  !== (base.service || ''))  rows.push(['Tên service', base.service || '',  cur.service || '']);
-      return rows;
+    // Tất cả 3 dòng định danh (Catalog/Category/Tên service) kèm cờ changed.
+    function _umRows(base, cur) {
+      return [
+        ['Catalog',     base.catalog || '',  cur.catalog || ''],
+        ['Category',    base.category || '', cur.category || ''],
+        ['Tên service', base.service || '',  cur.service || '']
+      ].map(r => ({ label: r[0], old: r[1], nw: r[2], changed: (r[1] || '') !== (r[2] || '') }));
     }
+    function _umDescChanged(base, cur) { return (cur.desc || '') !== (base.desc || ''); }
+    function _umHasChange(base, cur) { return _umRows(base, cur).some(r => r.changed) || _umDescChanged(base, cur); }
 
-    function _renameNoteData(origin, rows) {
+    function _umNoteMeta() {
       const now = new Date();
       const dateStr = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' });
       const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' });
       const dp = dateStr.split('/'), tp = timeStr.split(':');
-      const code = 'RNM-' + (dp[2] || '') + (dp[1] || '') + (dp[0] || '') + '-' + (tp[0] || '') + (tp[1] || '');
-      return {
-        originService: origin.service || '',
-        originPath: [origin.catalog, origin.category].filter(Boolean).join(' › '),
-        rows: rows, dateStr: dateStr, timeStr: timeStr, code: code
-      };
+      const code = 'UPD-' + (dp[2] || '') + (dp[1] || '') + (dp[0] || '') + '-' + (tp[0] || '') + (tp[1] || '');
+      return { dateStr: dateStr, timeStr: timeStr, code: code };
     }
 
-    function _buildRenameNoteHTML(d) {
-      const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-      const rowsHTML = d.rows.map(r =>
-        '<tr><td class="f">' + esc(r[0]) + '</td>' +
-        '<td class="old">' + esc(r[1]) + '</td>' +
-        '<td class="new">' + esc(r[2]) + '</td></tr>').join('');
-      return '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<title>Phiếu yêu cầu cập nhật định danh — ' + esc(d.originService) + '</title>' +
-        '<style>' +
-        '*{box-sizing:border-box}' +
-        'body{margin:0;background:#EEF2F8;color:#1A2236;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.6;padding:28px 16px}' +
-        '.sheet{max-width:680px;margin:0 auto;background:#fff;border:1px solid #D7DEE8;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(16,40,90,.09)}' +
-        '.hd{padding:22px 26px 20px;background:linear-gradient(135deg,#1e3a8a,#155DFC);color:#fff}' +
-        '.badge{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:12px}' +
-        '.hd h1{font-size:21px;font-weight:780;letter-spacing:-.3px;margin:0}' +
-        '.hd .sub{font-size:12.5px;opacity:.85;margin-top:3px}' +
-        '.bd{padding:22px 26px 26px}' +
-        '.meta{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#EEF1F5;border:1px solid #EEF1F5;border-radius:11px;overflow:hidden;margin-bottom:22px}' +
-        '.mc{background:#fff;padding:11px 14px}' +
-        '.mc .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;margin-bottom:3px}' +
-        '.mc .v{font-size:13.5px;font-weight:600;color:#1A2236;word-break:break-word}' +
-        'h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin:0 0 10px}' +
-        'table{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid #E2E8F0;border-radius:11px;overflow:hidden;margin-bottom:22px}' +
-        'th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;background:#F8FAFC;padding:9px 14px;border-bottom:1px solid #E2E8F0}' +
-        'td{padding:11px 14px;border-bottom:1px solid #EEF1F5;vertical-align:top}' +
-        'tr:last-child td{border-bottom:none}' +
-        '.f{font-weight:700;color:#334155;white-space:nowrap}' +
-        '.old{color:#64748B;text-decoration:line-through;text-decoration-color:#CBD5E1}' +
-        '.new{color:#0f4ecf;font-weight:700}' +
-        '.keep{display:flex;gap:13px;background:#F0F8F3;border:1px solid #CCE8D8;border-radius:13px;padding:15px 17px;margin-bottom:20px}' +
-        '.keep .ic{flex:none;width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid #CCE8D8;color:#15803D;display:flex;align-items:center;justify-content:center;font-size:17px}' +
-        '.keep .t{font-size:13.5px;font-weight:700;color:#166534;margin-bottom:3px}' +
-        '.keep .d{font-size:12.5px;color:#2c6a47}' +
-        '.todo{background:#FCFDFF;border:1px solid #E3EBF6;border-left:4px solid #155DFC;border-radius:11px;padding:14px 17px}' +
-        '.todo .t{font-size:12.5px;font-weight:700;color:#1e3a8a;margin-bottom:5px}' +
-        '.todo .d{font-size:13px;color:#3c4660}' +
-        '.ft{padding:13px 26px;border-top:1px solid #EEF1F5;background:#FBFCFE;font-size:11px;color:#94A3B8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}' +
-        '</style></head><body>' +
-        '<div class="sheet">' +
-        '<div class="hd"><span class="badge">🏷️ Cập nhật định danh · Không đổi form</span>' +
-        '<h1>Phiếu yêu cầu cập nhật định danh</h1>' +
-        '<div class="sub">Service Identity Update Request — Nexus Ticket Information Builder</div></div>' +
-        '<div class="bd">' +
-        '<div class="meta">' +
-        '<div class="mc"><div class="k">Service (định danh gốc)</div><div class="v">' + esc(d.originService) + '</div></div>' +
-        '<div class="mc"><div class="k">Đường dẫn</div><div class="v">' + esc(d.originPath) + '</div></div>' +
-        '<div class="mc"><div class="k">Ngày tạo yêu cầu</div><div class="v">' + esc(d.dateStr + ' — ' + d.timeStr + ' (GMT+7)') + '</div></div>' +
-        '<div class="mc"><div class="k">Mã phiếu</div><div class="v">' + esc(d.code) + '</div></div>' +
-        '</div>' +
-        '<h3>Nội dung thay đổi</h3>' +
-        '<table><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Đề xuất (mới)</th></tr></thead><tbody>' + rowsHTML + '</tbody></table>' +
-        '<div class="keep"><div class="ic">✓</div><div>' +
-        '<div class="t">Giữ nguyên form hiện hành trên Nexus</div>' +
-        '<div class="d">Toàn bộ field &amp; cấu hình form của service đang chạy trên Nexus (tính đến ' + esc(d.dateStr) + ') được <b>GIỮ NGUYÊN</b>. Yêu cầu này chỉ đổi định danh — không thêm / sửa / xoá field nào.</div>' +
-        '</div></div>' +
-        '<div class="todo"><div class="t">▶ Việc cần làm (PIC)</div>' +
-        '<div class="d">Cập nhật <b>định danh</b> của service trên Nexus admin theo bảng trên. <b>Không cần import lại form</b>, không chạm tới field.</div></div>' +
-        '</div>' +
-        '<div class="ft"><span>Tạo bởi Ticket Information Builder</span><span>Mã phiếu: ' + esc(d.code) + '</span></div>' +
-        '</div></body></html>';
+    // Bảng định danh (luôn đủ 3 dòng + trạng thái) & khối mô tả — dùng cho preview & phiếu.
+    function _umIdTableHTML(base, cur) {
+      const body = _umRows(base, cur).map(r => r.changed
+        ? '<tr><td class="f">' + H(r.label) + '</td><td class="old">' + H(r.old) + '</td><td class="new">' + H(r.nw) + '</td><td><span class="bg chg">✎ Thay đổi</span></td></tr>'
+        : '<tr><td class="f">' + H(r.label) + '</td><td class="sm">' + H(r.old) + '</td><td class="sm">' + H(r.nw) + '</td><td><span class="bg keep">Giữ nguyên</span></td></tr>'
+      ).join('');
+      return '<table><thead><tr><th>Mục</th><th>Hiện tại (gốc)</th><th>Sau cập nhật</th><th>Trạng thái</th></tr></thead><tbody>' + body + '</tbody></table>';
+    }
+    function _umDescHTML(base, cur) {
+      const ch = _umDescChanged(base, cur);
+      const head = '<div class="dh">Mô tả dịch vụ ' + (ch ? '<span class="bg chg">✎ Thay đổi</span>' : '<span class="bg keep">Giữ nguyên</span>') + '</div>';
+      if (ch) return '<div class="dsec">' + head + '<div class="dba"><div class="dc o"><div class="dl">Hiện tại (gốc)</div><div class="dt">' + H(base.desc || '') + '</div></div><div class="dc n"><div class="dl">Sau cập nhật</div><div class="dt">' + H(cur.desc || '') + '</div></div></div></div>';
+      return '<div class="dsec">' + head + '<div class="dba"><div class="dc s"><div class="dt">' + H(base.desc || '') + '</div></div></div></div>';
     }
 
-    function _dlRenameNote(noteData) {
+    function _buildUpdateNoteHTML(base, cur) {
+      const m = _umNoteMeta();
+      const path = [base.catalog, base.category].filter(Boolean).join(' › ');
+      const css = '*{box-sizing:border-box}'
+        + 'body{margin:0;background:#EEF2F8;color:#1A2236;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.6;padding:28px 16px}'
+        + '.sheet{max-width:680px;margin:0 auto;background:#fff;border:1px solid #D7DEE8;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(16,40,90,.09)}'
+        + '.hd{padding:22px 26px 18px;background:linear-gradient(135deg,#1e3a8a,#155DFC);color:#fff}'
+        + '.badge{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:11px}'
+        + '.hd h1{font-size:21px;font-weight:780;letter-spacing:-.3px;margin:0}'
+        + '.hd .sub{font-size:12.5px;opacity:.85;margin-top:3px}'
+        + '.bd{padding:20px 26px 26px}'
+        + '.meta{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#EEF1F5;border:1px solid #EEF1F5;border-radius:11px;overflow:hidden;margin-bottom:14px}'
+        + '.mc{background:#fff;padding:10px 14px}'
+        + '.mc .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;margin-bottom:3px}'
+        + '.mc .v{font-size:13px;font-weight:600;color:#1A2236;word-break:break-word}'
+        + '.subj{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:10px 13px;margin-bottom:16px}'
+        + '.subj .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;margin-bottom:2px}'
+        + '.subj .v{font-size:14px;font-weight:700}'
+        + 'h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;margin:0 0 9px}'
+        + 'table{width:100%;border-collapse:collapse;font-size:13px;border:1px solid #E2E8F0;border-radius:11px;overflow:hidden}'
+        + 'th{text-align:left;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748B;background:#F8FAFC;padding:9px 13px;border-bottom:1px solid #E2E8F0}'
+        + 'td{padding:10px 13px;border-bottom:1px solid #EEF1F5;vertical-align:middle}'
+        + 'tr:last-child td{border-bottom:none}'
+        + '.f{font-weight:700;color:#334155;white-space:nowrap}'
+        + '.old{color:#94A3B8;text-decoration:line-through;text-decoration-color:#CBD5E1}'
+        + '.new{color:#0f4ecf;font-weight:700}'
+        + '.sm{color:#475569}'
+        + '.bg{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:3px 8px;border-radius:999px;white-space:nowrap}'
+        + '.bg.keep{background:#F1F4F8;color:#7c879b;border:1px solid #E2E8F0}'
+        + '.bg.chg{background:#EAF1FE;color:#155DFC;border:1px solid #BFDBFE}'
+        + '.dsec{margin-top:16px}'
+        + '.dsec .dh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748B;display:flex;align-items:center;gap:8px;margin-bottom:8px}'
+        + '.dba{border:1px solid #E3EBF6;border-radius:10px;overflow:hidden}'
+        + '.dc{padding:10px 13px;font-size:13px;line-height:1.55}'
+        + '.dc .dl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#94A3B8;margin-bottom:2px}'
+        + '.dc.o{background:#FCF4F4;color:#8a6b6b;border-bottom:1px solid #F1E2E2}'
+        + '.dc.o .dt{text-decoration:line-through;text-decoration-color:#d9b3b3}'
+        + '.dc.n{background:#F0F8F3;color:#234a39;font-weight:600}'
+        + '.dc.s{background:#F8FAFC;color:#475569}'
+        + '.keep{display:flex;gap:13px;background:#F0F8F3;border:1px solid #CCE8D8;border-radius:13px;padding:14px 16px;margin-top:16px}'
+        + '.keep .ic{flex:none;width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid #CCE8D8;color:#15803D;display:flex;align-items:center;justify-content:center;font-size:16px}'
+        + '.keep .t{font-size:13px;font-weight:700;color:#166534;margin-bottom:2px}'
+        + '.keep .d{font-size:12.5px;color:#2c6a47}'
+        + '.todo{background:#FCFDFF;border:1px solid #E3EBF6;border-left:4px solid #155DFC;border-radius:11px;padding:13px 16px;margin-top:12px}'
+        + '.todo .t{font-size:12.5px;font-weight:700;color:#1e3a8a;margin-bottom:4px}'
+        + '.todo .d{font-size:13px;color:#3c4660}'
+        + '.ft{padding:13px 26px;border-top:1px solid #EEF1F5;background:#FBFCFE;font-size:11px;color:#94A3B8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}';
+      return '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">'
+        + '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+        + '<title>Phiếu yêu cầu cập nhật thông tin service — ' + H(base.service || '') + '</title>'
+        + '<style>' + css + '</style></head><body><div class="sheet">'
+        + '<div class="hd"><span class="badge">🏷️ Cập nhật service · Không đổi form</span>'
+        + '<h1>Phiếu yêu cầu cập nhật thông tin service</h1>'
+        + '<div class="sub">Service Info Update Request — Nexus Ticket Information Builder</div></div>'
+        + '<div class="bd">'
+        + '<div class="meta"><div class="mc"><div class="k">Ngày tạo yêu cầu</div><div class="v">' + H(m.dateStr + ' — ' + m.timeStr + ' (GMT+7)') + '</div></div>'
+        + '<div class="mc"><div class="k">Mã phiếu</div><div class="v">' + H(m.code) + '</div></div></div>'
+        + '<div class="subj"><div class="k">Service cần cập nhật (tên gốc)</div><div class="v">' + H(base.service || '') + (path ? ' <span style="font-weight:500;color:#94A3B8;font-size:12px">· ' + H(path) + '</span>' : '') + '</div></div>'
+        + '<h3>Định danh đầy đủ</h3>' + _umIdTableHTML(base, cur) + _umDescHTML(base, cur)
+        + '<div class="keep"><div class="ic">✓</div><div><div class="t">Giữ nguyên form hiện hành trên Nexus</div>'
+        + '<div class="d">Toàn bộ field &amp; cấu hình form của service đang chạy trên Nexus (tính đến ' + H(m.dateStr) + ') được <b>GIỮ NGUYÊN</b>. Yêu cầu này chỉ cập nhật thông tin — không thêm / sửa / xoá field nào.</div></div></div>'
+        + '<div class="todo"><div class="t">▶ Việc cần làm (PIC)</div><div class="d">Cập nhật <b>thông tin service</b> trên Nexus admin theo bảng trên. <b>Không cần import lại form</b>, không chạm tới field.</div></div>'
+        + '</div><div class="ft"><span>Tạo bởi Ticket Information Builder</span><span>Mã phiếu: ' + H(m.code) + '</span></div>'
+        + '</div></body></html>';
+    }
+
+    function _dlUpdateNote(base, cur) {
       try {
-        const html = _buildRenameNoteHTML(noteData);
+        const html = _buildUpdateNoteHTML(base, cur);
         const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-        const fname = 'yeu-cau-dinh-danh__' + _slug(noteData.originService || 'service', 60) + '.html';
+        const fname = 'phieu-cap-nhat-service__' + _slug(base.service || 'service', 60) + '.html';
         _triggerDownload(blob, fname);
-        toast('✅ Đã tải phiếu cập nhật định danh — ' + fname, 5000);
+        toast('✅ Đã tải phiếu cập nhật thông tin service — ' + fname, 5000);
       } catch (err) {
         toast('❌ Lỗi tạo phiếu: ' + (err.message || err));
       }
     }
 
-    // ── Entry 1: từ menu ⋯ của service đã lưu ──
-    let _renameBase = null;
-    function openRenameDialog(idx) {
-      const entry = sessionServices[idx];
-      if (!entry) return;
-      _renameBase = { catalog: entry.catalog || '', category: entry.category || '', service: entry.service || '' };
-      const b = _renameBase;
+    // ── Modal "Cập nhật thông tin service" (dùng chung Step 1 + menu ⋯) ──
+    let _umBase = null, _umKind = null, _umIdx = -1;
+    function openUpdateModalStep1() {
+      if (!_origin) { toast('⚠️ Chưa chọn service'); return; }
+      const di = document.getElementById('desc-input');
+      _umKind = 'step1'; _umIdx = -1;
+      _umBase = { catalog: _origin.catalog || '', category: _origin.category || '', service: _origin.service || '', desc: (di ? di.value : '').trim() };
+      _renderUpdateModal();
+    }
+    function openUpdateModalEntry(idx) {
+      const e = sessionServices[idx]; if (!e) return;
+      _umKind = 'entry'; _umIdx = idx;
+      _umBase = { catalog: e.catalog || '', category: e.category || '', service: e.service || '', desc: e.description || '' };
+      _renderUpdateModal();
+    }
+    function _renderUpdateModal() {
+      const b = _umBase;
       const ov = document.createElement('div');
-      ov.id = '_rename_overlay';
+      ov.id = '_um_overlay';
       ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px';
-      ov.onclick = function (e) { if (e.target === ov) closeRenameDialog(); };
-      const fld = (id, label, v) => '<div style="margin-bottom:11px"><label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:5px">' + label + '</label>' +
-        '<input id="' + id + '" value="' + H(v || '') + '" autocomplete="off" oninput="_renameDlgUpdate()" style="width:100%;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13.5px;font-family:inherit;color:#1A2236"></div>';
+      ov.onclick = function (e) { if (e.target === ov) closeUpdateModal(); };
+      const inp = (id, label, v) => '<div style="margin-bottom:10px"><label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">' + label + '</label>'
+        + '<input id="' + id + '" value="' + H(v || '') + '" autocomplete="off" oninput="_umRefresh()" style="width:100%;border:1.5px solid #E2E8F0;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;color:#1A2236;background:#fff"></div>';
+      const area = (id, label, v) => '<div style="margin-bottom:10px"><label style="display:block;font-size:11px;font-weight:600;color:#475569;margin-bottom:4px">' + label + '</label>'
+        + '<textarea id="' + id + '" oninput="_umRefresh()" style="width:100%;min-height:62px;resize:vertical;border:1.5px solid #E2E8F0;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;color:#1A2236;line-height:1.5;background:#fff">' + H(v || '') + '</textarea></div>';
       ov.innerHTML =
-        '<div style="width:100%;max-width:440px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(16,40,90,.2)" onclick="event.stopPropagation()">' +
-        '<div style="padding:15px 18px;border-bottom:1px solid #EEF1F5;display:flex;align-items:center;gap:9px"><span style="font-size:17px">🏷️</span><span style="font-size:15px;font-weight:740">Cập nhật định danh</span><span style="margin-left:auto;cursor:pointer;color:#94A3B8;font-size:16px" onclick="closeRenameDialog()">✕</span></div>' +
-        '<div style="padding:16px 18px">' +
-        '<div style="font-size:11.5px;color:#64748b;margin-bottom:13px">Chỉ đổi định danh (Catalog / Category / Tên service). <b>Form fields giữ nguyên</b> — xuất 1 phiếu yêu cầu cho PIC.</div>' +
-        fld('rn-svc', 'Tên service', b.service) +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' + fld('rn-cat', 'Catalog', b.catalog) + fld('rn-ctg', 'Category', b.category) + '</div>' +
-        '<div id="rn-note" style="margin-top:6px"></div>' +
-        '</div>' +
-        '<div style="display:flex;gap:9px;justify-content:flex-end;padding:13px 18px;border-top:1px solid #EEF1F5;background:#FBFCFE">' +
-        '<button onclick="closeRenameDialog()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #E2E8F0;background:#fff;color:#475569;cursor:pointer">Huỷ</button>' +
-        '<button id="rn-save" onclick="confirmRename()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #155DFC;background:#155DFC;color:#fff;cursor:pointer">Lưu &amp; xuất phiếu</button>' +
-        '</div></div>';
+        '<div style="width:100%;max-width:460px;max-height:90vh;display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 18px 44px rgba(16,40,90,.2)" onclick="event.stopPropagation()">'
+        + '<div style="padding:14px 18px;border-bottom:1px solid #EEF1F5;display:flex;align-items:center;gap:9px"><span style="font-size:17px">🏷️</span><span style="font-size:15px;font-weight:740">Cập nhật thông tin service</span><span style="margin-left:auto;cursor:pointer;color:#94A3B8;font-size:16px" onclick="closeUpdateModal()">✕</span></div>'
+        + '<div style="padding:16px 18px;overflow:auto">'
+        + '<div style="font-size:11.5px;color:#64748b;margin-bottom:12px">Sửa tên / Catalog / Category / mô tả. <b>Form fields giữ nguyên</b> — xuất 1 phiếu cho PIC.</div>'
+        + inp('um-svc', 'Tên service', b.service)
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' + inp('um-cat', 'Catalog', b.catalog) + inp('um-ctg', 'Category', b.category) + '</div>'
+        + area('um-desc', 'Mô tả dịch vụ', b.desc)
+        + '<div id="um-prev" style="margin-top:6px"></div>'
+        + '</div>'
+        + '<div style="display:flex;gap:9px;justify-content:flex-end;padding:13px 18px;border-top:1px solid #EEF1F5;background:#FBFCFE">'
+        + '<button onclick="closeUpdateModal()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #E2E8F0;background:#fff;color:#475569;cursor:pointer">Huỷ</button>'
+        + '<button id="um-save" onclick="_umExport()" style="border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #155DFC;background:#155DFC;color:#fff;cursor:pointer">📥 Xuất phiếu cập nhật</button>'
+        + '</div></div>';
       document.body.appendChild(ov);
-      document.addEventListener('keydown', _renameEsc);
-      _renameDlgUpdate();
-      setTimeout(() => { const el = document.getElementById('rn-svc'); if (el) el.focus(); }, 50);
+      document.addEventListener('keydown', _umEsc);
+      _umRefresh();
+      setTimeout(() => { const el = document.getElementById('um-svc'); if (el) el.focus(); }, 50);
     }
-    function _renameEsc(e) { if (e.key === 'Escape') closeRenameDialog(); }
-    function closeRenameDialog() {
-      const ov = document.getElementById('_rename_overlay');
-      if (ov) ov.remove();
-      document.removeEventListener('keydown', _renameEsc);
-      _renameBase = null;
+    function _umEsc(e) { if (e.key === 'Escape') closeUpdateModal(); }
+    function closeUpdateModal() { const ov = document.getElementById('_um_overlay'); if (ov) ov.remove(); document.removeEventListener('keydown', _umEsc); _umBase = null; _umKind = null; _umIdx = -1; }
+    function _umCur() {
+      const b = _umBase || {};
+      return { catalog: _rnVal('um-cat') || b.catalog, category: _rnVal('um-ctg') || b.category, service: _rnVal('um-svc') || b.service, desc: _rnVal('um-desc') };
     }
-    function _renameCur() {
-      const b = _renameBase || {};
-      return { catalog: _rnVal('rn-cat') || b.catalog, category: _rnVal('rn-ctg') || b.category, service: _rnVal('rn-svc') || b.service };
+    function _umHl(id, on) { const e = document.getElementById(id); if (e) { e.style.borderColor = on ? '#86A8F0' : '#E2E8F0'; e.style.background = on ? '#F5F8FF' : '#fff'; } }
+    function _umPreview(base, cur) {
+      return '<style>#um-prev table{width:100%;border-collapse:collapse;font-size:12px;border:1px solid #E2E8F0;border-radius:9px;overflow:hidden;margin-top:4px}#um-prev th{text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#64748B;background:#F8FAFC;padding:6px 9px;border-bottom:1px solid #E2E8F0}#um-prev td{padding:7px 9px;border-bottom:1px solid #EEF1F5}#um-prev tr:last-child td{border-bottom:none}#um-prev .f{font-weight:700;color:#334155;white-space:nowrap}#um-prev .old{color:#94A3B8;text-decoration:line-through}#um-prev .new{color:#0f4ecf;font-weight:700}#um-prev .sm{color:#475569}#um-prev .bg{display:inline-block;font-size:8.5px;font-weight:800;padding:2px 6px;border-radius:999px}#um-prev .bg.keep{background:#F1F4F8;color:#7c879b;border:1px solid #E2E8F0}#um-prev .bg.chg{background:#EAF1FE;color:#155DFC;border:1px solid #BFDBFE}#um-prev .dh{font-size:11px;font-weight:700;color:#334155;display:flex;gap:8px;align-items:center;margin:10px 0 6px}#um-prev .dba{border:1px solid #E3EBF6;border-radius:8px;overflow:hidden}#um-prev .dc{padding:7px 10px;font-size:12px;line-height:1.5}#um-prev .dc.o{background:#FCF4F4;color:#8a6b6b;border-bottom:1px solid #F1E2E2;text-decoration:line-through}#um-prev .dc.n{background:#F0F8F3;color:#234a39;font-weight:600}#um-prev .dc.s{background:#F8FAFC;color:#475569}#um-prev .dl{display:none}</style>'
+        + _umIdTableHTML(base, cur) + _umDescHTML(base, cur);
     }
-    function _renameDlgUpdate() {
-      if (!_renameBase) return;
-      const rows = _renameRows(_renameBase, _renameCur());
-      const note = document.getElementById('rn-note');
-      const save = document.getElementById('rn-save');
-      if (save) { save.disabled = !rows.length; save.style.opacity = rows.length ? '1' : '.45'; save.style.cursor = rows.length ? 'pointer' : 'not-allowed'; }
-      if (!note) return;
-      if (!rows.length) { note.innerHTML = '<div style="display:flex;align-items:center;gap:8px;background:#F6FBF7;border:1px solid #D5EAD9;border-radius:10px;padding:10px 13px;font-size:11.5px;color:#15803D;font-weight:600">✓ Chưa có thay đổi định danh.</div>'; return; }
-      const trs = rows.map(r => '<tr><td style="padding:6px 9px;border-bottom:1px solid #F2F5FA;font-weight:600;color:#334155;white-space:nowrap">' + H(r[0]) + '</td><td style="padding:6px 9px;border-bottom:1px solid #F2F5FA;color:#94A3B8;text-decoration:line-through">' + H(r[1]) + '</td><td style="padding:6px 9px;border-bottom:1px solid #F2F5FA;color:#0f4ecf;font-weight:600">' + H(r[2]) + '</td></tr>').join('');
-      note.innerHTML = '<div style="background:#FCFDFF;border:1px solid #E3EBF6;border-left:4px solid #155DFC;border-radius:11px;padding:12px 14px"><div style="font-size:12px;font-weight:700;color:#1e3a8a;margin-bottom:7px">Thay đổi (' + rows.length + ')</div><table style="width:100%;border-collapse:collapse;font-size:12px"><tbody>' + trs + '</tbody></table></div>';
+    function _umRefresh() {
+      if (!_umBase) return;
+      const cur = _umCur();
+      _umHl('um-svc', cur.service !== _umBase.service);
+      _umHl('um-cat', cur.catalog !== _umBase.catalog);
+      _umHl('um-ctg', cur.category !== _umBase.category);
+      _umHl('um-desc', (cur.desc || '') !== (_umBase.desc || ''));
+      const prev = document.getElementById('um-prev'); if (prev) prev.innerHTML = _umPreview(_umBase, cur);
+      const save = document.getElementById('um-save'); if (save) { const ok = _umHasChange(_umBase, cur); save.disabled = !ok; save.style.opacity = ok ? '1' : '.45'; save.style.cursor = ok ? 'pointer' : 'not-allowed'; }
     }
-    function confirmRename() {
-      if (!_renameBase) return;
-      const rows = _renameRows(_renameBase, _renameCur());
-      if (!rows.length) { toast('⚠️ Chưa có thay đổi định danh nào'); return; }
-      const nd = _renameNoteData({ service: _renameBase.service, catalog: _renameBase.catalog, category: _renameBase.category }, rows);
-      _dlRenameNote(nd);
-      closeRenameDialog();
+    function _umExport() {
+      if (!_umBase) return;
+      const cur = _umCur();
+      if (!_umHasChange(_umBase, cur)) { toast('⚠️ Chưa có thay đổi nào'); return; }
+      if (_umKind === 'step1') {
+        // Ghi lại để crumb & luồng dựng form phản ánh (KHÔNG đụng field/builder).
+        if (_idEdit) { _idEdit.service = cur.service; _idEdit.catalog = cur.catalog; _idEdit.category = cur.category; }
+        const di = document.getElementById('desc-input'); if (di) { di.value = cur.desc; if (typeof checkWords === 'function') checkWords(); }
+        if (typeof _idRender === 'function') _idRender();
+        if (typeof sv === 'function') sv();
+      }
+      _dlUpdateNote(_umBase, cur);
+      closeUpdateModal();
     }
 
-    // ── Entry 2: nút ở Step 1 (service mới chọn, chưa dựng form) ──
-    function _renameRowsStep1() {
-      if (!_origin || !_idEdit) return [];
-      return _renameRows(_origin, _idEdit);
-    }
+    // Nút "Cập nhật thông tin service" ở footer Step 1 + popup gợi ý (hiện 1 lần).
     function _syncRenameBtn() {
       const b = document.getElementById('rename-export-btn');
       if (!b) return;
-      b.style.display = (_origin && _renameRowsStep1().length > 0) ? 'inline-flex' : 'none';
+      const show = !!_origin;
+      b.style.display = show ? 'inline-flex' : 'none';
+      const host = document.getElementById('upd-foot-left');
+      let coach = document.getElementById('upd-coach');
+      let seen = false; try { seen = localStorage.getItem('tib_upd_coach') === '1'; } catch (e) {}
+      if (show && !seen && host && !coach) {
+        coach = document.createElement('div');
+        coach.id = 'upd-coach';
+        coach.style.cssText = 'position:absolute;left:0;bottom:calc(100% + 12px);z-index:50;width:320px;background:#1e293b;color:#fff;border-radius:13px;padding:13px 15px;box-shadow:0 16px 36px rgba(15,23,42,.3)';
+        coach.innerHTML = '<div style="position:absolute;bottom:-7px;left:30px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #1e293b"></div>'
+          + '<div style="font-size:13px;font-weight:700;margin-bottom:4px">💡 Cần cập nhật service?</div>'
+          + '<div style="font-size:12px;color:#cbd5e1;line-height:1.5">Bấm <b>"Cập nhật thông tin service"</b> để sửa tên / Catalog / Category / mô tả — không cần dựng form.</div>'
+          + '<div style="margin-top:10px;display:flex;justify-content:flex-end;gap:8px"><button onclick="_dismissUpdCoach()" style="font-size:12px;font-weight:600;padding:6px 8px;color:#94a3b8;background:none;border:none;cursor:pointer">Đừng hiện lại</button><button onclick="_dismissUpdCoach()" style="font-size:12px;font-weight:700;padding:6px 13px;border-radius:8px;background:#fff;color:#1e293b;border:none;cursor:pointer">Đã hiểu</button></div>';
+        host.appendChild(coach);
+      } else if ((!show || seen) && coach) { coach.remove(); }
     }
-    function exportRenameOnlyFromStep1() {
-      if (!_origin) { toast('⚠️ Chưa chọn service'); return; }
-      const rows = _renameRowsStep1();
-      if (!rows.length) { toast('⚠️ Chưa có thay đổi định danh. Bấm "Chỉnh sửa thông tin" để sửa Catalog / Category / Tên service.'); return; }
-      const nd = _renameNoteData({ service: _origin.service, catalog: _origin.catalog, category: _origin.category }, rows);
-      _dlRenameNote(nd);
-    }
+    function _dismissUpdCoach() { try { localStorage.setItem('tib_upd_coach', '1'); } catch (e) {} const c = document.getElementById('upd-coach'); if (c) c.remove(); }
 
         function showCancelBanner() {} // no-op (UI banner not implemented)
     function hideCancelBanner() {} // no-op
