@@ -120,6 +120,21 @@
   .addbtn{appearance:none;border:1.5px dashed var(--nexus-border);background:#fff;color:var(--nexus);font:inherit;font-size:13.5px;font-weight:800;padding:12px 22px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:9px}
   .addbtn:hover{background:var(--nexus-light)}
   .emptyhint{text-align:center;color:var(--faint);font-size:13px;padding:30px 10px}
+  /* Quick start (MS Forms empty state) */
+  .qs{background:#fff;border-radius:var(--r);border:1px solid var(--line-soft);box-shadow:var(--shadow);padding:22px 24px 24px}
+  .qs-head{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+  .qs-x{width:30px;height:30px;border-radius:50%;background:var(--nexus);color:#fff;border:0;display:grid;place-items:center;cursor:pointer;font-size:13px;flex-shrink:0}
+  .qs-x:hover{background:var(--nexus-hover)}
+  .qs-title{font-size:17px;font-weight:800;color:var(--nexus-dark)}
+  .qs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .qs-card{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:11px;background:#fff;padding:15px 18px;cursor:pointer;font-family:inherit;text-align:left;transition:border-color .15s,background .15s,box-shadow .15s}
+  .qs-card:hover{border-color:var(--nexus-border);background:var(--nexus-light);box-shadow:0 4px 14px -8px rgba(21,93,252,.4)}
+  .qs-card .qi{color:var(--nexus);flex-shrink:0;display:grid;place-items:center}
+  .qs-card .ql{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .qs-foot{margin-top:18px;font-size:12.5px;color:var(--muted)}
+  .qs-foot a{color:var(--nexus);font-weight:700;cursor:pointer;text-decoration:none}
+  .qs-foot a:hover{text-decoration:underline}
+  @media (max-width:680px){.qs-grid{grid-template-columns:1fr 1fr}}
 
   /* footer */
   .footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 18px;background:#fff;border-top:1px solid var(--line);flex-wrap:wrap}
@@ -232,7 +247,7 @@
             </div>
           </div>
           <div id="cards"></div>
-          <div class="addrow">
+          <div class="addrow" id="addRow">
             <button class="addbtn" onclick="openPicker(null)">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Thêm câu hỏi
             </button>
@@ -314,10 +329,30 @@ var CHOICE=['select','radio','checkbox','checklist','branch'];
 var OPTLESS_INPUT=['text','textarea','number','email','date','daterange','boolean','upload','country','language','product'];
 var API_TYPES=['product','country','language'];
 var HAS_VALIDATION=['text','textarea','email','number'];
+var TYPE_SVG={
+ label:'<path d="M4 6h16M4 11h16M4 16h9"/>',
+ text:'<rect x="3" y="8" width="18" height="8" rx="2"/><path d="M7 12h6"/>',
+ textarea:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/>',
+ number:'<path d="M8 4 6 20M18 4l-2 16M5 9h15M4 15h15"/>',
+ email:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+ boolean:'<rect x="2" y="7" width="20" height="10" rx="5"/><circle cx="16" cy="12" r="2.6"/>',
+ date:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
+ daterange:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M7 14h10"/>',
+ select:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="m8 11 4 4 4-4"/>',
+ radio:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.4" fill="currentColor" stroke="none"/>',
+ checkbox:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m7.5 12 3 3 6-7"/>',
+ checklist:'<path d="M10 6h10M10 12h10M10 18h10"/><path d="m3 6 1.4 1.4L7 5M3 12l1.4 1.4L7 11M3 18l1.4 1.4L7 17"/>',
+ branch:'<circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="9" r="2.4"/><path d="M6 8.4v7.2M6 12h6a4 4 0 0 0 4-3.6"/>',
+ upload:'<path d="M12 15V4M8 8l4-4 4 4M5 15v3a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3"/>',
+ country:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18"/>',
+ language:'<path d="M3 5h11M8.5 3v2M12 5c0 5-3.5 9-9 11M6 9c1 3.5 4 6 8 7"/><path d="m13 19 4-9 4 9M14.4 16h5.2"/>',
+ product:'<rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="13.5" r="1"/>'
+};
+function iconFor(t){return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(TYPE_SVG[t]||'<circle cx="12" cy="12" r="9"/>')+'</svg>';}
 
 /* ───────── State ───────── */
 var uid=1;
-var state={service:'',catalog:'CSKH',description:'',fields:[],selectedId:null,mode:'edit'};
+var state={service:'',catalog:'CSKH',description:'',fields:[],selectedId:null,mode:'edit',qsDismissed:false};
 
 function slug(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_+|_+$/g,'').toLowerCase().slice(0,40)||'field';}
 function uniqName(base,exceptId){var n=base,k=1;var used={};state.fields.forEach(function(f){if(f.id!==exceptId)used[f.fieldName]=1;});while(used[n]){n=base+'_'+(++k);}return n;}
@@ -427,9 +462,30 @@ function cardHtml(f,i){
 }
 function getByName(n){for(var i=0;i<state.fields.length;i++)if(state.fields[i].fieldName===n)return state.fields[i];return null;}
 
+function quickStartHtml(){
+  var cards=TYPES.map(function(t){
+    return '<button class="qs-card" data-action="qs-pick" data-type="'+t.id+'"><span class="qi">'+iconFor(t.id)+'</span><span class="ql">'+H(t.nm)+'</span></button>';
+  }).join('');
+  return '<div class="qs">'
+    +'<div class="qs-head"><button class="qs-x" data-action="qs-dismiss" title="Đóng gợi ý">✕</button><span class="qs-title">Bắt đầu nhanh với</span></div>'
+    +'<div class="qs-grid">'+cards+'</div>'
+    +'<div class="qs-foot">Chọn 1 loại để tạo câu hỏi đầu tiên — hoặc <a data-action="qs-demo">tải ví dụ mẫu</a> để xem form đã dựng.</div>'
+    +'</div>';
+}
 function renderCards(){
   var c=document.getElementById('cards');
-  if(!state.fields.length){c.innerHTML='<div class="emptyhint">Chưa có câu hỏi nào. Bấm <b>“Thêm câu hỏi”</b> bên dưới để bắt đầu.</div>';return;}
+  var addRow=document.getElementById('addRow');
+  if(!state.fields.length){
+    if(state.qsDismissed){
+      c.innerHTML='<div class="emptyhint">Chưa có câu hỏi nào. Bấm <b>“Thêm câu hỏi”</b> bên dưới để bắt đầu.</div>';
+      if(addRow)addRow.style.display='';
+    }else{
+      c.innerHTML=quickStartHtml();
+      if(addRow)addRow.style.display='none';
+    }
+    return;
+  }
+  if(addRow)addRow.style.display='';
   var h='';state.fields.forEach(function(f,i){h+=cardHtml(f,i);});c.innerHTML=h;
 }
 function renderAll(){renderCards();}
@@ -441,6 +497,9 @@ document.getElementById('cards').addEventListener('click',function(e){
   var act=el.getAttribute('data-action');var id=el.getAttribute('data-id')?+el.getAttribute('data-id'):null;
   if(act==='select'){ if(state.selectedId!==id){state.selectedId=id;renderAll();} return; }
   e.stopPropagation();
+  if(act==='qs-pick'){pickerInsertAfter=null;addField(el.getAttribute('data-type'));return;}
+  if(act==='qs-dismiss'){state.qsDismissed=true;renderAll();return;}
+  if(act==='qs-demo'){loadDemo();return;}
   var f=getF(id);
   if(act==='toggle-req'){f.required=!f.required;renderAll();}
   else if(act==='toggle-half'){f.halfWidth=!f.halfWidth;renderAll();}
@@ -704,22 +763,24 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closePops()
 document.addEventListener('click',function(e){ // click empty stage area deselects
   if(e.target.id==='builder'||e.target.classList&&e.target.classList.contains('formcol')){state.selectedId=null;renderAll();}
 });
-function resetAll(){if(confirm('Xoá hết câu hỏi?')){state.fields=[];state.selectedId=null;renderAll();}}
+function resetAll(){if(confirm('Xoá hết câu hỏi?')){state.fields=[];state.selectedId=null;state.qsDismissed=false;renderAll();}}
 
-/* ───────── Seed demo ───────── */
-function seed(){
-  state.service='Khôi phục tài khoản bị mất';
-  state.description='Điền thông tin bên dưới để bộ phận CSKH xác minh và hỗ trợ khôi phục tài khoản của bạn.';
+/* ───────── Demo (optional) ───────── */
+function loadDemo(){
   var f1=makeField('text');f1.label='UserID / Tên đăng nhập';f1.fieldName='user_id';f1.required=true;
   var f2=makeField('product');f2.label='Sản phẩm game';f2.fieldName='product';f2.required=true;
   var f3=makeField('radio');f3.label='Nền tảng đăng nhập';f3.fieldName='platform';f3.required=true;f3.options=['Facebook','Google','Apple ID','Số điện thoại'];
   var f4=makeField('textarea');f4.label='Mô tả chi tiết sự cố';f4.fieldName='description';f4.required=true;
   var f5=makeField('upload');f5.label='Ảnh minh chứng (CMND/CCCD)';f5.fieldName='proof';f5.visRule={on:true,source:'platform',op:'is',values:'Số điện thoại'};
-  state.fields=[f1,f2,f3,f4,f5];state.selectedId=f3.id;
-  document.getElementById('svcTitle').value=state.service;
-  document.getElementById('svcDesc').value=state.description;
+  state.fields=[f1,f2,f3,f4,f5];state.selectedId=f3.id;state.qsDismissed=true;
+  renderAll();toast('Đã tải ví dụ mẫu');
 }
-seed();renderAll();autoGrow(document.getElementById('svcDesc'));
+/* ───────── Init: bắt đầu rỗng → hiện lưới Quick start ───────── */
+state.service='Khôi phục tài khoản bị mất';
+state.description='Điền thông tin bên dưới để bộ phận CSKH xác minh và hỗ trợ khôi phục tài khoản của bạn.';
+document.getElementById('svcTitle').value=state.service;
+document.getElementById('svcDesc').value=state.description;
+renderAll();autoGrow(document.getElementById('svcDesc'));
 </script>
 </body>
 </html>
