@@ -5340,7 +5340,16 @@ ${formScript}
           + '─────\n'
           + '• JSON dùng để IMPORT, KHÔNG đọc trực tiếp\n'
           + '• .html + .json cùng tên = 1 cặp — cùng mô tả 1 service\n';
-        zip.file('README.txt', readme);
+        // Chỉ bổ sung mục giải thích phiếu cập nhật KHI gói có service chỉ-đổi-thông-tin
+        var _hasInfoOnly = entries.some(function (e) { return e.infoOnly || (!((e.fields) || []).length && e.proposedChanges); });
+        var _readmeOut = readme + (_hasInfoOnly
+          ? ('\nPHIẾU CẬP NHẬT THÔNG TIN\n'
+            + '────────────────────────\n'
+            + '• phieu-cap-nhat-service__<ten>.html  → service chỉ ĐỔI THÔNG TIN (tên / phân loại / mô tả), KHÔNG đổi form\n'
+            + '   Double-click mở bằng browser để xem bảng "Hiện tại → Sau cập nhật"; gửi PIC cập nhật trên Nexus admin.\n'
+            + '   Service loại này KHÔNG kèm file .json (vì không thay đổi field/form).\n')
+          : '');
+        zip.file('README.txt', _readmeOut);
 
         zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
           .then(blob => {
