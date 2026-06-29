@@ -919,14 +919,8 @@
       </div>
 
       <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fff;position:sticky;bottom:0;">
-        <div id="upd-foot-left" style="position:relative;display:flex;align-items:center">
-          <button id="rename-export-btn" onclick="exportUpdateFromStep1()" style="display:none;flex-direction:column;align-items:flex-start;gap:0;background:#fff;color:#155DFC;border:1.5px solid #BFDBFE;font-weight:700;padding:8px 16px;border-radius:12px;cursor:pointer" title="Xuất 1 phiếu cập nhật thông tin cho PIC — không update form">
-            <span style="font-size:13.5px;font-weight:700">Cập nhật thông tin service</span>
-            <span style="font-size:10.5px;font-weight:500;color:#64748B">không update form</span>
-          </button>
-        </div>
-        <button class="flex items-center gap-2 bg-slate-100 text-slate-400 font-bold px-5 py-3 rounded-xl transition" id="next-btn" onclick="goStep(2)" disabled>
-          <span>Dựng form</span>
+        <button class="flex items-center gap-2 bg-slate-100 text-slate-400 font-bold px-5 py-3 rounded-xl transition" id="next-btn" onclick="nextStep1()" disabled>
+          <span>Next</span>
           <svg id="next-arrow" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
         </button>
       </div>
@@ -5305,16 +5299,24 @@ ${formScript}
           entries.forEach(entry => {
             const svcSlug = _slug(entry.service||'service', 60);
             try {
-              zip.file(svcSlug + '.json', _buildJSONBlob(entry));
-              zip.file(svcSlug + '.html', _buildDesignHTMLBlob([entry]));
+              if (entry.infoOnly || (!((entry.fields)||[]).length && entry.proposedChanges)) {
+                zip.file('phieu-cap-nhat-service__' + svcSlug + '.html', _buildInfoNoteFromPC(entry.proposedChanges, entry));
+              } else {
+                zip.file(svcSlug + '.json', _buildJSONBlob(entry));
+                zip.file(svcSlug + '.html', _buildDesignHTMLBlob([entry]));
+              }
             } catch (e) {}
           });
         } else {
           // Single service: named files <service-slug>.html + <service-slug>.json
           const entry = entries[0];
           const svcSlug = _slug(entry.service||'service', 60);
-          zip.file(svcSlug + '.html', _buildDesignHTMLBlob([entry]));
-          zip.file(svcSlug + '.json', _buildJSONBlob(entry));
+          if (entry.infoOnly || (!((entry.fields)||[]).length && entry.proposedChanges)) {
+            zip.file('phieu-cap-nhat-service__' + svcSlug + '.html', _buildInfoNoteFromPC(entry.proposedChanges, entry));
+          } else {
+            zip.file(svcSlug + '.html', _buildDesignHTMLBlob([entry]));
+            zip.file(svcSlug + '.json', _buildJSONBlob(entry));
+          }
         }
         // README explains pair + print instructions
         const readme = '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n'
@@ -5674,6 +5676,78 @@ ${formScript}
       const cur = { catalog: e.catalog || base.catalog, category: e.category || base.category, service: e.service || base.service, desc: (di ? di.value : '').trim() };
       if (!_umHasChange(base, cur)) { toast('⚠️ Chưa có thay đổi. Bấm "Chỉnh sửa thông tin" để sửa, rồi xuất phiếu.'); return; }
       _openUpdateConfirm(base, cur);
+    }
+
+    // ═══ NEW (additive): gộp 2 nút footer Step 1 -> 1 nút "Next" -> hộp thoại 3 lựa chọn ═══
+    function nextStep1() { _openNextChooser(); }
+
+    function _ncCard(border, bg, title, sub, pillBg, pillColor, pillBorder, pillText, action) {
+      return '<div role="button" tabindex="0" onclick="' + action + '" '
+        + 'style="border:1.5px solid ' + border + ';border-radius:14px;padding:13px 15px;background:' + bg + ';cursor:pointer">'
+        + '<div style="font-size:14.5px;font-weight:800;color:#16203A;letter-spacing:-.2px">' + title + '</div>'
+        + '<div style="font-size:12.5px;color:#64748B;margin-top:3px;line-height:1.5">' + sub + '</div>'
+        + '<span style="display:inline-block;font-size:10px;font-weight:800;padding:3px 10px;border-radius:999px;margin-top:10px;background:' + pillBg + ';color:' + pillColor + ';border:1px solid ' + pillBorder + '">' + pillText + '</span>'
+        + '</div>';
+    }
+    function _openNextChooser() {
+      if (document.getElementById('_nc_overlay')) return;
+      const ov = document.createElement('div');
+      ov.id = '_nc_overlay';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:20px';
+      ov.onclick = function (e) { if (e.target === ov) _closeNextChooser(); };
+      ov.innerHTML =
+        '<div style="width:100%;max-width:460px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(16,40,90,.22)" onclick="event.stopPropagation()">'
+        + '<div style="padding:15px 18px;border-bottom:1px solid #EEF1F5;display:flex;align-items:center"><span style="font-size:16px;font-weight:850;letter-spacing:-.2px;color:#16203A">Chọn hướng xử lý</span><span style="margin-left:auto;cursor:pointer;color:#c2cad6;font-size:16px" onclick="_closeNextChooser()">✕</span></div>'
+        + '<div style="padding:15px 18px 18px;display:flex;flex-direction:column;gap:11px">'
+        + _ncCard('#BFDBFE', 'linear-gradient(180deg,#f7faff,#fff)', 'Tiếp tục thiết kế form', 'Cập nhật các field của form thu thập thông tin', '#155DFC', '#fff', '#155DFC', 'Tiếp tục →', '_closeNextChooser(); goStep(2);')
+        + _ncCard('#BFE6D4', 'linear-gradient(180deg,#f5fbf8,#fff)', 'Lưu &amp; chỉnh sửa service khác', 'Lưu phần cập nhật thông tin vào danh sách, rồi tiếp tục chỉnh sửa service khác — Export all sẽ gộp tất cả khi xong.', '#EAF7F1', '#0F8A5F', '#BFE6D4', 'Lưu &amp; tiếp tục', '_closeNextChooser(); _saveInfoAndContinue();')
+        + _ncCard('#FED7AA', '#fff', 'Xuất file cập nhật ngay', 'Tải file cập nhật tên / phân loại / mô tả — không cập nhật form', '#FFF7ED', '#B45309', '#FED7AA', 'Xuất file &amp; hoàn thành', '_closeNextChooser(); exportUpdateFromStep1();')
+        + '</div></div>';
+      document.body.appendChild(ov);
+      document.addEventListener('keydown', _ncEsc);
+    }
+    function _ncEsc(e) { if (e.key === 'Escape') _closeNextChooser(); }
+    function _closeNextChooser() { const ov = document.getElementById('_nc_overlay'); if (ov) ov.remove(); document.removeEventListener('keydown', _ncEsc); }
+
+    // 🟩 Lưu thay đổi thông tin (info-only) vào phiên rồi quay lại chọn service khác
+    function _saveInfoAndContinue() {
+      if (!_origin) { toast('⚠️ Chưa chọn service'); return; }
+      const di = document.getElementById('desc-input');
+      const base = { catalog: _origin.catalog || '', category: _origin.category || '', service: _origin.service || '', desc: _origin.sla || '' };
+      const e0 = _idEdit || base;
+      const cur = { catalog: e0.catalog || base.catalog, category: e0.category || base.category, service: e0.service || base.service, desc: (di ? di.value : '').trim() };
+      if (!_umHasChange(base, cur)) { toast('⚠️ Chưa có thay đổi thông tin. Bấm "Chỉnh sửa thông tin" để sửa trước.'); return; }
+      const ch = {};
+      if (cur.catalog !== base.catalog) ch.catalog = cur.catalog;
+      if (cur.category !== base.category) ch.category = cur.category;
+      if (cur.service !== base.service) ch.service = cur.service;
+      if (base.desc && cur.desc && cur.desc !== base.desc) ch.description = cur.desc;
+      ch.origin = { catalog: base.catalog, category: base.category, service: base.service };
+      ch.sla = base.desc || '';
+      const entry = { catalog: cur.catalog, category: cur.category, service: cur.service, description: (di ? di.value : ''), fields: [], isCustom: false, proposedChanges: ch, infoOnly: true, _infoBase: base, _infoCur: cur };
+      const ix = sessionServices.findIndex(function (x) { return x.catalog === base.catalog && x.category === base.category && x.service === base.service; });
+      if (ix >= 0) sessionServices[ix] = entry; else sessionServices.push(entry);
+      if (typeof updateSessionCounter === 'function') updateSessionCounter();
+      const svcName = cur.service;
+      fields = []; _fid = 1; activeId = null; previewState = {};
+      sel = { s: sel.s, g: '', n: '' };
+      _origin = null; _idEdit = null; _editingId = false;
+      if (di) di.value = '';
+      const dp = document.getElementById('desc-path'); if (dp) { dp.style.display = 'none'; dp.innerHTML = ''; }
+      if (typeof checkWords === 'function') checkWords();
+      goStep(1);
+      if (typeof renderCols === 'function') renderCols();
+      if (typeof sv === 'function') sv();
+      toast('✅ Đã lưu cập nhật thông tin "' + svcName + '" vào danh sách. Chọn service khác để tiếp tục.', 4000);
+    }
+
+    // Export all: dựng "phiếu cập nhật thông tin" cho entry info-only (dùng đúng _buildUpdateNoteHTML có sẵn)
+    function _buildInfoNoteFromPC(pc, entry) {
+      if (entry && entry._infoBase && entry._infoCur) return _buildUpdateNoteHTML(entry._infoBase, entry._infoCur);
+      const o = (pc && pc.origin) || {};
+      const base = { catalog: o.catalog || '', category: o.category || '', service: o.service || (entry ? entry.service : ''), desc: (pc && pc.sla) || '' };
+      const cur = { catalog: (pc && pc.catalog) || base.catalog, category: (pc && pc.category) || base.category, service: (pc && pc.service) || base.service, desc: (pc && pc.description) || base.desc };
+      return _buildUpdateNoteHTML(base, cur);
     }
 
     // Bước xác nhận: cho user soát lại thay đổi (read-only) một lần nữa rồi mới xuất phiếu.
