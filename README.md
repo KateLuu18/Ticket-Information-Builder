@@ -1,6 +1,6 @@
-# Nexus TIB — Ticket Information Builder
+# Hub TIB — Ticket Information Builder
 
-Internal tool for Service Owners at GPP / VNG Games to design ticket forms for the Nexus platform.
+Internal tool for Service Owners at GPP / VNG Games to design ticket forms for the Hub platform.
 
 ## 🚀 Deploy
 
