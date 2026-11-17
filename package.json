@@ -1,7 +1,7 @@
 {
-  "name": "nexus-tib",
+  "name": "hub-tib",
   "version": "1.0.0",
-  "description": "Nexus Ticket Information Builder — GPP / VNG Games",
+  "description": "Hub Ticket Information Builder — GPP / VNG Games",
   "private": true,
   "scripts": {
     "start": "serve -s . -l tcp://0.0.0.0:${PORT:-3000} --no-clipboard"

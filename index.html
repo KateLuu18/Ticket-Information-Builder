@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus — Ticket Information Builder</title>
+  <title>Hub — Ticket Information Builder</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -416,7 +416,7 @@
 
     /* ═══════════════════════════════════════════════════════════════
        HUB UI DESIGN TOKENS — for modals (Edit Wizard, Field Type Picker,
-       Verify JSON). Token values pulled from Nexus Hub UI design system.
+       Verify JSON). Token values pulled from Hub UI design system.
        ═══════════════════════════════════════════════════════════════ */
     :root {
       --hub-bg-container: #ffffffe8;
@@ -682,7 +682,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="text-xs font-bold text-slate-800">Color test (8 màu)</div>
-                <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Thêm 1 label đủ 8 màu để export đi test trên Nexus · không thay form hiện tại</div>
+                <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Thêm 1 label đủ 8 màu để export đi test trên Hub · không thay form hiện tại</div>
               </div>
             </button>
             <div class="border-t border-slate-100 mt-1 pt-2 pb-1 px-3">
@@ -740,7 +740,7 @@
                 <div class="s0-card-icon ci-blue"><svg viewBox="0 0 24 24" fill="none" stroke="#3B6DC6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><path d="M8 13h8"/><path d="M8 17h5"/></svg></div>
                 <div class="s0-card-body">
                   <div class="s0-card-badge bd-blue"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Khuyến nghị</div>
-                  <div class="s0-card-title">Service đã có trên Nexus</div>
+                  <div class="s0-card-title">Service đã có trên Hub</div>
                   <div class="s0-card-desc">Chọn từ danh sách Catalog → Category → Service đang hoạt động</div>
                   <div class="s0-card-stat st-blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/></svg> <b id="s0-svc-count">0</b> services đang hoạt động</div>
                 </div>
@@ -910,7 +910,7 @@
           </label>
           <div class="text-xs font-semibold text-slate-400" id="wcount">0 / 100 words</div>
         </div>
-        <textarea class="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-sm font-medium focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 text-slate-800 transition placeholder:italic placeholder:text-slate-400 placeholder:font-normal" id="desc-input" placeholder="Mô tả mục đích, đầu vào và đầu ra của dịch vụ. VD: Tiếp nhận yêu cầu cấp quyền truy cập hệ thống Nexus, GS cung cấp thông tin nhân sự, kết quả là tài khoản được tạo trong 1-2 ngày làm việc." autocomplete="off" oninput="checkWords()" style="flex:1;min-height:150px;resize:none;"></textarea>
+        <textarea class="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-sm font-medium focus:outline-none focus:border-nexus focus:ring-4 focus:ring-nexus/10 text-slate-800 transition placeholder:italic placeholder:text-slate-400 placeholder:font-normal" id="desc-input" placeholder="Mô tả mục đích, đầu vào và đầu ra của dịch vụ. VD: Tiếp nhận yêu cầu cấp quyền truy cập hệ thống Hub, GS cung cấp thông tin nhân sự, kết quả là tài khoản được tạo trong 1-2 ngày làm việc." autocomplete="off" oninput="checkWords()" style="flex:1;min-height:150px;resize:none;"></textarea>
         <div id="wcount-warn" style="display:none" class="text-xs font-semibold text-red-500 mt-1.5">⚠ Mô tả vượt quá 100 từ — vui lòng rút gọn để tiếp tục.</div>
         <div id="ed-ref" style="display:none;background:#fff;border:1px dashed #D6DEEA;border-radius:10px;padding:9px 12px;font-size:11.5px;color:#5b6b85;line-height:1.5;margin-top:9px"></div>
         <div id="ed-note" style="display:none"></div>
@@ -1112,7 +1112,7 @@
           <div style="display:flex;align-items:center;gap:8px;margin:4px 0;font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em"><span style="flex:1;height:0.5px;background:#e2e8f0"></span>Hoặc dùng danh sách tự động (auto-load)<span style="flex:1;height:0.5px;background:#e2e8f0"></span></div>
           <button class="fta-sub" onclick="FTA.sel2('list-country',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Country — auto-loaded list</span></span></div><span class="s-note"><i>Danh sách quốc gia/vùng tự động cập nhật — không phải nhập tay, luôn chuẩn</i></span></button>
           <button class="fta-sub" onclick="FTA.sel2('list-language',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c0 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Language — auto-loaded list</span></span></div><span class="s-note"><i>Danh sách ngôn ngữ tự động cập nhật — không phải nhập tay</i></span></button>
-          <button class="fta-sub" onclick="FTA.sel2('list-product',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Game / product — synced from Nexus</span></span></div><span class="s-note"><i>Danh sách game/sản phẩm đồng bộ từ hệ thống — luôn khớp dữ liệu thật</i></span></button>
+          <button class="fta-sub" onclick="FTA.sel2('list-product',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Game / product — synced from Hub</span></span></div><span class="s-note"><i>Danh sách game/sản phẩm đồng bộ từ hệ thống — luôn khớp dữ liệu thật</i></span></button>
         </div>
         <div id="fta-sub-input" class="fta-subs">
           <button class="fta-sub" onclick="FTA.sel2('text-short',this)"><div class="fta-sub-row"><span class="fta-sub-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="17" x2="17" y2="17"/></svg></span><span class="fta-sub-text"><span class="fta-sub-title">Short text — under 100 chars (name, code, ID)</span></span></div><span class="s-note"><i>Một dòng ngắn gồm chữ và số. VD: mã giao dịch TXN-001, tên studio</i></span></button>
@@ -1514,7 +1514,7 @@
       return TYPE_ICONS[tid] || '<span style="font-size:14px">' + (TI(tid).ic || '?') + '</span>';
     }
     // Inline styles — Tailwind CDN can't detect dynamic class names in JS
-    // ALL types use unified nexus blue (matches real Nexus tool — no color salad)
+    // ALL types use unified nexus blue (matches real Hub tool — no color salad)
     const _NEXUS_COLOR = { bg: '#EFF6FF', border: '#BFDBFE', text: '#155DFC' };
     const TYPE_COLORS = {
       label:     _NEXUS_COLOR,
@@ -1578,7 +1578,7 @@
       str = str.replace(/[^a-z0-9_]/g, '_');
       str = str.replace(/__+/g, '_');
       str = str.replace(/^_+|_+$/g, '');
-      if (str.length > 64) str = str.slice(0, 64).replace(/_+$/, '');  // giới hạn 64 ký tự (DB Nexus)
+      if (str.length > 64) str = str.slice(0, 64).replace(/_+$/, '');  // giới hạn 64 ký tự (DB Hub)
       return str;
     }
 
@@ -1841,7 +1841,7 @@
       if (u1) u1.style.backgroundColor = isValid ? '#155DFC' : 'transparent';
     }
 
-    // ── Edit identity of an EXISTING service (additive; never touches Nexus JSON) ──
+    // ── Edit identity of an EXISTING service (additive; never touches Hub JSON) ──
     // State (_origin / _idEdit / _editingId) is declared near top with other globals.
     function _slaDescOf(n) {
       try { const f = raw().find(x => x.s === sel.s && x.g === sel.g && x.n === n); return (f && f.d) ? f.d : ''; }
@@ -2510,7 +2510,7 @@
         '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><span style="width:27px;height:27px;border-radius:7px;background:#EAF1FE;color:#155DFC;display:flex;align-items:center;justify-content:center">' + pen + '</span>' +
         '<span style="font-size:13px;font-weight:700;color:#1e3a8a">Thông tin cần cập nhật trên hệ thống</span>' +
         '<span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#155DFC;background:#EAF1FE;padding:2px 7px;border-radius:999px">' + rows.length + ' thay đổi</span></div>' +
-        '<p style="font-size:11px;color:#64748b;margin:0 0 10px 36px">Service này dựa trên một service hiện có. Vui lòng cập nhật các thông tin sau trên hệ thống Nexus.</p>' +
+        '<p style="font-size:11px;color:#64748b;margin:0 0 10px 36px">Service này dựa trên một service hiện có. Vui lòng cập nhật các thông tin sau trên hệ thống Hub.</p>' +
         '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="' + th + '">Mục</th><th style="' + th + '">Hiện tại (gốc)</th><th style="' + th + '">Đề xuất (mới)</th></tr></thead><tbody>' + body + '</tbody></table>' +
         '<div style="font-size:10px;color:#94A3B8;margin-top:9px;padding-top:8px;border-top:1px dashed #E7ECF4">Thông tin thay đổi chỉ mang tính thông báo — không ảnh hưởng dữ liệu field trong file import.</div></div>';
     }
@@ -2686,7 +2686,7 @@
         const labelRow = isLabel ? '' : '<label for="inp-'+f.id+'" style="'+S.label+'">'+displayLabel+reqStar+'</label>'+hintHtml;
         const errorEl = (!isLabel) ? '<div id="err-'+f.id+'" style="display:none;font-size:11px;color:#EF4444;margin-top:4px;align-items:center;gap:4px"><span>\u26a0</span><span id="err-msg-'+f.id+'">Tr\u01b0\u1eddng n\u00e0y b\u1eaft bu\u1ed9c</span></div>' : '';
 
-        // Yes/No: h\u00e0ng c\u00f4ng t\u1eafc \u2014 nh\u00e3n tr\u00e1i, c\u00f4ng t\u1eafc ph\u1ea3i (gi\u1ed1ng Nexus)
+        // Yes/No: h\u00e0ng c\u00f4ng t\u1eafc \u2014 nh\u00e3n tr\u00e1i, c\u00f4ng t\u1eafc ph\u1ea3i (gi\u1ed1ng Hub)
         if (f.type === 'boolean') {
           return '<div id="'+wrapId+'" style="'+wrapHide+'" data-fid="'+f.id+'"'+visAttr+'><div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><label for="inp-'+f.id+'" style="'+S.label+';margin:0">'+displayLabel+reqStar+'</label>'+hintHtml+'</div>'+inputHtml+'</div>'+errorEl+'</div>';
         }
@@ -2732,9 +2732,9 @@
         <script type="application/json" id="spec-${idx}">${specJson.replace(/</g,'\\u003c')}<\/sc` + `ript>
         <div class="svc-section" id="svc-${idx}" data-slug="${svcSlug}" style="${idx>0?'margin-top:32px;padding-top:32px;border-top:1px solid #E5E7EB':''}">
           <div style="border-bottom:1px solid #F1F5F9;padding-bottom:16px;margin-bottom:16px">
-            <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:8px"><div style="display:inline-block;font-size:12px;font-weight:700;color:#155DFC;background:rgba(21,93,252,0.1);border:1px solid rgba(21,93,252,0.3);padding:2px 8px;border-radius:6px">${H2(entry.catalog||'Nexus')}</div>${entry.isCustom?'<div style="display:inline-block;font-size:10px;font-weight:600;color:#92400E;background:#FFFBEB;border:1px solid #FCD34D;padding:2px 8px;border-radius:6px">Custom service</div>':''}</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:8px"><div style="display:inline-block;font-size:12px;font-weight:700;color:#155DFC;background:rgba(21,93,252,0.1);border:1px solid rgba(21,93,252,0.3);padding:2px 8px;border-radius:6px">${H2(entry.catalog||'Hub')}</div>${entry.isCustom?'<div style="display:inline-block;font-size:10px;font-weight:600;color:#92400E;background:#FFFBEB;border:1px solid #FCD34D;padding:2px 8px;border-radius:6px">Custom service</div>':''}</div>
             <h2 style="font-size:16px;font-weight:800;color:#1E293B;line-height:1.3">${H2(entry.service||'Service')}</h2>
-            ${entry.isCustom?'<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#D97706;margin-top:6px;padding:6px 10px;background:#FFFDF5;border:0.5px solid #FDE68A;border-radius:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Service này chưa có trên Nexus — thông tin Catalog/Category/Service do người tạo tự điền.</div>':''}
+            ${entry.isCustom?'<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#D97706;margin-top:6px;padding:6px 10px;background:#FFFDF5;border:0.5px solid #FDE68A;border-radius:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Service này chưa có trên Hub — thông tin Catalog/Category/Service do người tạo tự điền.</div>':''}
             ${entry.description?'<p style="font-size:11px;color:#64748B;font-style:italic;line-height:1.5;margin-top:6px;background:#F8FAFC;padding:10px;border-radius:8px;border:1px solid #F1F5F9">"'+H2(entry.description)+'"</p>':''}
             ${entry.proposedChanges ? _changeNoteHTMLExport(entry.proposedChanges) : ''}
           </div>
@@ -3039,7 +3039,7 @@
         [entry.service || ''],
         ['Catalog: ' + (entry.catalog||'') + '   |   Category: ' + (entry.category||'') + '   |   Total fields: ' + totalFields],
         ['Description: ' + (entry.description || '(no description)')],
-        ['Exported: ' + dateStr + ' ' + timeStr + '   |   Tool: Nexus Ticket Information Builder'],
+        ['Exported: ' + dateStr + ' ' + timeStr + '   |   Tool: Hub Ticket Information Builder'],
         [],
         ['#','field_name','label','type','required','visible','editable','searchable','multiple','hint','placeholder','default_value','options','validation','conditional_rule','parent_field','parent_option','half_width','pair_with']
       ];
@@ -3108,7 +3108,7 @@
       var now = new Date();
       var dateStr = now.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'Asia/Ho_Chi_Minh'});
       var aoa = [
-        ['Nexus Ticket Information Builder — Form Spec Export'],
+        ['Hub Ticket Information Builder — Form Spec Export'],
         ['Exported: ' + dateStr + '   |   Total services: ' + specs.length],
         [],
         ['#','Catalog','Category','Service','Description','Total fields','Sheet']
@@ -3130,14 +3130,14 @@
       return (n + '_' + s.trim()).slice(0, 31);
     }
 
-    // ── Filename: nexus-spec-{CATALOG}-{N}svc-{YYYYMMDD}.xlsx ──
+    // ── Filename: hub-spec-{CATALOG}-{N}svc-{YYYYMMDD}.xlsx ──
     function _buildFilename(specs) {
       var now = new Date();
       var pad = function(n){return String(n).padStart(2,'0');};
       var d = now.getFullYear()+''+pad(now.getMonth()+1)+''+pad(now.getDate());
       var catalogs = specs.map(function(e){return e.catalog||'';}).filter(function(v,i,a){return a.indexOf(v)===i;});
       var cat = catalogs.length===1 ? '-'+catalogs[0].toLowerCase().replace(/[^a-z0-9]/g,'-') : '-multi';
-      return 'nexus-spec'+cat+'-'+specs.length+'svc-'+d+'.xlsx';
+      return 'hub-spec'+cat+'-'+specs.length+'svc-'+d+'.xlsx';
     }
 
     function _buildChangesSheet(specs) {
@@ -3201,7 +3201,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${entries.length===1 ? H2(entries[0].service||'Form') : 'Nexus Forms'} — Test Form</title>
+<title>${entries.length===1 ? H2(entries[0].service||'Form') : 'Hub Forms'} — Test Form</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;background:#F8FAFC;color:#111;min-height:100vh;display:flex;flex-direction:column}
@@ -3241,7 +3241,7 @@ input[type=text]:focus,input[type=number]:focus,input[type=email]:focus,input[ty
 <body>
 <div class="topbar no-print">
   <div style="display:flex;align-items:center">
-    <span class="topbar-brand">Nexus</span>
+    <span class="topbar-brand">Hub</span>
     <span class="topbar-sep"></span>
     <span class="topbar-bc">${entries.length===1 ? (()=>{const bc=[entries[0].catalog,entries[0].category].filter(Boolean).join(' \u203a ');return (bc?H2(bc)+' \u203a ':'')+'\u003cb\u003e'+H2(entries[0].service||'Service')+'\u003c/b\u003e';})() : '\u003cb\u003e'+entries.length+' services\u003c/b\u003e'}</span>
   </div>
@@ -3329,7 +3329,7 @@ ${formScript}
             const subInline = sf.halfWidth && subLastWasHalf;
             subLastWasHalf = sf.halfWidth && !subInline;
             const subRow = _buildNexusRow(sf, subInline, idToName, idToMulti);
-            // Use confirmed Nexus visibility_rule format
+            // Use confirmed Hub visibility_rule format
             subRow.visibility_rule = {
               source_field: branchName,
               operator: 'equals',
@@ -3344,12 +3344,12 @@ ${formScript}
 
     function _buildNexusRow(f, isInline, idToName, idToMulti) {
       const fieldName = f.fieldName || ('field_' + f.id);
-      // Build visibility_rule using confirmed Nexus format: {source_field, operator, values:[]}
+      // Build visibility_rule using confirmed Hub format: {source_field, operator, values:[]}
       let visRule = null;
       if (f.visRule && f.visRule.source && String(f.visRule.source).trim() !== '' && f.visRule.values && String(f.visRule.values).trim() !== '' && idToName) {
         const srcName = idToName[f.visRule.source] || ('field_' + f.visRule.source);
         let op = f.visRule.op || 'equals';
-        // Nguồn là multi-select (checkbox/checklist/select-multiple) → Nexus cần contains, không phải equals
+        // Nguồn là multi-select (checkbox/checklist/select-multiple) → Hub cần contains, không phải equals
         if (idToMulti && idToMulti[f.visRule.source]) {
           if (op === 'equals') op = 'contains';
           else if (op === 'not_equals') op = 'not_contains';
@@ -3490,14 +3490,14 @@ ${formScript}
     function applyFieldTemplate(presetId) {
       if (!presetId) return;
       closeTemplateMenu();
-      // Tiện ích "Color test": THÊM 1 label đủ 8 màu (không thay form hiện tại) để export đi test trên Nexus
+      // Tiện ích "Color test": THÊM 1 label đủ 8 màu (không thay form hiện tại) để export đi test trên Hub
       if (presetId === 'color_test') {
-        const colors = [['#1E293B','mặc định'],['#64748B','xám'],['#E11D48','đỏ'],['#EA580C','cam'],['#CA8A04','vàng'],['#16A34A','xanh lá'],['#155DFC','xanh nexus'],['#7C3AED','tím']];
+        const colors = [['#1E293B','mặc định'],['#64748B','xám'],['#E11D48','đỏ'],['#EA580C','cam'],['#CA8A04','vàng'],['#16A34A','xanh lá'],['#155DFC','xanh hub'],['#7C3AED','tím']];
         const content = '<b>Color test:</b><br>' + colors.map(c => `<span style="color:${c[0]}">${c[0]} ${c[1]}</span>`).join('<br>');
         fields.push({ id: fuid(), type: 'label', content, fieldName: 'label_color_test', hint: '', required: false, visible: true, editable: true, isFieldNameManual: true, options: [], branchFields: {}, halfWidth: false });
         renderPreview();
         sv();
-        toast('✅ Đã thêm label "Color test" — Export rồi mở trên Nexus để xem màu nào hiển thị được');
+        toast('✅ Đã thêm label "Color test" — Export rồi mở trên Hub để xem màu nào hiển thị được');
         return;
       }
       if (fields.length > 0) {
@@ -3630,7 +3630,7 @@ ${formScript}
       { g: 'SMART PICKERS', ds: 'Tìm kiếm đồng bộ tự động qua API.', types: [
         { id: 'country', nm: 'Country', ic: '🌐', ds: 'Bộ chọn quốc gia auto-load.' },
         { id: 'language', nm: 'Language', ic: '🗣️', ds: 'Bộ chọn ngôn ngữ auto-load.' },
-        { id: 'product', nm: 'Game product', ic: '🎮', ds: 'Đồng bộ Game Product từ Nexus.' }
+        { id: 'product', nm: 'Game product', ic: '🎮', ds: 'Đồng bộ Game Product từ Hub.' }
       ]},
       { g: 'FILES & ADVANCED', ds: 'Tải tài liệu và các tích hợp tùy chỉnh.', types: [
         { id: 'upload', nm: 'Attachment', ic: '📎', ds: 'Upload File đính kèm lên phiếu.' }
@@ -3803,7 +3803,7 @@ ${formScript}
         if (nextBtn) nextBtn.disabled = true;
         return false;
       } else if (val.length > 64) {
-        errEl.textContent = '⚠️ Field name tối đa 64 ký tự (giới hạn DB Nexus).';
+        errEl.textContent = '⚠️ Field name tối đa 64 ký tự (giới hạn DB Hub).';
         errEl.classList.remove('hidden');
         if (nextBtn) nextBtn.disabled = true;
         return false;
@@ -3850,7 +3850,7 @@ ${formScript}
       const autoKey = EW.fieldName || toCleanFieldName(EW.label || EW.content);
       let h = '';
       if (['country', 'language', 'product'].includes(EW.type)) {
-        h += `<div class="bg-sky-50 border border-sky-100 text-sky-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5 mb-4"><span class="shrink-0 text-sm">ℹ️</span><div>Field này nạp option từ API. <b>Tool demo chỉ hiển thị một vài option mẫu</b> — khi PIC set up trên môi trường thật, hệ thống sẽ tự kéo đầy đủ danh sách từ Nexus.</div></div>`;
+        h += `<div class="bg-sky-50 border border-sky-100 text-sky-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5 mb-4"><span class="shrink-0 text-sm">ℹ️</span><div>Field này nạp option từ API. <b>Tool demo chỉ hiển thị một vài option mẫu</b> — khi PIC set up trên môi trường thật, hệ thống sẽ tự kéo đầy đủ danh sách từ Hub.</div></div>`;
       }
       if (isLbl) {
         h += `<div class="bg-blue-50 border border-blue-100 text-slate-600 text-xs p-3.5 rounded-xl flex items-start gap-2.5 mb-4"><span class="shrink-0 text-sm">ℹ️</span><div>Label hiển thị nội dung tĩnh, hỗ trợ HTML cơ bản — không thu thập dữ liệu.</div></div>`;
@@ -3875,7 +3875,7 @@ ${formScript}
                   <button type="button" onmousedown="event.preventDefault();rtColor('#EA580C')" title="Cam" class="w-6 h-6 rounded-md border border-slate-200" style="background:#EA580C"></button>
                   <button type="button" onmousedown="event.preventDefault();rtColor('#CA8A04')" title="Vàng" class="w-6 h-6 rounded-md border border-slate-200" style="background:#CA8A04"></button>
                   <button type="button" onmousedown="event.preventDefault();rtColor('#16A34A')" title="Xanh lá" class="w-6 h-6 rounded-md border border-slate-200" style="background:#16A34A"></button>
-                  <button type="button" onmousedown="event.preventDefault();rtColor('#155DFC')" title="Xanh nexus" class="w-6 h-6 rounded-md border border-slate-200" style="background:#155DFC"></button>
+                  <button type="button" onmousedown="event.preventDefault();rtColor('#155DFC')" title="xanh hub" class="w-6 h-6 rounded-md border border-slate-200" style="background:#155DFC"></button>
                   <button type="button" onmousedown="event.preventDefault();rtColor('#7C3AED')" title="Tím" class="w-6 h-6 rounded-md border border-slate-200" style="background:#7C3AED"></button>
                 </div>
               </div>
@@ -4491,7 +4491,7 @@ ${formScript}
     function closeFieldMenu() { document.querySelectorAll('.field-menu-dropdown').forEach(el => el.remove()); }
 
     // ═══════════════════════════════════════════════════════════
-    // renderFieldList — match real Nexus tool styling
+    // renderFieldList — match real Hub tool styling
     // - Branch sub-fields unfold as flat siblings (each with Conditional badge)
     // - font-semibold (not bold), sans-serif meta (not mono), no Branching badge
     // ═══════════════════════════════════════════════════════════
@@ -4527,7 +4527,7 @@ ${formScript}
       // Step B: Group into rows respecting halfWidth — but only for TOP-LEVEL items.
       // Sub-fields always full-width (their pairing inside branch is handled by branch editor).
       //
-      // Pair rules (mirror Nexus origin):
+      // Pair rules (mirror Hub origin):
       //   1) Both items must have halfWidth=true.
       //   2) Top-level + top-level:
       //        - both non-conditional → pair
@@ -4829,7 +4829,7 @@ ${formScript}
         container.innerHTML = '<div style="border:1.5px dashed #cbd5e1;border-radius:12px;padding:40px 24px;text-align:center;color:#94a3b8;font-size:13px;margin:8px 0;">No fields yet &#8212; add a field on the left to see the preview.</div>';
         return;
       }
-      let h = `<div class="border-b border-slate-100 pb-4 mb-4"><div class="text-xs font-bold text-nexus bg-nexus/10 border border-nexus/30 px-2 py-0.5 rounded-md inline-block mb-2">${H(sel.s || 'Nexus')}</div><h2 class="text-base font-extrabold text-slate-800 leading-snug">${H(sel.n || 'Mẫu phiếu')}</h2>${desc ? `<p class="text-[11px] text-slate-500 italic leading-relaxed mt-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-100">"${H(desc)}"</p>` : ''}</div><form class="space-y-4" onsubmit="event.preventDefault();">`;
+      let h = `<div class="border-b border-slate-100 pb-4 mb-4"><div class="text-xs font-bold text-nexus bg-nexus/10 border border-nexus/30 px-2 py-0.5 rounded-md inline-block mb-2">${H(sel.s || 'Hub')}</div><h2 class="text-base font-extrabold text-slate-800 leading-snug">${H(sel.n || 'Mẫu phiếu')}</h2>${desc ? `<p class="text-[11px] text-slate-500 italic leading-relaxed mt-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-100">"${H(desc)}"</p>` : ''}</div><form class="space-y-4" onsubmit="event.preventDefault();">`;
 
       // Group greedy 2-by-2
       let pvRows = [];
@@ -4858,7 +4858,7 @@ ${formScript}
             const labelStyle = (f.inlineStyles || []).map(s => `${s.key}:${s.value}`).join(';');
             h += `<div class="p-3.5 rounded-xl text-xs text-slate-700 leading-relaxed border border-slate-200/60 bg-slate-50/70" style="${labelStyle}">${f.content || '<span class=\'text-slate-400 italic\'>Nội dung label...</span>'}</div>`;
           } else if (f.type === 'boolean') {
-            // Yes/No: hàng công tắc — nhãn trái, công tắc phải (giống Nexus), không chữ "Active"
+            // Yes/No: hàng công tắc — nhãn trái, công tắc phải (giống Hub), không chữ "Active"
             h += `<div class="flex items-center justify-between gap-3"><div><span class="block text-xs font-bold text-slate-700">${H(displayLabel)}${reqStar}</span>${f.hint ? `<p class="text-[10px] text-slate-400 leading-relaxed">${H(f.hint)}</p>` : ''}</div><label class="relative inline-flex items-center cursor-pointer shrink-0"><input type="checkbox" ${f.defaultValue === 'true' ? 'checked' : ''} onchange="updatePreviewState('${f.fieldName}', String(this.checked))" class="sr-only peer"><div class="w-9 h-5 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-nexus"></div></label></div>`;
           } else {
             h += `<label class="block text-xs font-bold text-slate-700">${H(displayLabel)}${reqStar}</label>`;
@@ -5285,7 +5285,7 @@ ${formScript}
       if (isMulti) {
         const cats = [...new Set(entries.map(e => e.catalog))];
         const slug = cats.length === 1 ? _slug(cats[0], 30) : 'multi';
-        zipName = 'nexus-tib-' + slug + '-' + entries.length + 'svc-' + ts + '.zip';
+        zipName = 'hub-tib-' + slug + '-' + entries.length + 'svc-' + ts + '.zip';
       } else {
         zipName = _slug(entries[0].service||'service', 60) + '.zip';
       }
@@ -5320,13 +5320,13 @@ ${formScript}
         }
         // README explains pair + print instructions
         const readme = '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n'
-          + 'Nexus Ticket Information Builder \u2014 Bundle\n'
+          + 'Hub Ticket Information Builder \u2014 Bundle\n'
           + '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n'
           + 'Tạo lúc: ' + new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }) + '\n'
           + 'Số service: ' + entries.length + '\n\n'
           + 'NỘI DUNG GÓI\n'
           + '────────────\n'
-          + '⚙️  <service-slug>.json  → Gửi PIC services để import vào Nexus admin\n\n'
+          + '⚙️  <service-slug>.json  → Gửi PIC services để import vào Hub admin\n\n'
           + 'CÁCH SỬ DỤNG\n'
           + '────────────\n'
           + '1. XEM FORM SPEC\n'
@@ -5334,8 +5334,8 @@ ${formScript}
           + '   Xem preview form spec, kiểm tra fields, conditional logic...\n\n'
           + '2. EXPORT EXCEL (backup)\n'
           + '   Trong form → bấm "Export Excel" → tải .xlsx với tất cả fields\n\n'
-          + '3. IMPORT VÀO NEXUS\n'
-          + '   PIC services nhận <service-slug>.json → upload vào Nexus admin\n\n'
+          + '3. IMPORT VÀO HUB\n'
+          + '   PIC services nhận <service-slug>.json → upload vào Hub admin\n\n'
           + 'LƯU Ý\n'
           + '─────\n'
           + '• JSON dùng để IMPORT, KHÔNG đọc trực tiếp\n'
@@ -5346,7 +5346,7 @@ ${formScript}
           ? ('\nPHIẾU CẬP NHẬT THÔNG TIN\n'
             + '────────────────────────\n'
             + '• phieu-cap-nhat-service__<ten>.html  → service chỉ ĐỔI THÔNG TIN (tên / phân loại / mô tả), KHÔNG đổi form\n'
-            + '   Double-click mở bằng browser để xem bảng "Hiện tại → Sau cập nhật"; gửi PIC cập nhật trên Nexus admin.\n'
+            + '   Double-click mở bằng browser để xem bảng "Hiện tại → Sau cập nhật"; gửi PIC cập nhật trên Hub admin.\n'
             + '   Service loại này KHÔNG kèm file .json (vì không thay đổi field/form).\n')
           : '');
         zip.file('README.txt', _readmeOut);
@@ -5388,7 +5388,7 @@ ${formScript}
       pop.innerHTML = '<div style="font-size:11px;font-weight:600;color:#94a3b8;padding:6px 10px 4px">Ch\u1ecdn \u0111\u1ecbnh d\u1ea1ng xu\u1ea5t</div>'
         + _popItem('both', '#EFF6FF', '#155DFC', 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4', 'B\u1ed9 \u0111\u1ea7y \u0111\u1ee7 (ZIP)', 'JSON + design HTML + README', true)
         + '<div style="height:0.5px;background:#f1f5f9;margin:2px 10px"></div>'
-        + _popItem('json', '#FFF7ED', '#BA7517', 'M17 8l4 4-4 4M7 8l-4 4 4 4M14 4l-4 16', 'Ch\u1ec9 JSON', 'G\u1eedi PIC services import Nexus', false);
+        + _popItem('json', '#FFF7ED', '#BA7517', 'M17 8l4 4-4 4M7 8l-4 4 4 4M14 4l-4 16', 'Ch\u1ec9 JSON', 'G\u1eedi PIC services import Hub', false);
       document.body.appendChild(pop);
       // Position above button
       const rect = btnEl.getBoundingClientRect();
@@ -5549,15 +5549,15 @@ ${formScript}
         + '<style>' + css + '</style></head><body><div class="sheet">'
         + '<div class="hd"><span class="badge">🏷️ Cập nhật service · Không đổi form</span>'
         + '<h1>Phiếu yêu cầu cập nhật thông tin service</h1>'
-        + '<div class="sub">Service Info Update Request — Nexus Ticket Information Builder</div></div>'
+        + '<div class="sub">Service Info Update Request — Hub Ticket Information Builder</div></div>'
         + '<div class="bd">'
         + '<div class="meta"><div class="mc"><div class="k">Ngày tạo yêu cầu</div><div class="v">' + H(m.dateStr + ' — ' + m.timeStr + ' (GMT+7)') + '</div></div>'
         + '<div class="mc"><div class="k">Mã phiếu</div><div class="v">' + H(m.code) + '</div></div></div>'
         + '<div class="subj"><div class="k">Service cần cập nhật (tên gốc)</div><div class="v">' + H(base.service || '') + (path ? ' <span style="font-weight:500;color:#94A3B8;font-size:12px">· ' + H(path) + '</span>' : '') + '</div></div>'
         + '<h3>Định danh đầy đủ</h3>' + _umIdTableHTML(base, cur) + _umDescHTML(base, cur)
-        + '<div class="keep"><div class="ic">✓</div><div><div class="t">Giữ nguyên form hiện hành trên Nexus</div>'
-        + '<div class="d">Toàn bộ field &amp; cấu hình form của service đang chạy trên Nexus (tính đến ' + H(m.dateStr) + ') được <b>GIỮ NGUYÊN</b>. Yêu cầu này chỉ cập nhật thông tin — không thêm / sửa / xoá field nào.</div></div></div>'
-        + '<div class="todo"><div class="t">▶ Việc cần làm (PIC)</div><div class="d">Cập nhật <b>thông tin service</b> trên Nexus admin theo bảng trên. <b>Không cần import lại form</b>, không chạm tới field.</div></div>'
+        + '<div class="keep"><div class="ic">✓</div><div><div class="t">Giữ nguyên form hiện hành trên Hub</div>'
+        + '<div class="d">Toàn bộ field &amp; cấu hình form của service đang chạy trên Hub (tính đến ' + H(m.dateStr) + ') được <b>GIỮ NGUYÊN</b>. Yêu cầu này chỉ cập nhật thông tin — không thêm / sửa / xoá field nào.</div></div></div>'
+        + '<div class="todo"><div class="t">▶ Việc cần làm (PIC)</div><div class="d">Cập nhật <b>thông tin service</b> trên Hub admin theo bảng trên. <b>Không cần import lại form</b>, không chạm tới field.</div></div>'
         + '</div><div class="ft"><span>Tạo bởi Ticket Information Builder</span><span>Mã phiếu: ' + H(m.code) + '</span></div>'
         + '</div></body></html>';
     }
@@ -5884,10 +5884,10 @@ ${formScript}
         callout: '💡 Phù hợp: Ngôn ngữ game hỗ trợ, ngôn ngữ liên hệ.',
         sim: '<input type="text" placeholder="🔍 Tìm ngôn ngữ (VD: Tiếng Việt, English...)" style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:240px">' },
       'list-product':     { type: 'product',  name: 'Game / Product Picker',
-        desc: 'Danh sách game/sản phẩm đồng bộ trực tiếp từ Nexus — luôn khớp dữ liệu thật.',
+        desc: 'Danh sách game/sản phẩm đồng bộ trực tiếp từ Hub — luôn khớp dữ liệu thật.',
         cfg: 'Field type: <b>product</b> · Đồng bộ Game Product từ hệ thống',
         callout: '💡 Phù hợp: Chọn game liên quan, sản phẩm bị ảnh hưởng. Tránh gõ sai tên game.',
-        sim: '<select style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#1e293b;font-size:12px;width:240px"><option>-- Chọn game/sản phẩm --</option><option>Auto-load từ Nexus...</option></select>' }
+        sim: '<select style="padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#1e293b;font-size:12px;width:240px"><option>-- Chọn game/sản phẩm --</option><option>Auto-load từ Hub...</option></select>' }
     };
 
     const FTA_CAT_LABEL = { list: 'Pick from list', input: 'Type input', date: 'Date / Time', file: 'File attachment', display: 'Display info' };
@@ -6338,7 +6338,7 @@ ${formScript}
 
     // ════════════════════════════════════════════════════════
     // REVIEW JSON FEATURE
-    // Verify exported Nexus TIB JSON files + optional reload as template
+    // Verify exported Hub TIB JSON files + optional reload as template
     // ════════════════════════════════════════════════════════
 
     // Holds the parsed + validated JSON for the current Verify session
@@ -6431,7 +6431,7 @@ ${formScript}
         try {
           _validateNexusJSON(raw);
         } catch (err) {
-          toast('❌ ' + (err.message || 'Not a valid Nexus TIB JSON'));
+          toast('❌ ' + (err.message || 'Not a valid Hub TIB JSON'));
           return;
         }
 
@@ -6454,13 +6454,13 @@ ${formScript}
     // ── Validator ──
     function _validateNexusJSON(data) {
       if (!data || typeof data !== 'object') throw new Error('Invalid JSON structure');
-      if (!data.form || typeof data.form !== 'object') throw new Error('Missing "form" key — not a Nexus TIB JSON');
-      if (!Array.isArray(data.form.rows)) throw new Error('Missing "form.rows" array — not a Nexus TIB JSON');
+      if (!data.form || typeof data.form !== 'object') throw new Error('Missing "form" key — not a Hub TIB JSON');
+      if (!Array.isArray(data.form.rows)) throw new Error('Missing "form.rows" array — not a Hub TIB JSON');
       return true;
     }
 
     // ── Reverse parser: JSON row → internal field state ──
-    // Known Nexus types we map back; anything else → 'text' with a console warn
+    // Known Hub types we map back; anything else → 'text' with a console warn
     const _RJ_KNOWN_TYPES = new Set([
       'label','text','textarea','number','email','boolean','date','daterange',
       'select','radio','checkbox','checklist','upload','attachment',
@@ -6471,7 +6471,7 @@ ${formScript}
       const settings = row.settings || {};
       const rawType = row.type || 'text';
       let type = rawType;
-      // Nexus uses 'attachment' as the on-wire type for upload fields
+      // Hub uses 'attachment' as the on-wire type for upload fields
       if (type === 'attachment') type = 'upload';
       if (!_RJ_KNOWN_TYPES.has(rawType)) {
         console.warn('[Review JSON] Unknown field type "' + rawType + '" — falling back to text');
@@ -6535,7 +6535,7 @@ ${formScript}
 
       // Product family
       if (type === 'product' && settings.family) field.productFamily = settings.family;
-      // Accept types for upload — Nexus doesn't standardize this; keep blank
+      // Accept types for upload — Hub doesn't standardize this; keep blank
       if (type === 'upload') {
         field.acceptTypes = '';
         field.uploadMode = 'online';
@@ -7563,7 +7563,7 @@ ${formScript}
             &lt;div class=&quot;stitle&quot;&gt;Chọn service&lt;/div&gt;
             &lt;div class=&quot;sbody&quot;&gt;
               &lt;div class=&quot;opt-row&quot;&gt;
-                &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;Service đã có trên Nexus&lt;/div&gt;&lt;div class=&quot;od&quot;&gt;Chọn theo Catalog → Category → Service (có sẵn), rồi bấm &quot;Dựng form&quot;.&lt;/div&gt;&lt;/div&gt;
+                &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;Service đã có trên Hub&lt;/div&gt;&lt;div class=&quot;od&quot;&gt;Chọn theo Catalog → Category → Service (có sẵn), rồi bấm &quot;Dựng form&quot;.&lt;/div&gt;&lt;/div&gt;
                 &lt;div class=&quot;opt&quot;&gt;&lt;div class=&quot;ot&quot;&gt;Service mới chưa có&lt;/div&gt;&lt;div class=&quot;od&quot;&gt;Tự nhập Catalog / Category / Service + mô tả ngắn (≤100 từ).&lt;/div&gt;&lt;/div&gt;
               &lt;/div&gt;
             &lt;/div&gt;
@@ -7620,7 +7620,7 @@ ${formScript}
           &lt;/div&gt;
           &lt;div class=&quot;step&quot;&gt;
             &lt;div class=&quot;sn&quot;&gt;2&lt;/div&gt;
-            &lt;div class=&quot;stitle&quot;&gt;Chọn &quot;Service đã có trên Nexus&quot;&lt;/div&gt;
+            &lt;div class=&quot;stitle&quot;&gt;Chọn &quot;Service đã có trên Hub&quot;&lt;/div&gt;
             &lt;div class=&quot;sbody&quot;&gt;&lt;p&gt;Tìm đúng service cần cập nhật theo Catalog → Category → Service.&lt;/p&gt;&lt;/div&gt;
           &lt;/div&gt;
           &lt;div class=&quot;step&quot;&gt;
@@ -7813,7 +7813,7 @@ ${formScript}
       upload:&#x27;Attachment&#x27;, combo:&#x27;Template link + Upload (combo)&#x27;, label:&#x27;Label / Rich text&#x27;};
     var DESC={radio:&#x27;Nút tròn, chọn đúng 1&#x27;, select:&#x27;Danh sách thả xuống&#x27;, checkbox:&#x27;Ô vuông, chọn nhiều&#x27;,
       checklist:&#x27;Danh sách tick từng mục&#x27;, country:&#x27;Quốc gia, tự nạp&#x27;, language:&#x27;Ngôn ngữ, tự nạp&#x27;,
-      product:&#x27;Game/sản phẩm, tự nạp từ Nexus&#x27;, text:&#x27;Ô nhập 1 dòng&#x27;, textarea:&#x27;Ô nhập nhiều dòng&#x27;,
+      product:&#x27;Game/sản phẩm, tự nạp từ Hub&#x27;, text:&#x27;Ô nhập 1 dòng&#x27;, textarea:&#x27;Ô nhập nhiều dòng&#x27;,
       email:&#x27;Có kiểm tra định dạng&#x27;, number:&#x27;Chỉ nhập số&#x27;, boolean:&#x27;1 ô tick có/không&#x27;,
       date:&#x27;Chọn 1 ngày từ lịch&#x27;, daterange:&#x27;Chọn ngày bắt đầu → kết thúc&#x27;,
       upload:&#x27;Đính kèm 1 hoặc nhiều tệp&#x27;, combo:&#x27;Gồm 2 field: 1 Label chứa link tải mẫu + 1 Attachment để nộp lại.&#x27;, label:&#x27;Văn bản tĩnh để đọc, không nhập&#x27;};

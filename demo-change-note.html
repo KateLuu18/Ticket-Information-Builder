@@ -115,7 +115,7 @@
   <div class="panel" id="p2">
     <p class="ctx">Sheet riêng "Changes" — không đụng bảng 19 cột field.</p>
     <div class="browser">
-      <div class="bbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="burl">nexus-spec-payment-1svc-20260615.xlsx</span></div>
+      <div class="bbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="burl">hub-spec-payment-1svc-20260615.xlsx</span></div>
       <div style="padding:18px 20px 0" id="x-body"></div>
       <div class="xtabs"><div class="xtab">Summary</div><div class="xtab act">Changes</div><div class="xtab">01_Service…</div></div>
     </div>
@@ -182,10 +182,10 @@
     document.getElementById('t-note').innerHTML = noteHTML('Thay đổi so với service gốc', 'PIC cần nắm các thay đổi sau để cập nhật thủ công bên hệ thống.');
     // html
     const slug = c.service.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    document.getElementById('h-url').textContent = 'nexus-form-'+slug+'.html';
+    document.getElementById('h-url').textContent = 'hub-form-'+slug+'.html';
     document.getElementById('h-title').textContent = c.service;
-    document.getElementById('h-meta').textContent = c.catalog+' › '+c.category+' · 8 fields · Nexus Ticket Information Builder';
-    document.getElementById('h-note').innerHTML = noteHTML('Yêu cầu cập nhật cho PIC', 'Service này dựa trên một service hiện có. Vui lòng cập nhật các thông tin sau trên hệ thống Nexus.');
+    document.getElementById('h-meta').textContent = c.catalog+' › '+c.category+' · 8 fields · Hub Ticket Information Builder';
+    document.getElementById('h-note').innerHTML = noteHTML('Yêu cầu cập nhật cho PIC', 'Service này dựa trên một service hiện có. Vui lòng cập nhật các thông tin sau trên hệ thống Hub.');
     // excel
     let xb;
     if (!rows.length){
